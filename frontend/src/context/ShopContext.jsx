@@ -7,21 +7,24 @@ import {
   dummyProducts,
 } from "../assets/greencart_assets/assets";
 
-export const ShopContext =
-  createContext();
+export const ShopContext = createContext();
 
 const ShopContextProvider = ({
   children,
 }) => {
-  const [products] =
-    useState(dummyProducts);
+  const [products] = useState(dummyProducts);
 
   const [cartItems, setCartItems] =
     useState([]);
 
-  // =========================
-  // ADD TO CART
-  // =========================
+  const [user, setUser] =
+    useState(
+      JSON.parse(
+        localStorage.getItem("user")
+      ) || null
+    );
+
+  // Add to Cart
   const addToCart = (product) => {
     setCartItems((prev) => [
       ...prev,
@@ -29,16 +32,30 @@ const ShopContextProvider = ({
     ]);
   };
 
+  // Login User
+  const loginUser = (userData) => {
+    setUser(userData);
+  };
+
+  // Logout User
+  const logoutUser = () => {
+    setUser(null);
+    localStorage.removeItem("user");
+    localStorage.removeItem("token");
+  };
+
   const value = {
     products,
     cartItems,
     addToCart,
+
+    user,
+    loginUser,
+    logoutUser,
   };
 
   return (
-    <ShopContext.Provider
-      value={value}
-    >
+    <ShopContext.Provider value={value}>
       {children}
     </ShopContext.Provider>
   );

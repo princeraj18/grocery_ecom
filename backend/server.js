@@ -10,6 +10,8 @@ import cartRoutes from "./routes/cart.routes.js";
 // import reviewRoutes from "./routes/review.routes.js";
 import contactRoutes from "./routes/contact.routes.js";
 import productRoutes from "./routes/product.routes.js";
+import adminRoutes from "./routes/admin.routes.js";
+
 connectDB();
 
 const app = express();
@@ -35,11 +37,14 @@ app.use(
   contactRoutes
 );
 app.use(
-  "/api/v1/products",
+  "/api/products",
   productRoutes
 );
 // app.use("/api/reviews", reviewRoutes);
-
+app.use(
+  "/api/admin",
+  adminRoutes
+);
 app.get("/", (req, res) => {
   res.send("ShopEase Backend is Running");
 });

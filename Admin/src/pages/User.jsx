@@ -1,73 +1,83 @@
+/* eslint-disable react-hooks/set-state-in-effect */
+
 import { useEffect, useState } from "react";
-import AdminLayout from "../layout/AdminLayout";
 import api from "../services/api";
 
 export default function User() {
 
-  const [users, setUsers] = useState([]);
+  const [users, setUsers] =
+    useState([]);
+
   const [loading, setLoading] =
     useState(true);
 
-  // fetch users
+  // FETCH USERS
   useEffect(() => {
 
-    const fetchUsers = async () => {
+    const fetchUsers =
+      async () => {
 
-      try {
+        try {
 
-        const { data } =
-          await api.get("/admin/users");
+          const { data } =
+            await api.get(
+              "/admin/users"
+            );
 
-        setUsers(data.users || []);
+          setUsers(
+            data.users || []
+          );
 
-      } catch (error) {
+        } catch (error) {
 
-        console.log(error);
+          console.log(error);
 
-      } finally {
+        } finally {
 
-        setLoading(false);
-
-      }
-    };
+          setLoading(false);
+        }
+      };
 
     fetchUsers();
 
   }, []);
 
-  // delete user
-  const deleteUser = async (id) => {
+  // DELETE USER
+  const deleteUser =
+    async (id) => {
 
-    const confirmDelete =
-      window.confirm(
-        "Are you sure you want to delete this user?"
-      );
+      const confirmDelete =
+        window.confirm(
+          "Delete this user?"
+        );
 
-    if (!confirmDelete) return;
+      if (!confirmDelete) return;
 
-    try {
+      try {
 
-      await api.delete(
-        `/admin/users/${id}`
-      );
+        await api.delete(
+          `/admin/users/${id}`
+        );
 
-      setUsers(
-        users.filter(
-          (user) => user._id !== id
-        )
-      );
+        setUsers(
+          users.filter(
+            (user) =>
+              user._id !== id
+          )
+        );
 
-    } catch (error) {
+      } catch (error) {
 
-      console.log(error);
+        console.log(error);
 
-      alert("Failed to delete user");
-
-    }
-  };
+        alert(
+          "Failed to delete user"
+        );
+      }
+    };
 
   return (
-    <AdminLayout>
+    <div>
 
       <div className="flex items-center justify-between mb-6">
 
@@ -76,7 +86,9 @@ export default function User() {
         </h1>
 
         <p className="text-gray-500">
-          Total Users: {users.length}
+          Total Users:
+          {" "}
+          {users.length}
         </p>
 
       </div>
@@ -86,7 +98,7 @@ export default function User() {
         {
           loading ? (
 
-            <div className="p-6 text-center text-lg">
+            <div className="p-6 text-center">
               Loading users...
             </div>
 
@@ -98,23 +110,23 @@ export default function User() {
 
                 <tr>
 
-                  <th className="text-left p-4">
+                  <th className="p-4 text-left">
                     ID
                   </th>
 
-                  <th className="text-left p-4">
+                  <th className="p-4 text-left">
                     Name
                   </th>
 
-                  <th className="text-left p-4">
+                  <th className="p-4 text-left">
                     Email
                   </th>
 
-                  <th className="text-left p-4">
+                  <th className="p-4 text-left">
                     Role
                   </th>
 
-                  <th className="text-left p-4">
+                  <th className="p-4 text-left">
                     Actions
                   </th>
 
@@ -131,7 +143,7 @@ export default function User() {
 
                       <tr
                         key={user._id}
-                        className="border-t hover:bg-gray-50"
+                        className="border-t"
                       >
 
                         <td className="p-4">
@@ -147,9 +159,7 @@ export default function User() {
                         </td>
 
                         <td className="p-4">
-                          <span className="bg-black text-white px-3 py-1 rounded-full text-sm">
-                            {user.role || "user"}
-                          </span>
+                          {user.role}
                         </td>
 
                         <td className="p-4">
@@ -160,7 +170,7 @@ export default function User() {
                                 user._id
                               )
                             }
-                            className="bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600 transition"
+                            className="bg-red-500 text-white px-4 py-2 rounded"
                           >
                             Delete
                           </button>
@@ -175,7 +185,7 @@ export default function User() {
 
                       <td
                         colSpan="5"
-                        className="text-center p-6 text-gray-500"
+                        className="text-center p-6"
                       >
                         No users found
                       </td>
@@ -192,6 +202,6 @@ export default function User() {
 
       </div>
 
-    </AdminLayout>
+    </div>
   );
 }

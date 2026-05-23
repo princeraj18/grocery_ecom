@@ -1,4 +1,8 @@
-import { Routes, Route, Navigate } from "react-router-dom";
+import {
+  Routes,
+  Route,
+  Navigate,
+} from "react-router-dom";
 
 import Dashboard from "../pages/Dashboard";
 import User from "../pages/User";
@@ -10,6 +14,8 @@ import Order from "../pages/Order";
 import EditProduct from "../pages/EditProduct";
 
 import ProtectedRoute from "./ProtectedRoute";
+
+import AdminLayout from "../layout/AdminLayout";
 
 export default function AppRoutes() {
 
@@ -28,7 +34,7 @@ export default function AppRoutes() {
         element={<Register />}
       />
 
-      {/* REDIRECTS */}
+      {/* ROOT */}
       <Route
         path="/"
         element={
@@ -39,92 +45,69 @@ export default function AppRoutes() {
         }
       />
 
-      <Route
-        path="/products"
-        element={
-          <Navigate
-            to="/admin/products"
-            replace
-          />
-        }
-      />
-
-      <Route
-        path="/products/create"
-        element={
-          <Navigate
-            to="/admin/products/create"
-            replace
-          />
-        }
-      />
-
-      <Route
-        path="/products/edit/:id"
-        element={
-          <Navigate
-            to="/admin/products"
-            replace
-          />
-        }
-      />
-
-      {/* ADMIN DASHBOARD */}
+      {/* ADMIN ROUTES */}
       <Route
         path="/admin"
         element={
           <ProtectedRoute>
-            <Dashboard />
+            <AdminLayout>
+              <Dashboard />
+            </AdminLayout>
           </ProtectedRoute>
         }
       />
 
-      {/* USERS */}
       <Route
         path="/admin/users"
         element={
           <ProtectedRoute>
-            <User />
+            <AdminLayout>
+              <User />
+            </AdminLayout>
           </ProtectedRoute>
         }
       />
 
-      {/* PRODUCTS */}
       <Route
         path="/admin/products"
         element={
           <ProtectedRoute>
-            <Product />
+            <AdminLayout>
+              <Product />
+            </AdminLayout>
           </ProtectedRoute>
         }
       />
 
-      {/* CREATE PRODUCT */}
       <Route
         path="/admin/products/create"
         element={
           <ProtectedRoute>
-            <CreateProduct />
+            <AdminLayout>
+              <CreateProduct />
+            </AdminLayout>
           </ProtectedRoute>
         }
       />
 
-      {/* EDIT PRODUCT */}
       <Route
         path="/admin/products/edit/:id"
         element={
           <ProtectedRoute>
-            <EditProduct />
+            <AdminLayout>
+              <EditProduct />
+            </AdminLayout>
           </ProtectedRoute>
         }
       />
 
-      {/* ORDERS */}
       <Route
         path="/admin/orders"
         element={
           <ProtectedRoute>
-            <Order />
+            <AdminLayout>
+              <Order />
+            </AdminLayout>
           </ProtectedRoute>
         }
       />

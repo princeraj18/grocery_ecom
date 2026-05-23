@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react";
-import AdminLayout from "../layout/AdminLayout";
 import api from "../services/api";
 
 export default function Dashboard() {
@@ -21,7 +20,6 @@ export default function Dashboard() {
 
         try {
 
-          // fetch all data together
           const [
             usersRes,
             productsRes,
@@ -41,12 +39,11 @@ export default function Dashboard() {
           const orders =
             ordersRes.data.orders || [];
 
-          // calculate revenue
           const revenue =
             orders.reduce(
               (total, order) =>
                 total +
-                (order.totalPrice || 0),
+                (order.totalAmount || 0),
               0
             );
 
@@ -64,7 +61,6 @@ export default function Dashboard() {
         } finally {
 
           setLoading(false);
-
         }
       };
 
@@ -92,7 +88,7 @@ export default function Dashboard() {
   ];
 
   return (
-    <AdminLayout>
+    <div>
 
       <div className="flex items-center justify-between mb-8">
 
@@ -123,7 +119,7 @@ export default function Dashboard() {
 
                   <div
                     key={index}
-                    className="bg-white p-6 rounded-2xl shadow hover:shadow-lg transition"
+                    className="bg-white p-6 rounded-2xl shadow"
                   >
 
                     <h2 className="text-gray-500 text-lg">
@@ -143,6 +139,6 @@ export default function Dashboard() {
         )
       }
 
-    </AdminLayout>
+    </div>
   );
 }

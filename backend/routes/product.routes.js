@@ -1,22 +1,20 @@
 import express from "express";
 
 import {
-  getSingleProduct,
-  getRelatedProducts,
+  createProduct,
+  getProducts,
 } from "../controllers/product.controller.js";
 
 const router = express.Router();
 
-// Single Product
-router.get(
-  "/:id",
-  getSingleProduct
+router.post(
+  "/",
+  createProduct
 );
 
-// Related Products
 router.get(
-  "/related/:category/:productId",
-  getRelatedProducts
+  "/",
+  getProducts
 );
 
 export default router;

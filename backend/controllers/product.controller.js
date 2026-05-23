@@ -1,69 +1,105 @@
 import Product from "../models/product.model.js";
+import cloudinary from "../config/cloudinary.js";
 
-// ======================================
-// GET SINGLE PRODUCT
-// ======================================
-export const getSingleProduct =
-  async (req, res) => {
-    try {
-      const product =
-        await Product.findById(
-          req.params.id
+// ==========================================
+// CREATE PRODUCT
+// ==========================================
+export const createProduct = async (
+  req,
+  res
+) => {
+  try {
+
+    const {
+      name,
+      description,
+      category,
+      price,
+      offerPrice,
+      inStock,
+      stockQuantity,
+      bestseller,
+      images,
+    } = req.body;
+
+    // ============================
+    // UPLOAD IMAGES TO CLOUDINARY
+    // ============================
+
+    let imageUrls = [];
+
+    for (const image of images) {
+
+      const uploaded =
+        await cloudinary.uploader.upload(
+          image,
+          {
+            folder: "grocery_products",
+          }
         );
 
-      if (!product) {
-        return res.status(404).json({
-          success: false,
-          message:
-            "Product not found",
-        });
-      }
-
-      res.status(200).json({
-        success: true,
-        product,
-      });
-    } catch (error) {
-      console.log(error);
-
-      res.status(500).json({
-        success: false,
-        message:
-          "Failed to fetch product",
-      });
+      imageUrls.push(
+        uploaded.secure_url
+      );
     }
-  };
 
-// ======================================
-// GET RELATED PRODUCTS
-// ======================================
-export const getRelatedProducts =
-  async (req, res) => {
-    try {
-      const {
+    // ============================
+    // CREATE PRODUCT
+    // ============================
+
+    const product =
+      await Product.create({
+        name,
+        description,
         category,
-        productId,
-      } = req.params;
-
-      const products =
-        await Product.find({
-          category,
-          _id: {
-            $ne: productId,
-          },
-        }).limit(4);
-
-      res.status(200).json({
-        success: true,
-        products,
+        price,
+        offerPrice,
+        image: imageUrls,
+        inStock,
+        stockQuantity,
+        bestseller,
       });
-    } catch (error) {
-      console.log(error);
 
-      res.status(500).json({
-        success: false,
-        message:
-          "Failed to fetch related products",
-      });
-    }
-  };
+    res.status(201).json({
+      success: true,
+      product,
+    });
+
+  } catch (error) {
+
+    console.log(error);
+
+    res.status(500).json({
+      success: false,
+      message:
+        "Product creation failed",
+    });
+  }
+};
+
+// ==========================================
+// GET ALL PRODUCTS
+// ==========================================
+export const getProducts = async (
+  req,
+  res
+) => {
+  try {
+
+    const products =
+      await Product.find();
+
+    res.status(200).json({
+      success: true,
+      products,
+    });
+
+  } catch (error) {
+
+    res.status(500).json({
+      success: false,
+      message:
+        "Failed to fetch products",
+    });
+  }
+};

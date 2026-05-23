@@ -1,13 +1,17 @@
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
 import api from "../services/api";
+import { useAuth } from "../context/AuthContext";
 
 export default function Login() {
 
   const navigate = useNavigate();
 
+  const { login } = useAuth();
+
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+
   const [loading, setLoading] = useState(false);
 
   const handleLogin = async (e) => {
@@ -26,39 +30,33 @@ export default function Login() {
         }
       );
 
-      // save admin token
+      // SAVE TOKEN
       localStorage.setItem(
         "adminToken",
         data.token
       );
 
-      // optional common token
-      localStorage.setItem(
-        "token",
-        data.token
-      );
-
-      // save admin info
+      // SAVE ADMIN
       localStorage.setItem(
         "admin",
-        JSON.stringify({
-          _id: data._id,
-          name: data.name,
-          email: data.email,
-          role: data.role,
-          permissions:
-            data.permissions || [],
-        })
+        JSON.stringify(data.admin)
       );
 
-      // redirect admin dashboard
+      // CONTEXT LOGIN
+      login(data.admin);
+
+      alert("Login Successful");
+
+      // REDIRECT TO ADMIN DASHBOARD
       navigate("/admin");
 
     } catch (error) {
 
+      console.log(error);
+
       alert(
         error.response?.data?.message ||
-        "Login failed"
+        "Login Failed"
       );
 
     } finally {
@@ -80,31 +78,31 @@ export default function Login() {
           Admin Login
         </h1>
 
-        {/* Email */}
+        {/* EMAIL */}
         <input
-          className="w-full border p-3 mb-4 rounded-lg outline-none focus:ring-2 focus:ring-black"
-          placeholder="Email"
           type="email"
+          placeholder="Enter Email"
           value={email}
           onChange={(e) =>
             setEmail(e.target.value)
           }
+          className="w-full border p-3 mb-4 rounded-lg outline-none focus:ring-2 focus:ring-black"
           required
         />
 
-        {/* Password */}
+        {/* PASSWORD */}
         <input
-          className="w-full border p-3 mb-4 rounded-lg outline-none focus:ring-2 focus:ring-black"
-          placeholder="Password"
           type="password"
+          placeholder="Enter Password"
           value={password}
           onChange={(e) =>
             setPassword(e.target.value)
           }
+          className="w-full border p-3 mb-4 rounded-lg outline-none focus:ring-2 focus:ring-black"
           required
         />
 
-        {/* Login Button */}
+        {/* LOGIN BUTTON */}
         <button
           type="submit"
           disabled={loading}
@@ -117,9 +115,9 @@ export default function Login() {
           }
         </button>
 
-        {/* Register Redirect */}
+        {/* REGISTER OPTION */}
         <p className="text-center mt-5 text-gray-600">
-          Don't have an admin account?
+          Don't have an account?
         </p>
 
         <button
@@ -129,7 +127,7 @@ export default function Login() {
           }
           className="w-full mt-3 border border-black text-black p-3 rounded-lg hover:bg-black hover:text-white transition"
         >
-          Register Admin
+          Register Now
         </button>
 
       </form>

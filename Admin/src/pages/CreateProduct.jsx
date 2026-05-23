@@ -1,221 +1,213 @@
-import { useNavigate } from "react-router-dom"
-import { useState } from "react"
-import AdminLayout from "../layout/AdminLayout"
-import api from "../services/api"
-
-const fileToDataUrl = (file) =>
-  new Promise((resolve, reject) => {
-    const reader = new FileReader()
-    reader.onload = () => resolve(reader.result)
-    reader.onerror = reject
-    reader.readAsDataURL(file)
-  })
+import { useState } from "react";
+import api from "../services/api";
 
 export default function CreateProduct() {
-  const navigate = useNavigate()
-  const [form, setForm] = useState({
-    name: "",
-    price: "",
-    description: "",
-    stock: "",
-    category: "",
-    subcategory: "",
-  })
 
-  const [sizes, setSizes] = useState([])
+  const [formData, setFormData] =
+    useState({
+      name: "",
+      description: "",
+      category: "Vegetables",
+      price: "",
+      offerPrice: "",
+      stockQuantity: "",
+    });
 
-  const [images, setImages] = useState([])
-  const [previews, setPreviews] = useState([])
+  const [images, setImages] =
+    useState([]);
 
-  const availableSizes = ["S", "M", "L", "XL", "XXL"]
+  // =============================
+  // CONVERT FILE TO BASE64
+  // =============================
+  const fileToBase64 = (file) =>
+    new Promise((resolve, reject) => {
 
+      const reader =
+        new FileReader();
+
+      reader.readAsDataURL(file);
+
+      reader.onload = () =>
+        resolve(reader.result);
+
+      reader.onerror = reject;
+    });
+
+  // =============================
+  // INPUT CHANGE
+  // =============================
   const handleChange = (e) => {
-    setForm({
-      ...form,
-      [e.target.name]: e.target.value,
-    })
-  }
 
-  // SIZE TOGGLE
-  const handleSizeChange = (size) => {
-    setSizes((prev) =>
-      prev.includes(size)
-        ? prev.filter((s) => s !== size)
-        : [...prev, size]
-    )
-  }
+    setFormData({
+      ...formData,
+      [e.target.name]:
+        e.target.value,
+    });
+  };
 
-  // IMAGES
-  const handleImageChange = (e) => {
-    const files = Array.from(e.target.files)
-    setImages(files)
+  // =============================
+  // IMAGE CHANGE
+  // =============================
+  const handleImageChange = (
+    e
+  ) => {
 
-    const previewUrls = files.map((file) =>
-      URL.createObjectURL(file)
-    )
-    setPreviews(previewUrls)
-  }
+    setImages(
+      Array.from(e.target.files)
+    );
+  };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault()
+  // =============================
+  // SUBMIT
+  // =============================
+  const handleSubmit = async (
+    e
+  ) => {
+
+    e.preventDefault();
 
     try {
-      const imageData = await Promise.all(
-        images.map((file) => fileToDataUrl(file))
-      )
 
-      await api.post("/products", {
-        name: form.name,
-        price: Number(form.price),
-        stock: Number(form.stock),
-        description: form.description,
-        category: form.category,
-        subCategory: form.subcategory,
-        sizes,
+      // convert images to base64
+      const imageBase64 =
+        await Promise.all(
+          images.map((img) =>
+            fileToBase64(img)
+          )
+        );
+
+      const payload = {
+        ...formData,
+        images: imageBase64,
+        inStock: true,
         bestseller: false,
-        image: imageData,
-      })
+      };
 
-      alert("Product created successfully")
-      navigate("/admin/products")
+      const { data } =
+        await api.post(
+          "/products",
+          payload
+        );
 
-      // RESET
-      setForm({
-        name: "",
-        price: "",
-        description: "",
-        stock: "",
-        category: "",
-        subcategory: "",
-      })
+      alert(
+        "Product Created Successfully"
+      );
 
-      setSizes([])
-      setImages([])
-      setPreviews([])
-    } catch (err) {
-      console.log(err)
-      alert("Failed to create product")
+      console.log(data);
+
+    } catch (error) {
+
+      console.log(error);
+
+      alert(
+        "Product creation failed"
+      );
     }
-  }
+  };
 
   return (
-    <AdminLayout>
-      <h1 className="text-2xl font-bold mb-6">
-        Create Product
-      </h1>
+    <div className="p-10">
 
       <form
         onSubmit={handleSubmit}
-        className="bg-white p-6 rounded shadow max-w-lg space-y-4"
+        className="space-y-4 max-w-xl"
       >
-        {/* NAME */}
+
         <input
+          type="text"
           name="name"
-          value={form.name}
+          placeholder="Name"
           onChange={handleChange}
-          placeholder="Product Name"
-          className="w-full border p-3 rounded"
+          className="border p-3 w-full"
         />
 
-        {/* PRICE */}
-        <input
-          name="price"
-          value={form.price}
-          onChange={handleChange}
-          placeholder="Price"
-          type="number"
-          className="w-full border p-3 rounded"
-        />
-
-        {/* STOCK */}
-        <input
-          name="stock"
-          value={form.stock}
-          onChange={handleChange}
-          placeholder="Stock"
-          type="number"
-          className="w-full border p-3 rounded"
-        />
-
-        {/* CATEGORY */}
-        <input
-          name="category"
-          value={form.category}
-          onChange={handleChange}
-          placeholder="Category (e.g. Men, Women)"
-          className="w-full border p-3 rounded"
-        />
-
-        {/* SUBCATEGORY */}
-        <input
-          name="subcategory"
-          value={form.subcategory}
-          onChange={handleChange}
-          placeholder="Subcategory (e.g. T-Shirt, Jeans)"
-          className="w-full border p-3 rounded"
-        />
-
-        {/* DESCRIPTION */}
         <textarea
           name="description"
-          value={form.description}
-          onChange={handleChange}
           placeholder="Description"
-          className="w-full border p-3 rounded"
+          onChange={handleChange}
+          className="border p-3 w-full"
         />
 
-        {/* SIZES */}
-        <div>
-          <p className="font-medium mb-2">Select Sizes:</p>
-          <div className="flex gap-2 flex-wrap">
-            {availableSizes.map((size) => (
-              <button
-                type="button"
-                key={size}
-                onClick={() => handleSizeChange(size)}
-                className={`px-3 py-1 border rounded ${
-                  sizes.includes(size)
-                    ? "bg-black text-white"
-                    : "bg-white"
-                }`}
-              >
-                {size}
-              </button>
-            ))}
-          </div>
-        </div>
+        <select
+          name="category"
+          onChange={handleChange}
+          className="border p-3 w-full"
+        >
 
-        {/* IMAGES */}
+          <option>
+            Vegetables
+          </option>
+
+          <option>
+            Fruits
+          </option>
+
+          <option>
+            Drinks
+          </option>
+
+          <option>
+            Instant
+          </option>
+
+          <option>
+            Dairy
+          </option>
+
+          <option>
+            Bakery
+          </option>
+
+          <option>
+            Grains
+          </option>
+
+        </select>
+
+        <input
+          type="number"
+          name="price"
+          placeholder="Price"
+          onChange={handleChange}
+          className="border p-3 w-full"
+        />
+
+        <input
+          type="number"
+          name="offerPrice"
+          placeholder="Offer Price"
+          onChange={handleChange}
+          className="border p-3 w-full"
+        />
+
+        <input
+          type="number"
+          name="stockQuantity"
+          placeholder="Stock Quantity"
+          onChange={handleChange}
+          className="border p-3 w-full"
+        />
+
+        {/* IMAGE */}
         <input
           type="file"
-          accept="image/*"
           multiple
-          onChange={handleImageChange}
-          className="w-full border p-3 rounded"
+          accept="image/*"
+          onChange={
+            handleImageChange
+          }
+          className="border p-3 w-full"
         />
 
-        {/* PREVIEW */}
-        {previews.length > 0 && (
-          <div className="flex gap-2 flex-wrap">
-            {previews.map((src, index) => (
-              <img
-                key={index}
-                src={src}
-                alt="preview"
-                className="w-24 h-24 object-cover rounded border"
-              />
-            ))}
-          </div>
-        )}
-
-        {/* SUBMIT */}
         <button
           type="submit"
-          className="bg-black text-white px-4 py-2 rounded w-full"
+          className="bg-black text-white px-5 py-3 rounded"
         >
           Create Product
         </button>
+
       </form>
-    </AdminLayout>
-  )
+
+    </div>
+  );
 }

@@ -1,20 +1,21 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import api from "../services/api";
+import { useAuth } from "../context/AuthContext";
 
 export default function Register() {
 
   const navigate = useNavigate();
 
-  const [loading, setLoading] =
-    useState(false);
+  const { login } = useAuth();
 
-  const [formData, setFormData] =
-    useState({
-      name: "",
-      email: "",
-      password: "",
-    });
+  const [loading, setLoading] = useState(false);
+
+  const [formData, setFormData] = useState({
+    name: "",
+    email: "",
+    password: "",
+  });
 
   const handleChange = (e) => {
 
@@ -34,23 +35,40 @@ export default function Register() {
 
       setLoading(true);
 
-      await api.post(
+      const { data } = await api.post(
         "/admin/register",
         formData
       );
 
-      alert(
-        "Admin registered successfully"
+      // SAVE TOKEN
+      localStorage.setItem(
+        "adminToken",
+        data.token
       );
 
-      // redirect to login page
-      navigate("/login");
+      // SAVE ADMIN
+      localStorage.setItem(
+        "admin",
+        JSON.stringify(data.admin)
+      );
+
+      // CONTEXT LOGIN
+      login(data.admin);
+
+      alert(
+        "Admin Registered Successfully"
+      );
+
+      // REDIRECT TO ADMIN PAGE
+      navigate("/admin");
 
     } catch (error) {
 
+      console.log(error);
+
       alert(
         error.response?.data?.message ||
-        "Registration failed"
+        "Registration Failed"
       );
 
     } finally {
@@ -72,37 +90,40 @@ export default function Register() {
           Admin Register
         </h1>
 
-        {/* Name */}
+        {/* NAME */}
         <input
           type="text"
           name="name"
-          placeholder="Name"
-          className="w-full border p-3 mb-4 rounded-lg outline-none focus:ring-2 focus:ring-black"
+          placeholder="Enter Name"
+          value={formData.name}
           onChange={handleChange}
+          className="w-full border p-3 mb-4 rounded-lg outline-none focus:ring-2 focus:ring-black"
           required
         />
 
-        {/* Email */}
+        {/* EMAIL */}
         <input
           type="email"
           name="email"
-          placeholder="Email"
-          className="w-full border p-3 mb-4 rounded-lg outline-none focus:ring-2 focus:ring-black"
+          placeholder="Enter Email"
+          value={formData.email}
           onChange={handleChange}
+          className="w-full border p-3 mb-4 rounded-lg outline-none focus:ring-2 focus:ring-black"
           required
         />
 
-        {/* Password */}
+        {/* PASSWORD */}
         <input
           type="password"
           name="password"
-          placeholder="Password"
-          className="w-full border p-3 mb-4 rounded-lg outline-none focus:ring-2 focus:ring-black"
+          placeholder="Enter Password"
+          value={formData.password}
           onChange={handleChange}
+          className="w-full border p-3 mb-4 rounded-lg outline-none focus:ring-2 focus:ring-black"
           required
         />
 
-        {/* Register Button */}
+        {/* REGISTER BUTTON */}
         <button
           type="submit"
           disabled={loading}
@@ -115,7 +136,7 @@ export default function Register() {
           }
         </button>
 
-        {/* Login Redirect */}
+        {/* LOGIN OPTION */}
         <p className="text-center mt-5 text-gray-600">
           Already have an account?
         </p>
@@ -127,7 +148,7 @@ export default function Register() {
           }
           className="w-full mt-3 border border-black text-black p-3 rounded-lg hover:bg-black hover:text-white transition"
         >
-          Go to Login
+          Login Here
         </button>
 
       </form>

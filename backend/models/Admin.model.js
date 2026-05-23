@@ -1,47 +1,39 @@
 import mongoose from "mongoose";
 
-const adminSchema = new mongoose.Schema(
-  {
-    name: {
-      type: String,
-      required: true,
-      trim: true,
-    },
+const adminSchema =
+  new mongoose.Schema(
+    {
+      name: {
+        type: String,
+        required: true,
+        trim: true,
+      },
 
-    email: {
-      type: String,
-      required: true,
-      unique: true,
-      lowercase: true,
-    },
+      email: {
+        type: String,
+        required: true,
+        unique: true,
+        trim: true,
+      },
 
-    password: {
-      type: String,
-      required: true,
-      minlength: 6,
-    },
+      password: {
+        type: String,
+        required: true,
+      },
 
-    role: {
-      type: String,
-      default: "admin",
+      role: {
+        type: String,
+        default: "admin",
+      },
     },
+    {
+      timestamps: true,
+    }
+  );
 
-    permissions: {
-      type: [String],
-      default: [
-        "CREATE_PRODUCT",
-        "UPDATE_PRODUCT",
-        "DELETE_PRODUCT",
-        "VIEW_ORDERS",
-        "MANAGE_USERS",
-      ],
-    },
-  },
-  {
-    timestamps: true,
-  }
+const Admin = mongoose.model(
+  "Admin",
+  adminSchema
 );
-
-const Admin = mongoose.model("Admin", adminSchema);
 
 export default Admin;
