@@ -1,5 +1,6 @@
 import React, {
   useContext,
+  useEffect,
   useState,
 } from "react";
 
@@ -8,29 +9,43 @@ import {
   useParams,
 } from "react-router-dom";
 
-import {
-  dummyProducts,
-} from "../assets/greencart_assets/assets";
-
 import { ShopContext } from "../context/ShopContext";
+
+import RelatedProducts from "../components/RelatedProducts";
 
 const ProductDetails = () => {
   const { id } = useParams();
 
   const navigate = useNavigate();
 
-  const { addToCart } =
-    useContext(ShopContext);
+  const {
+    products,
+    addToCart,
+  } = useContext(ShopContext);
+
+  const [product, setProduct] =
+    useState(null);
 
   const [mainImage, setMainImage] =
     useState(0);
 
-  // Find Product
-  const product = dummyProducts.find(
-    (item) => item._id === id
-  );
+  // =========================
+  // FIND PRODUCT
+  // =========================
+  useEffect(() => {
+    if (products.length > 0) {
+      const foundProduct =
+        products.find(
+          (item) => item._id === id
+        );
 
-  // Product Not Found
+      setProduct(foundProduct);
+    }
+  }, [id, products]);
+
+  // =========================
+  // PRODUCT NOT FOUND
+  // =========================
   if (!product) {
     return (
       <div className="text-center py-20">
@@ -41,7 +56,9 @@ const ProductDetails = () => {
     );
   }
 
-  // Add To Cart
+  // =========================
+  // ADD TO CART
+  // =========================
   const handleAddToCart = () => {
     addToCart(product);
 
@@ -50,8 +67,12 @@ const ProductDetails = () => {
 
   return (
     <div className="max-w-7xl mx-auto py-10 px-6">
+
       <div className="grid md:grid-cols-2 gap-10">
-        {/* Product Images */}
+
+        {/* ===================== */}
+        {/* PRODUCT IMAGES */}
+        {/* ===================== */}
         <div>
           <img
             src={product.image[mainImage]}
@@ -59,8 +80,8 @@ const ProductDetails = () => {
             className="w-full h-[500px] object-cover rounded-2xl border"
           />
 
-          {/* Thumbnail Images */}
-          <div className="flex gap-3 mt-4">
+          {/* THUMBNAILS */}
+          <div className="flex gap-3 mt-4 flex-wrap">
             {product.image.map(
               (img, index) => (
                 <img
@@ -72,7 +93,7 @@ const ProductDetails = () => {
                   }
                   className={`w-24 h-24 object-cover rounded-lg border cursor-pointer ${
                     mainImage === index
-                      ? "border-green-600"
+                      ? "border-green-600 border-2"
                       : ""
                   }`}
                 />
@@ -81,20 +102,24 @@ const ProductDetails = () => {
           </div>
         </div>
 
-        {/* Product Details */}
+        {/* ===================== */}
+        {/* PRODUCT DETAILS */}
+        {/* ===================== */}
         <div>
-          {/* Category */}
+
+          {/* CATEGORY */}
           <span className="bg-green-100 text-green-700 px-3 py-1 rounded-full text-sm">
             {product.category}
           </span>
 
-          {/* Name */}
+          {/* NAME */}
           <h1 className="text-4xl font-bold mt-4">
             {product.name}
           </h1>
 
-          {/* Price */}
+          {/* PRICE */}
           <div className="flex items-center gap-4 mt-5">
+
             <p className="text-3xl font-bold text-green-600">
               ₹{product.offerPrice}
             </p>
@@ -102,9 +127,10 @@ const ProductDetails = () => {
             <p className="text-xl text-gray-400 line-through">
               ₹{product.price}
             </p>
+
           </div>
 
-          {/* Stock */}
+          {/* STOCK */}
           <p
             className={`mt-4 font-medium ${
               product.inStock
@@ -117,13 +143,15 @@ const ProductDetails = () => {
               : "Out of Stock"}
           </p>
 
-          {/* Description */}
+          {/* DESCRIPTION */}
           <div className="mt-6">
+
             <h3 className="font-semibold text-lg mb-3">
               Product Details
             </h3>
 
             <ul className="list-disc pl-5 text-gray-600 space-y-2">
+
               {product.description.map(
                 (desc, index) => (
                   <li key={index}>
@@ -131,11 +159,14 @@ const ProductDetails = () => {
                   </li>
                 )
               )}
+
             </ul>
+
           </div>
 
-          {/* Buttons */}
+          {/* BUTTONS */}
           <div className="flex gap-4 mt-10">
+
             <button
               onClick={handleAddToCart}
               className="bg-green-600 hover:bg-green-700 text-white px-8 py-3 rounded-lg transition"
@@ -151,9 +182,20 @@ const ProductDetails = () => {
             >
               Continue Shopping
             </button>
+
           </div>
+
         </div>
       </div>
+
+      {/* ========================= */}
+      {/* RELATED PRODUCTS */}
+      {/* ========================= */}
+      <RelatedProducts
+        category={product.category}
+        productId={product._id}
+      />
+
     </div>
   );
 };

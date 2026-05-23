@@ -1,108 +1,246 @@
-// <!-- ContactUs.jsx -->
-import React from "react";
+// pages/Contact.jsx
 
-const ContactUs = () => {
+import React, {
+  useState,
+} from "react";
+
+import api from "../api/Axios";
+
+const Contact = () => {
+  const [formData, setFormData] =
+    useState({
+      name: "",
+      email: "",
+      subject: "",
+      message: "",
+    });
+
+  const [loading, setLoading] =
+    useState(false);
+
+  const [success, setSuccess] =
+    useState("");
+
+  const [error, setError] =
+    useState("");
+
+  // =========================
+  // HANDLE CHANGE
+  // =========================
+  const handleChange = (e) => {
+    setFormData({
+      ...formData,
+      [e.target.name]:
+        e.target.value,
+    });
+  };
+
+  // =========================
+  // HANDLE SUBMIT
+  // =========================
+  const handleSubmit = async (
+    e
+  ) => {
+    e.preventDefault();
+
+    try {
+      setLoading(true);
+
+      setSuccess("");
+
+      setError("");
+
+      const res = await api.post(
+        "/contacts",
+        formData
+      );
+
+      setSuccess(
+        res.data.message
+      );
+
+      setFormData({
+        name: "",
+        email: "",
+        subject: "",
+        message: "",
+      });
+    } catch (error) {
+      console.log(error);
+
+      setError(
+        error.response?.data
+          ?.message ||
+          "Something went wrong"
+      );
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
-    <div className="bg-gray-50 min-h-screen py-16 px-6">
+    <div className="min-h-screen bg-gray-50 py-16 px-6">
+
       <div className="max-w-6xl mx-auto">
-        
+
         {/* Heading */}
-        <div className="text-center mb-14">
+        <div className="text-center mb-12">
+
           <h1 className="text-5xl font-bold text-gray-800">
-            Contact <span className="text-indigo-600">Grocify</span>
+            Contact Us
           </h1>
 
-          <p className="mt-4 text-lg text-gray-600">
-            We'd love to hear from you. Get in touch with us anytime.
+          <p className="mt-4 text-gray-600">
+            We'd love to hear from you
           </p>
+
         </div>
 
-        <div className="grid md:grid-cols-2 gap-12">
-          
-          {/* Contact Info */}
+        <div className="grid md:grid-cols-2 gap-10">
+
+          {/* LEFT */}
           <div className="bg-white rounded-3xl shadow-lg p-10">
-            <h2 className="text-3xl font-semibold text-gray-800 mb-8">
+
+            <h2 className="text-3xl font-semibold mb-8">
               Get In Touch
             </h2>
 
             <div className="space-y-6">
+
               <div>
-                <h3 className="font-semibold text-lg text-indigo-600">
+                <h3 className="font-semibold text-green-600">
                   Address
                 </h3>
+
                 <p className="text-gray-600">
-                  123 Market Street, Mumbai, India
+                  Mumbai, India
                 </p>
               </div>
 
               <div>
-                <h3 className="font-semibold text-lg text-indigo-600">
+                <h3 className="font-semibold text-green-600">
                   Email
                 </h3>
-                <p className="text-gray-600">support@grocify.com</p>
+
+                <p className="text-gray-600">
+                  support@grocify.com
+                </p>
               </div>
 
               <div>
-                <h3 className="font-semibold text-lg text-indigo-600">
+                <h3 className="font-semibold text-green-600">
                   Phone
                 </h3>
-                <p className="text-gray-600">+91 98765 43210</p>
+
+                <p className="text-gray-600">
+                  +91 9876543210
+                </p>
               </div>
+
             </div>
+
           </div>
 
-          {/* Contact Form */}
+          {/* RIGHT */}
           <div className="bg-white rounded-3xl shadow-lg p-10">
-            <form className="space-y-6">
-              
-              <div>
-                <label className="block mb-2 text-gray-700 font-medium">
-                  Full Name
-                </label>
 
-                <input
-                  type="text"
-                  placeholder="Enter your name"
-                  className="w-full px-4 py-3 rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                />
+            {/* Success */}
+            {success && (
+              <div className="mb-5 bg-green-100 text-green-700 p-4 rounded-lg">
+                {success}
               </div>
+            )}
 
-              <div>
-                <label className="block mb-2 text-gray-700 font-medium">
-                  Email Address
-                </label>
-
-                <input
-                  type="email"
-                  placeholder="Enter your email"
-                  className="w-full px-4 py-3 rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                />
+            {/* Error */}
+            {error && (
+              <div className="mb-5 bg-red-100 text-red-700 p-4 rounded-lg">
+                {error}
               </div>
+            )}
 
-              <div>
-                <label className="block mb-2 text-gray-700 font-medium">
-                  Message
-                </label>
+            <form
+              onSubmit={
+                handleSubmit
+              }
+              className="space-y-5"
+            >
 
-                <textarea
-                  rows="5"
-                  placeholder="Write your message..."
-                  className="w-full px-4 py-3 rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                ></textarea>
-              </div>
+              <input
+                type="text"
+                name="name"
+                placeholder="Full Name"
+                value={
+                  formData.name
+                }
+                onChange={
+                  handleChange
+                }
+                className="w-full border rounded-xl px-4 py-3"
+                required
+              />
+
+              <input
+                type="email"
+                name="email"
+                placeholder="Email Address"
+                value={
+                  formData.email
+                }
+                onChange={
+                  handleChange
+                }
+                className="w-full border rounded-xl px-4 py-3"
+                required
+              />
+
+              <input
+                type="text"
+                name="subject"
+                placeholder="Subject"
+                value={
+                  formData.subject
+                }
+                onChange={
+                  handleChange
+                }
+                className="w-full border rounded-xl px-4 py-3"
+                required
+              />
+
+              <textarea
+                rows="5"
+                name="message"
+                placeholder="Write your message..."
+                value={
+                  formData.message
+                }
+                onChange={
+                  handleChange
+                }
+                className="w-full border rounded-xl px-4 py-3"
+                required
+              />
 
               <button
                 type="submit"
-                className="w-full bg-indigo-600 hover:bg-indigo-700 text-white py-3 rounded-xl font-semibold transition duration-300"
+                disabled={loading}
+                className="w-full bg-green-600 hover:bg-green-700 text-white py-3 rounded-xl"
               >
-                Send Message
+                {loading
+                  ? "Sending..."
+                  : "Send Message"}
               </button>
+
             </form>
+
           </div>
+
         </div>
+
       </div>
+
     </div>
   );
 };
 
-export default ContactUs;
+export default Contact;
