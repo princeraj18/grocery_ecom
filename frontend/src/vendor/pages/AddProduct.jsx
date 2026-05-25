@@ -4,6 +4,9 @@ import React, {
 
 import axios from "axios";
 
+import Sidebar from "../components/Sidebar";
+import Navbar from "../components/Navbar";
+
 export default function AddProduct() {
 
   const [formData, setFormData] =
@@ -19,6 +22,9 @@ export default function AddProduct() {
   const [images, setImages] =
     useState([]);
 
+  // =========================
+  // HANDLE INPUT CHANGE
+  // =========================
   const handleChange = (e) => {
 
     setFormData({
@@ -28,11 +34,17 @@ export default function AddProduct() {
     });
   };
 
+  // =========================
+  // HANDLE IMAGE CHANGE
+  // =========================
   const handleImages = (e) => {
 
     setImages(e.target.files);
   };
 
+  // =========================
+  // SUBMIT FORM
+  // =========================
   const handleSubmit = async (
     e
   ) => {
@@ -112,6 +124,18 @@ export default function AddProduct() {
 
       console.log(res.data);
 
+      // RESET FORM
+      setFormData({
+        name: "",
+        description: "",
+        category: "",
+        price: "",
+        offerPrice: "",
+        stockQuantity: "",
+      });
+
+      setImages([]);
+
     } catch (error) {
 
       console.log(error);
@@ -125,111 +149,225 @@ export default function AddProduct() {
   };
 
   return (
-    <div className="p-6">
 
-      <h1 className="text-2xl font-bold mb-6">
-        Add Product
-      </h1>
+    <div className="flex min-h-screen bg-gray-100">
 
-      <form
-        onSubmit={handleSubmit}
-        className="space-y-4"
-      >
+      {/* SIDEBAR */}
+      <Sidebar />
 
-        <input
-          type="text"
-          name="name"
-          placeholder="Product Name"
-          onChange={handleChange}
-          className="border p-3 w-full"
-        />
+      {/* MAIN CONTENT */}
+      <div className="flex-1">
 
-        <textarea
-          name="description"
-          placeholder="Description"
-          onChange={handleChange}
-          className="border p-3 w-full"
-        />
+        {/* NAVBAR */}
+        <Navbar />
 
-        <select
-          name="category"
-          onChange={handleChange}
-          className="border p-3 w-full"
-        >
+        {/* PAGE CONTENT */}
+        <div className="p-6">
 
-          <option value="">
-            Select Category
-          </option>
+          <div className="bg-white rounded-2xl shadow-lg p-8 max-w-4xl mx-auto">
 
-          <option value="Vegetables">
-            Vegetables
-          </option>
+            {/* TITLE */}
+            <h1 className="text-3xl font-bold mb-8 text-gray-800">
+              Add Product
+            </h1>
 
-          <option value="Fruits">
-            Fruits
-          </option>
+            {/* FORM */}
+            <form
+              onSubmit={handleSubmit}
+              className="space-y-6"
+            >
 
-          <option value="Drinks">
-            Drinks
-          </option>
+              {/* PRODUCT NAME */}
+              <div>
 
-          <option value="Instant">
-            Instant
-          </option>
+                <label className="block mb-2 font-semibold text-gray-700">
+                  Product Name
+                </label>
 
-          <option value="Dairy">
-            Dairy
-          </option>
+                <input
+                  type="text"
+                  name="name"
+                  value={formData.name}
+                  placeholder="Enter product name"
+                  onChange={handleChange}
+                  className="border border-gray-300 p-3 w-full rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
+                  required
+                />
 
-          <option value="Bakery">
-            Bakery
-          </option>
+              </div>
 
-          <option value="Grains">
-            Grains
-          </option>
+              {/* DESCRIPTION */}
+              <div>
 
-        </select>
+                <label className="block mb-2 font-semibold text-gray-700">
+                  Description
+                </label>
 
-        <input
-          type="number"
-          name="price"
-          placeholder="Price"
-          onChange={handleChange}
-          className="border p-3 w-full"
-        />
+                <textarea
+                  name="description"
+                  value={
+                    formData.description
+                  }
+                  placeholder="Enter product description"
+                  onChange={handleChange}
+                  rows="4"
+                  className="border border-gray-300 p-3 w-full rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
+                  required
+                />
 
-        <input
-          type="number"
-          name="offerPrice"
-          placeholder="Offer Price"
-          onChange={handleChange}
-          className="border p-3 w-full"
-        />
+              </div>
 
-        <input
-          type="number"
-          name="stockQuantity"
-          placeholder="Stock Quantity"
-          onChange={handleChange}
-          className="border p-3 w-full"
-        />
+              {/* CATEGORY */}
+              <div>
 
-        <input
-          type="file"
-          multiple
-          onChange={handleImages}
-          className="border p-3 w-full"
-        />
+                <label className="block mb-2 font-semibold text-gray-700">
+                  Category
+                </label>
 
-        <button
-          type="submit"
-          className="bg-green-600 text-white px-6 py-3 rounded"
-        >
-          Add Product
-        </button>
+                <select
+                  name="category"
+                  value={
+                    formData.category
+                  }
+                  onChange={handleChange}
+                  className="border border-gray-300 p-3 w-full rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
+                  required
+                >
 
-      </form>
+                  <option value="">
+                    Select Category
+                  </option>
+
+                  <option value="Vegetables">
+                    Vegetables
+                  </option>
+
+                  <option value="Fruits">
+                    Fruits
+                  </option>
+
+                  <option value="Drinks">
+                    Drinks
+                  </option>
+
+                  <option value="Instant">
+                    Instant
+                  </option>
+
+                  <option value="Dairy">
+                    Dairy
+                  </option>
+
+                  <option value="Bakery">
+                    Bakery
+                  </option>
+
+                  <option value="Grains">
+                    Grains
+                  </option>
+
+                </select>
+
+              </div>
+
+              {/* PRICE SECTION */}
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+
+                {/* PRICE */}
+                <div>
+
+                  <label className="block mb-2 font-semibold text-gray-700">
+                    Price
+                  </label>
+
+                  <input
+                    type="number"
+                    name="price"
+                    value={formData.price}
+                    placeholder="Price"
+                    onChange={handleChange}
+                    className="border border-gray-300 p-3 w-full rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
+                    required
+                  />
+
+                </div>
+
+                {/* OFFER PRICE */}
+                <div>
+
+                  <label className="block mb-2 font-semibold text-gray-700">
+                    Offer Price
+                  </label>
+
+                  <input
+                    type="number"
+                    name="offerPrice"
+                    value={
+                      formData.offerPrice
+                    }
+                    placeholder="Offer Price"
+                    onChange={handleChange}
+                    className="border border-gray-300 p-3 w-full rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
+                    required
+                  />
+
+                </div>
+
+                {/* STOCK */}
+                <div>
+
+                  <label className="block mb-2 font-semibold text-gray-700">
+                    Stock Quantity
+                  </label>
+
+                  <input
+                    type="number"
+                    name="stockQuantity"
+                    value={
+                      formData.stockQuantity
+                    }
+                    placeholder="Stock Quantity"
+                    onChange={handleChange}
+                    className="border border-gray-300 p-3 w-full rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
+                    required
+                  />
+
+                </div>
+
+              </div>
+
+              {/* IMAGES */}
+              <div>
+
+                <label className="block mb-2 font-semibold text-gray-700">
+                  Upload Images
+                </label>
+
+                <input
+                  type="file"
+                  multiple
+                  onChange={handleImages}
+                  className="border border-gray-300 p-3 w-full rounded-lg"
+                  required
+                />
+
+              </div>
+
+              {/* BUTTON */}
+              <button
+                type="submit"
+                className="bg-green-600 hover:bg-green-700 text-white px-8 py-3 rounded-lg font-semibold transition duration-300"
+              >
+                Add Product
+              </button>
+
+            </form>
+
+          </div>
+
+        </div>
+
+      </div>
 
     </div>
   );

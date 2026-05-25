@@ -67,7 +67,7 @@ export default function VendorRoutes() {
         }
       />
 
-      {/* EDIT PRODUCT */}
+      {/* EDIT PRODUCT - nested under /vendor/products/edit/:id */}
       <Route
         path="products/edit/:id"
         element={

@@ -2,6 +2,8 @@ import {
   Routes,
   Route,
   useLocation,
+  useParams,
+  Navigate,
 } from "react-router-dom";
 
 import Home from "../pages/Home";
@@ -167,6 +169,9 @@ const AppRoutes = () => {
           }
         />
 
+        {/* Legacy/edit shortcut -> redirect to vendor edit */}
+        <Route path="/edit/:id" element={<EditRedirect />} />
+
         {/* ====================== */}
         {/* VENDOR ROUTES */}
         {/* ====================== */}
@@ -182,3 +187,9 @@ const AppRoutes = () => {
 };
 
 export default AppRoutes;
+
+// Redirect component for legacy or shorthand edit URLs
+function EditRedirect() {
+  const { id } = useParams();
+  return <Navigate to={`/vendor/products/edit/${id}`} replace />;
+}

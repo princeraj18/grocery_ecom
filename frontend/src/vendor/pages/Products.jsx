@@ -2,7 +2,7 @@ import React, {
   useEffect,
   useState,
 } from "react";
-
+import { useNavigate } from "react-router-dom";
 import axios from "axios";
 
 import Sidebar from "../components/Sidebar";
@@ -16,7 +16,7 @@ export default function Products() {
 
   const [loading, setLoading] =
     useState(true);
-
+const navigate = useNavigate();
   // =========================
   // FETCH VENDOR PRODUCTS
   // =========================
@@ -260,11 +260,14 @@ export default function Products() {
                           <div className="flex gap-3">
 
                             {/* EDIT */}
-                            <button
-                              className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg"
-                            >
-                              Edit
-                            </button>
+                        <button
+                          onClick={() =>
+                            navigate(`/vendor/products/edit/${product._id}`)
+                          }
+                          className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg"
+                        >
+                          Edit
+                        </button>
 
                             {/* DELETE */}
                             <button
