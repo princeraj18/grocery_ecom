@@ -141,6 +141,14 @@ const getAllOrders = async (req, res) => {
 // ====================================
 const getSingleOrder = async (req, res) => {
   try {
+    // Validate id to avoid CastError
+    if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid order id",
+      });
+    }
+
     const order = await Order.findById(req.params.id);
 
     if (!order) {
@@ -164,6 +172,71 @@ const getSingleOrder = async (req, res) => {
   }
 };
 
+// GET ORDERS
+export const getVendorOrders =
+  async (req, res) => {
+
+    try {
+
+      const orders =
+        await Order.find()
+          .populate(
+            "user",
+            "name email"
+          )
+          .sort({
+            createdAt: -1,
+          });
+
+      res.status(200).json({
+        success: true,
+        orders,
+      });
+
+    } catch (error) {
+
+      res.status(500).json({
+        success: false,
+      });
+    }
+  };
+
+// UPDATE STATUS
+export const updateOrderStatus =
+  async (req, res) => {
+
+    try {
+
+      // Validate id to avoid CastError
+      if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
+        return res.status(400).json({
+          success: false,
+          message: "Invalid order id",
+        });
+      }
+
+      const order = await Order.findByIdAndUpdate(
+        req.params.id,
+        {
+          orderStatus: req.body.orderStatus,
+        },
+        {
+          new: true,
+        }
+      );
+
+      res.status(200).json({
+        success: true,
+        order,
+      });
+
+    } catch (error) {
+
+      res.status(500).json({
+        success: false,
+      });
+    }
+  };
 export {
   createOrder,
   getMyOrders,

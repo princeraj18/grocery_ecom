@@ -1,11 +1,64 @@
-import React from "react";
+import React, {
+  useEffect,
+  useState,
+} from "react";
+
+import axios from "axios";
+
 import Sidebar from "../components/Sidebar";
+
 import Navbar from "../components/Navbar";
+
 import StatCard from "../components/StatCard";
 
 export default function Dashboard() {
 
+  const [stats, setStats] =
+    useState({
+      totalSales: 0,
+      totalOrders: 0,
+      totalProducts: 0,
+      totalCustomers: 0,
+      totalReviews: 0,
+    });
+
+  useEffect(() => {
+
+    fetchDashboard();
+
+  }, []);
+
+  const fetchDashboard =
+    async () => {
+
+      try {
+
+        const token =
+          localStorage.getItem(
+            "vendorToken"
+          );
+
+        const { data } =
+          await axios.get(
+            "http://localhost:5000/api/dashboard/stats",
+            {
+              headers: {
+                Authorization:
+                  `Bearer ${token}`,
+              },
+            }
+          );
+
+        setStats(data.stats);
+
+      } catch (error) {
+
+        console.log(error);
+      }
+    };
+
   return (
+
     <div className="flex">
 
       <Sidebar />
@@ -16,26 +69,31 @@ export default function Dashboard() {
 
         <div className="p-6">
 
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-5 gap-6">
 
             <StatCard
               title="Total Sales"
-              value="₹50,000"
+              value={`₹${stats.totalSales}`}
             />
 
             <StatCard
               title="Orders"
-              value="120"
+              value={stats.totalOrders}
             />
 
             <StatCard
               title="Products"
-              value="45"
+              value={stats.totalProducts}
             />
 
             <StatCard
               title="Customers"
-              value="320"
+              value={stats.totalCustomers}
+            />
+
+            <StatCard
+              title="Reviews"
+              value={stats.totalReviews}
             />
 
           </div>

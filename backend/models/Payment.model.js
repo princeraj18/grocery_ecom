@@ -14,13 +14,9 @@ const paymentSchema = new mongoose.Schema(
       required: true,
     },
 
-    paymentId: {
-      type: String,
-    },
+    paymentId: String,
 
-    transactionId: {
-      type: String,
-    },
+    transactionId: String,
 
     amount: {
       type: Number,
@@ -34,25 +30,21 @@ const paymentSchema = new mongoose.Schema(
 
     paymentMethod: {
       type: String,
-
       enum: [
         "Stripe",
         "Razorpay",
         "COD",
       ],
-
       default: "COD",
     },
 
     paymentStatus: {
       type: String,
-
       enum: [
         "Pending",
         "Success",
         "Failed",
       ],
-
       default: "Pending",
     },
   },
@@ -61,9 +53,11 @@ const paymentSchema = new mongoose.Schema(
   }
 );
 
-const Payment = mongoose.model(
-  "Payment",
-  paymentSchema
-);
+const Payment =
+  mongoose.models.Payment ||
+  mongoose.model(
+    "Payment",
+    paymentSchema
+  );
 
 export default Payment;

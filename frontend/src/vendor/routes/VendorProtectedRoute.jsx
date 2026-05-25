@@ -1,6 +1,13 @@
-import React, { useEffect, useState } from "react";
-import { Navigate } from "react-router-dom";
-import api from "../services/api";
+import React, {
+  useEffect,
+  useState,
+} from "react";
+
+import {
+  Navigate,
+} from "react-router-dom";
+
+import api from "../api/api";
 
 export default function VendorProtectedRoute({
   children,
@@ -33,17 +40,21 @@ export default function VendorProtectedRoute({
             return;
           }
 
-          // VERIFY TOKEN FROM BACKEND
-          await api.get(
-            "/vendors/profile",
-            {
-              headers: {
-                Authorization: `Bearer ${token}`,
-              },
-            }
-          );
+          const response =
+            await api.get(
+              "/vendors/profile",
+              {
+                headers: {
+                  Authorization:
+                    `Bearer ${token}`,
+                },
+              }
+            );
 
-          setIsAuthenticated(true);
+          if (response.data) {
+
+            setIsAuthenticated(true);
+          }
 
         } catch (error) {
 
@@ -51,6 +62,10 @@ export default function VendorProtectedRoute({
 
           localStorage.removeItem(
             "vendorToken"
+          );
+
+          localStorage.removeItem(
+            "vendor"
           );
 
           setIsAuthenticated(false);
@@ -63,17 +78,15 @@ export default function VendorProtectedRoute({
 
   }, []);
 
-  // LOADING SCREEN
   if (loading) {
 
     return (
-      <div className="flex items-center justify-center min-h-screen text-2xl font-bold">
+      <div className="min-h-screen flex items-center justify-center text-2xl font-bold">
         Loading...
       </div>
     );
   }
 
-  // REDIRECT TO LOGIN
   if (!isAuthenticated) {
 
     return (

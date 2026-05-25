@@ -15,9 +15,11 @@ import productRoutes from "./routes/product.routes.js";
 import adminRoutes from "./routes/admin.routes.js";
 import vendorRoutes from "./routes/vendor.routes.js";
 import { connectCloudinary } from "./config/cloudinary.js";
-
+import dashboardRoutes from "./routes/dashboard.routes.js";
 connectDB();
 connectCloudinary();
+
+import path from "path";
 
 const app = express();
 
@@ -75,6 +77,14 @@ app.use(
   "/api/vendors",
   vendorRoutes
 );
+
+app.use(
+  "/api/dashboard",
+  dashboardRoutes
+);
+
+// Serve local uploads as a fallback when Cloudinary isn't available
+app.use("/uploads", express.static(path.join(process.cwd(), "uploads")));
 // ======================
 // TEST ROUTE
 // ======================

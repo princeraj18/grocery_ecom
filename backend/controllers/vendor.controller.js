@@ -3,76 +3,84 @@ import Vendor from "../models/Vendor.model.js";
 import bcrypt from "bcryptjs";
 
 import jwt from "jsonwebtoken";
+import { cloudinary } from "../config/cloudinary.js";
+import fs from "fs";
+import path from "path";
 
 // ==============================
 // REGISTER VENDOR
 // ==============================
-export const registerVendor =
-  async (req, res) => {
+export const registerVendor = async (req, res) => {
 
-    try {
+  try {
 
-      const {
+    const {
+      shopName,
+      ownerName,
+      email,
+      password,
+      phone,
+      address,
+    } = req.body;
+
+    // CHECK EMAIL
+    const vendorExists =
+      await Vendor.findOne({ email });
+
+    if (vendorExists) {
+
+      return res.status(400).json({
+        success: false,
+        message: "Vendor already exists",
+      });
+    }
+
+    // HASH PASSWORD
+    const hashedPassword =
+      await bcrypt.hash(password, 10);
+
+    // CREATE VENDOR
+    const vendor =
+      await Vendor.create({
         shopName,
         ownerName,
         email,
-        password,
+        password: hashedPassword,
         phone,
         address,
-      } = req.body;
+      });
 
-      // CHECK EMAIL
-      const vendorExists =
-        await Vendor.findOne({
-          email,
-        });
-
-      if (vendorExists) {
-
-        return res.status(400).json({
-          success: false,
-          message:
-            "Vendor already exists",
-        });
+    // CREATE TOKEN
+    const token = jwt.sign(
+      {
+        id: vendor._id,
+        role: vendor.role,
+      },
+      process.env.JWT_SECRET,
+      {
+        expiresIn: "7d",
       }
+    );
 
-      // HASH PASSWORD
-      const hashedPassword =
-        await bcrypt.hash(
-          password,
-          10
-        );
+    // SEND RESPONSE
+    res.status(201).json({
+      success: true,
+      message:
+        "Vendor Registered Successfully",
+      token,
+      vendor,
+    });
 
-      // CREATE VENDOR
-      const vendor =
-        await Vendor.create({
-          shopName,
-          ownerName,
-          email,
-          password:
-            hashedPassword,
-          phone,
-          address,
-        });
+  } catch (error) {
 
-      res.status(201).json({
-        success: true,
-        message:
-          "Vendor Registered Successfully",
-        vendor,
-      });
+    console.log(error);
 
-    } catch (error) {
-
-      console.log(error);
-
-      res.status(500).json({
-        success: false,
-        message:
-          error.message,
-      });
-    }
-  };
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
 
 // ==============================
 // LOGIN VENDOR
@@ -253,12 +261,34 @@ export const updateVendor =
         vendor.address;
 
       // LOGO
-      if (
-        req.file
-      ) {
+      if (req.file) {
+        try {
+          const uploadResult = await new Promise((resolve, reject) => {
+            const stream = cloudinary.uploader.upload_stream(
+              { resource_type: "auto", folder: "vendors/logos", public_id: `${Date.now()}-${req.file.originalname}` },
+              (error, result) => {
+                if (error) return reject(error);
+                resolve(result);
+              }
+            );
 
-        vendor.logo =
-          req.file.path;
+            stream.end(req.file.buffer);
+          });
+
+          vendor.logo = uploadResult.secure_url || uploadResult.url || "";
+        } catch (err) {
+          // fallback to local uploads
+          const uploadsDir = path.join(process.cwd(), "uploads");
+          if (!fs.existsSync(uploadsDir)) fs.mkdirSync(uploadsDir, { recursive: true });
+
+          const safeName = `${Date.now()}-${(req.file.originalname || "logo").replace(/\s+/g, "-")}`;
+          const filePath = path.join(uploadsDir, safeName);
+          fs.writeFileSync(filePath, req.file.buffer);
+
+          vendor.logo = `${process.env.BASE_URL || `http://localhost:${process.env.PORT || 5000}`}/uploads/${safeName}`;
+
+          console.warn("Vendor logo upload failed, saved locally:", err.message || err);
+        }
       }
 
       await vendor.save();
@@ -316,6 +346,31 @@ export const deleteVendor =
         success: false,
         message:
           error.message,
+      });
+    }
+  };
+
+
+// GET PROFILE
+export const getVendorProfile =
+  async (req, res) => {
+
+    try {
+
+      const vendor =
+        await Vendor.findById(
+          req.vendor._id
+        ).select("-password");
+
+      res.status(200).json(vendor);
+
+    } catch (error) {
+
+      console.log(error);
+
+      res.status(500).json({
+        message:
+          "Server Error",
       });
     }
   };

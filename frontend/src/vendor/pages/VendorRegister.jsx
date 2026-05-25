@@ -57,13 +57,21 @@ export default function VendorRegister() {
             formData
           );
 
-        alert(
-          data.message
-        );
+localStorage.setItem(
+  "vendorToken",
+  data.token
+);
 
-        navigate(
-          "/vendor/login"
-        );
+localStorage.setItem(
+  "vendor",
+  JSON.stringify(data.vendor)
+);
+
+alert("Registration Successful");
+
+// navigate("/vendor/dashboard");
+window.location.href =
+  "/vendor/dashboard";
 
       } catch (error) {
 

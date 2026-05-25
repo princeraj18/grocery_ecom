@@ -1,38 +1,36 @@
 import mongoose from "mongoose";
 
-const reviewSchema = new mongoose.Schema(
-  {
-    name: {
-      type: String,
-      required: true,
-      trim: true,
-    },
+const reviewSchema =
+  new mongoose.Schema(
+    {
+      user: {
+        type:
+          mongoose.Schema.Types
+            .ObjectId,
+        ref: "User",
+      },
 
-    email: {
-      type: String,
-      required: true,
-      trim: true,
-    },
+      product: {
+        type:
+          mongoose.Schema.Types
+            .ObjectId,
+        ref: "Product",
+      },
 
-    message: {
-      type: String,
-      required: true,
-      trim: true,
-    },
+      rating: Number,
 
-    isRead: {
-      type: Boolean,
-      default: false,
+      comment: String,
     },
-  },
-  {
-    timestamps: true,
-  }
-);
+    {
+      timestamps: true,
+    }
+  );
 
-const Review = mongoose.model(
-  "Review",
-  reviewSchema
-);
+const Review =
+  mongoose.models.Review ||
+  mongoose.model(
+    "Review",
+    reviewSchema
+  );
 
 export default Review;

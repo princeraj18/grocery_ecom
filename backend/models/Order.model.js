@@ -13,10 +13,8 @@ const orderSchema = new mongoose.Schema(
         product: {
           type: mongoose.Schema.Types.ObjectId,
           ref: "Product",
-          required: false,
         },
 
-        // store client-side product id when the product isn't a Mongo ObjectId
         clientId: String,
 
         name: String,
@@ -91,9 +89,11 @@ const orderSchema = new mongoose.Schema(
   }
 );
 
-const Order = mongoose.model(
-  "Order",
-  orderSchema
-);
+const Order =
+  mongoose.models.Order ||
+  mongoose.model(
+    "Order",
+    orderSchema
+  );
 
 export default Order;

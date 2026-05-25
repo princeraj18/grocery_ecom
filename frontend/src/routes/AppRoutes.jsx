@@ -1,4 +1,8 @@
-import { Routes, Route, useLocation } from "react-router-dom";
+import {
+  Routes,
+  Route,
+  useLocation,
+} from "react-router-dom";
 
 import Home from "../pages/Home";
 import Products from "../pages/Products";
@@ -12,14 +16,19 @@ import Orders from "../pages/Orders";
 import AboutUs from "../pages/About";
 import ContactUs from "../pages/Contact";
 import PaymentSuccess from "../pages/PaymentSuccess";
+import CategoryProducts from "../pages/CategoryProducts";
 
 import ProtectedRoute from "../components/ProtectedRoutes";
 import Navbar from "../components/Navbar";
-import CategoryProducts from "../pages/CategoryProducts";
+
+// IMPORT VENDOR ROUTES
+import VendorRoutes from "../vendor/routes/VendorRoutes";
 
 const AppRoutes = () => {
+
   const location = useLocation();
 
+  // HIDE NAVBAR
   const hideNavbarRoutes = [
     "/login",
     "/register",
@@ -27,15 +36,23 @@ const AppRoutes = () => {
     "/payment-cancel",
   ];
 
-  const hideNavbar = hideNavbarRoutes.includes(
-    location.pathname
-  );
+  // HIDE NAVBAR ON ALL VENDOR ROUTES
+  const isVendorRoute =
+    location.pathname.startsWith("/vendor");
+
+  const hideNavbar =
+    hideNavbarRoutes.includes(
+      location.pathname
+    ) || isVendorRoute;
 
   return (
     <>
-      {!hideNavbar && <Navbar />}
+      {/* {!hideNavbar && <Navbar />} */}
 
       <Routes>
+
+        {/* USER ROUTES */}
+
         <Route
           path="/"
           element={
@@ -62,15 +79,15 @@ const AppRoutes = () => {
             </ProtectedRoute>
           }
         />
-       <Route
-  path="/category/:category"
-  element={
-    <ProtectedRoute>
-      <CategoryProducts />
-    </ProtectedRoute>
-  }
-/>
-      
+
+        <Route
+          path="/category/:category"
+          element={
+            <ProtectedRoute>
+              <CategoryProducts />
+            </ProtectedRoute>
+          }
+        />
 
         <Route
           path="/cart"
@@ -90,7 +107,10 @@ const AppRoutes = () => {
           }
         />
 
-        <Route path="/login" element={<Login />} />
+        <Route
+          path="/login"
+          element={<Login />}
+        />
 
         <Route
           path="/register"
@@ -146,6 +166,16 @@ const AppRoutes = () => {
             </div>
           }
         />
+
+        {/* ====================== */}
+        {/* VENDOR ROUTES */}
+        {/* ====================== */}
+
+        <Route
+          path="/vendor/*"
+          element={<VendorRoutes />}
+        />
+
       </Routes>
     </>
   );

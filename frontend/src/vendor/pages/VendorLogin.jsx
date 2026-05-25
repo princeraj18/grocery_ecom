@@ -1,13 +1,8 @@
-import React, {
-  useState,
-} from "react";
+import React, { useState } from "react";
 
 import axios from "axios";
 
-import {
-  useNavigate,
-  Link,
-} from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 
 export default function VendorLogin() {
 
@@ -38,59 +33,66 @@ export default function VendorLogin() {
   // =========================
   // HANDLE LOGIN
   // =========================
-  const handleSubmit =
-    async (e) => {
+ const handleSubmit = async (e) => {
 
-      e.preventDefault();
+  e.preventDefault();
 
-      try {
+  try {
 
-        setLoading(true);
+    setLoading(true);
 
-        const { data } =
-          await axios.post(
-            "http://localhost:5000/api/vendors/login",
-            formData
-          );
+    const { data } =
+      await axios.post(
+        "http://localhost:5000/api/vendors/login",
+        formData
+      );
 
-        // SAVE TOKEN
-        localStorage.setItem(
-          "vendorToken",
-          data.token
-        );
+    // SAVE TOKEN
+    localStorage.setItem(
+      "vendorToken",
+      data.token
+    );
 
-        localStorage.setItem(
-          "vendor",
-          JSON.stringify(
-            data.vendor
-          )
-        );
+    localStorage.setItem(
+      "vendor",
+      JSON.stringify(data.vendor)
+    );
 
-        alert(
-          "Login Successful"
-        );
+    alert("Login Successful");
 
-        navigate("/vendor");
+    // REDIRECT TO DASHBOARD
+    // navigate("/vendor/dashboard");
+    window.location.href =
+  "/vendor/dashboard";
 
-      } catch (error) {
+  } catch (error) {
 
-        console.log(error);
+    console.log(error);
 
-        alert(
-          error.response?.data
-            ?.message ||
-            "Login Failed"
-        );
+    alert(
+      error.response?.data?.message ||
+      "Login Failed"
+    );
 
-      } finally {
+  } finally {
 
-        setLoading(false);
-      }
-    };
+    setLoading(false);
+  }
+};
+
 
   return (
 
-    <div className="min-h-screen flex items-center justify-center bg-gray-100">
+    <div className="min-h-screen flex items-center justify-center bg-gray-100 relative">
+
+      <div className="absolute top-6 right-6">
+        <Link
+          to="/login"
+          className="bg-gray-200 px-3 py-2 rounded hover:bg-gray-300 text-sm font-medium"
+        >
+          Back to user login
+        </Link>
+      </div>
 
       <div className="bg-white p-8 rounded-2xl shadow-lg w-full max-w-md">
 

@@ -1,4 +1,5 @@
 import React from "react";
+
 import {
   Routes,
   Route,
@@ -15,100 +16,117 @@ import Reviews from "../pages/Reviews";
 import Profile from "../pages/Profile";
 import VendorLogin from "../pages/VendorLogin";
 import VendorRegister from "../pages/VendorRegister";
+
 import VendorProtectedRoute from "./VendorProtectedRoute";
+
 export default function VendorRoutes() {
 
   return (
+
     <Routes>
-<Route
-          path="/vendor/dashboard"
-          element={
-            <VendorProtectedRoute>
-              <Dashboard />
-            </VendorProtectedRoute>
-          }
-        />
 
-        <Route
-          path="/vendor/products"
-          element={
-            <VendorProtectedRoute>
-              <Products />
-            </VendorProtectedRoute>
-          }
-        />
+      {/* LOGIN */}
+      <Route
+        path="login"
+        element={<VendorLogin />}
+      />
 
-        <Route
-          path="/vendor/products/create"
-          element={
-            <VendorProtectedRoute>
-              <AddProduct />
-            </VendorProtectedRoute>
-          }
-        />
+      {/* REGISTER */}
+      <Route
+        path="register"
+        element={<VendorRegister />}
+      />
 
-        <Route
-          path="/vendor/products/edit/:id"
-          element={
-            <VendorProtectedRoute>
-              <EditProduct />
-            </VendorProtectedRoute>
-          }
-        />
+      {/* DASHBOARD */}
+      <Route
+        path="dashboard"
+        element={
+          <VendorProtectedRoute>
+            <Dashboard />
+          </VendorProtectedRoute>
+        }
+      />
 
-        <Route
-          path="/vendor/orders"
-          element={
-            <VendorProtectedRoute>
-              <Orders />
-            </VendorProtectedRoute>
-          }
-        />
+      {/* PRODUCTS */}
+      <Route
+        path="products"
+        element={
+          <VendorProtectedRoute>
+            <Products />
+          </VendorProtectedRoute>
+        }
+      />
 
-        <Route
-          path="/vendor/coupons"
-          element={
-            <VendorProtectedRoute>
-              <Coupons />
-            </VendorProtectedRoute>
-          }
-        />
+      {/* ADD PRODUCT */}
+      <Route
+        path="products/create"
+        element={
+          <VendorProtectedRoute>
+            <AddProduct />
+          </VendorProtectedRoute>
+        }
+      />
 
-        <Route
-          path="/vendor/analytics"
-          element={
-            <VendorProtectedRoute>
-              <Analytics />
-            </VendorProtectedRoute>
-          }
-        />
+      {/* EDIT PRODUCT */}
+      <Route
+        path="products/edit/:id"
+        element={
+          <VendorProtectedRoute>
+            <EditProduct />
+          </VendorProtectedRoute>
+        }
+      />
 
-        <Route
-          path="/vendor/reviews"
-          element={
-            <VendorProtectedRoute>
-              <Reviews />
-            </VendorProtectedRoute>
-          }
-        />
+      {/* ORDERS */}
+      <Route
+        path="orders"
+        element={
+          <VendorProtectedRoute>
+            <Orders />
+          </VendorProtectedRoute>
+        }
+      />
 
-        <Route
-          path="/vendor/profile"
-          element={
-            <VendorProtectedRoute>
-              <Profile />
-            </VendorProtectedRoute>
-          }
-        />
-<Route
-  path="/vendor/login"
-  element={<VendorLogin />}
-/>
+      {/* COUPONS */}
+      <Route
+        path="coupons"
+        element={
+          <VendorProtectedRoute>
+            <Coupons />
+          </VendorProtectedRoute>
+        }
+      />
 
-<Route
-  path="/vendor/register"
-  element={<VendorRegister />}
-/>
+      {/* ANALYTICS */}
+      <Route
+        path="analytics"
+        element={
+          <VendorProtectedRoute>
+            <Analytics />
+          </VendorProtectedRoute>
+        }
+      />
+
+      {/* REVIEWS */}
+      <Route
+        path="reviews"
+        element={
+          <VendorProtectedRoute>
+            <Reviews />
+          </VendorProtectedRoute>
+        }
+      />
+
+      {/* PROFILE */}
+      <Route
+        path="profile"
+        element={
+          <VendorProtectedRoute>
+            <Profile />
+          </VendorProtectedRoute>
+        }
+      />
+
     </Routes>
   );
 }

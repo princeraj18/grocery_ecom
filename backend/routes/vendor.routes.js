@@ -9,11 +9,12 @@ import {
   getSingleVendor,
   updateVendor,
   deleteVendor,
+  getVendorProfile,
 } from "../controllers/vendor.controller.js";
+
 import vendorAuth from "../middleware/vendorAuth.js";
 
-const router =
-  express.Router();
+const router = express.Router();
 
 // REGISTER
 router.post(
@@ -27,15 +28,24 @@ router.post(
   loginVendor
 );
 
+// PROFILE
+router.get(
+  "/profile",
+  vendorAuth,
+  getVendorProfile
+);
+
 // GET ALL VENDORS
 router.get(
-  "/",vendorAuth,
+  "/",
+  vendorAuth,
   getVendors
 );
 
 // GET SINGLE VENDOR
 router.get(
-  "/:id",vendorAuth,
+  "/:id",
+  vendorAuth,
   getSingleVendor
 );
 
@@ -53,6 +63,5 @@ router.delete(
   vendorAuth,
   deleteVendor
 );
-
 
 export default router;

@@ -1,70 +1,80 @@
 import mongoose from "mongoose";
 
-const productSchema = new mongoose.Schema(
-  {
-    name: {
-      type: String,
-      required: true,
-      trim: true,
-    },
+const productSchema =
+  new mongoose.Schema(
+    {
+      vendor: {
+        type:
+          mongoose.Schema.Types.ObjectId,
+        ref: "Vendor",
+        required: true,
+      },
 
-    description: {
-      type: [String],
-      default: [],
-    },
+      name: {
+        type: String,
+        required: true,
+        trim: true,
+      },
 
-    category: {
-      type: String,
-      required: true,
-      enum: [
-        "Vegetables",
-        "Fruits",
-        "Drinks",
-        "Instant",
-        "Dairy",
-        "Bakery",
-        "Grains",
-      ],
-    },
+      description: {
+        type: [String],
+        default: [],
+      },
 
-    price: {
-      type: Number,
-      required: true,
-    },
+      category: {
+        type: String,
+        required: true,
+        enum: [
+          "Vegetables",
+          "Fruits",
+          "Drinks",
+          "Instant",
+          "Dairy",
+          "Bakery",
+          "Grains",
+        ],
+      },
 
-    offerPrice: {
-      type: Number,
-      required: true,
-    },
+      price: {
+        type: Number,
+        required: true,
+      },
 
-    image: {
-      type: [String],
-      required: true,
-    },
+      offerPrice: {
+        type: Number,
+        required: true,
+      },
 
-    inStock: {
-      type: Boolean,
-      default: true,
-    },
+      image: {
+        type: [String],
+        required: true,
+      },
 
-    stockQuantity: {
-      type: Number,
-      default: 0,
-    },
+      inStock: {
+        type: Boolean,
+        default: true,
+      },
 
-    bestseller: {
-      type: Boolean,
-      default: false,
-    },
-  },
-  {
-    timestamps: true,
-  }
-);
+      stockQuantity: {
+        type: Number,
+        default: 0,
+      },
 
-const Product = mongoose.model(
-  "Product",
-  productSchema
-);
+      bestseller: {
+        type: Boolean,
+        default: false,
+      },
+    },
+    {
+      timestamps: true,
+    }
+  );
+
+const Product =
+  mongoose.models.Product ||
+  mongoose.model(
+    "Product",
+    productSchema
+  );
 
 export default Product;
