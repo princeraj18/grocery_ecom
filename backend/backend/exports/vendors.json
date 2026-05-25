@@ -1,0 +1,67 @@
+[
+  {
+    "_id": "6a12bc04e56a0743c027042f",
+    "shopName": "amazon",
+    "ownerName": "prince",
+    "email": "prince@gmail.com",
+    "phone": "9973678578",
+    "address": "patna",
+    "logo": "",
+    "isVerified": false,
+    "role": "vendor",
+    "createdAt": "2026-05-24T08:51:16.356Z",
+    "updatedAt": "2026-05-24T08:51:16.356Z"
+  },
+  {
+    "_id": "6a13dd9b7315818cff40773c",
+    "shopName": "google",
+    "ownerName": "prince",
+    "email": "luv@gmail.com",
+    "phone": "9973678578",
+    "address": "patna",
+    "logo": "",
+    "isVerified": false,
+    "role": "vendor",
+    "createdAt": "2026-05-25T05:26:52.011Z",
+    "updatedAt": "2026-05-25T05:26:52.011Z"
+  },
+  {
+    "_id": "6a13e235d57a2a3582dc0f63",
+    "shopName": "google",
+    "ownerName": "prince",
+    "email": "luv1@gmail.com",
+    "phone": "9973678578",
+    "address": "patna",
+    "logo": "",
+    "isVerified": false,
+    "role": "vendor",
+    "createdAt": "2026-05-25T05:46:29.948Z",
+    "updatedAt": "2026-05-25T05:46:29.948Z"
+  },
+  {
+    "_id": "6a13fa15ccbb9f77bcd923e9",
+    "shopName": "TestShop",
+    "ownerName": "Owner",
+    "email": "testvendor@example.com",
+    "phone": "1234567890",
+    "address": "Addr",
+    "logo": "",
+    "isVerified": false,
+    "role": "vendor",
+    "createdAt": "2026-05-25T07:28:21.627Z",
+    "updatedAt": "2026-05-25T07:28:21.627Z"
+  },
+  {
+    "_id": "6a140185eb4df0317a1cd2a8",
+    "shopName": "test",
+    "ownerName": "test",
+    "email": "test@gmail.com",
+    "phone": "8226933065",
+    "address": "nirala nagar colony digha thana",
+    "logo": "",
+    "isVerified": false,
+    "role": "vendor",
+    "createdAt": "2026-05-25T08:00:05.879Z",
+    "updatedAt": "2026-05-25T08:00:05.879Z"
+  }
+]

@@ -81,13 +81,7 @@ export default function Product() {
           Products
         </h1>
 
-        {/* CREATE PRODUCT BUTTON */}
-        <Link
-          to="/admin/products/create"
-          className="bg-black text-white px-5 py-3 rounded-lg hover:bg-gray-800 transition"
-        >
-          + Create Product
-        </Link>
+        {/* removed Create Product button per request */}
 
       </div>
 

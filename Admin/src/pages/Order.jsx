@@ -8,7 +8,9 @@ export default function Order() {
   const [orders, setOrders] =
     useState([]);
 
-  // FETCH ORDERS
+  // ==========================
+  // FETCH ALL ORDERS
+  // ==========================
   const fetchOrders =
     async () => {
 
@@ -37,55 +39,46 @@ export default function Order() {
 
   }, []);
 
-  // UPDATE STATUS
-  const updateStatus =
-    async (id, status) => {
-
-      try {
-
-        await api.put(
-          `/orders/${id}`,
-          {
-            orderStatus: status,
-          }
-        );
-
-        fetchOrders();
-
-      } catch (err) {
-
-        console.log(err);
-      }
-    };
-
   return (
-    <div>
 
-      <h1 className="text-2xl font-bold mb-6">
+    <div className="p-6">
+
+      {/* HEADER */}
+      <h1 className="text-3xl font-bold mb-6">
         Orders
       </h1>
 
-      <div className="bg-white shadow rounded overflow-x-auto">
+      {/* TABLE */}
+      <div className="bg-white shadow rounded-xl overflow-x-auto">
 
         <table className="w-full">
 
-          <thead className="bg-gray-100">
+          {/* TABLE HEAD */}
+          <thead className="bg-black text-white">
 
             <tr>
 
-              <th className="p-3 text-left">
+              <th className="p-4 text-left">
                 Order ID
               </th>
 
-              <th className="p-3 text-left">
+              <th className="p-4 text-left">
                 Customer
               </th>
 
-              <th className="p-3 text-left">
+              <th className="p-4 text-left">
+                Address
+              </th>
+
+              <th className="p-4 text-left">
                 Total
               </th>
 
-              <th className="p-3 text-left">
+              <th className="p-4 text-left">
+                Payment
+              </th>
+
+              <th className="p-4 text-left">
                 Status
               </th>
 
@@ -93,6 +86,7 @@ export default function Order() {
 
           </thead>
 
+          {/* TABLE BODY */}
           <tbody>
 
             {
@@ -101,8 +95,8 @@ export default function Order() {
                 <tr>
 
                   <td
-                    colSpan="4"
-                    className="p-4 text-center"
+                    colSpan="6"
+                    className="p-6 text-center"
                   >
                     No orders found
                   </td>
@@ -115,56 +109,141 @@ export default function Order() {
 
                   <tr
                     key={order._id}
-                    className="border-t"
+                    className="border-b hover:bg-gray-50"
                   >
 
-                    <td className="p-3">
+                    {/* ORDER ID */}
+                    <td className="p-4 font-semibold">
                       #{order._id.slice(-6)}
                     </td>
 
-                    <td className="p-3">
-                      {
-                        order.user?.name ||
-                        "Guest"
-                      }
+                    {/* CUSTOMER */}
+                    <td className="p-4">
+
+                      <div>
+
+                        <p className="font-semibold">
+                          {
+                            order.shippingAddress
+                              ?.firstName
+                          }{" "}
+                          {
+                            order.shippingAddress
+                              ?.lastName
+                          }
+                        </p>
+
+                        <p className="text-sm text-gray-500">
+                          {
+                            order.shippingAddress
+                              ?.email
+                          }
+                        </p>
+
+                        <p className="text-sm text-gray-500">
+                          {
+                            order.shippingAddress
+                              ?.phone
+                          }
+                        </p>
+
+                      </div>
+
                     </td>
 
-                    <td className="p-3">
+                    {/* ADDRESS */}
+                    <td className="p-4 text-sm">
+
+                      <div className="max-w-xs">
+
+                        <p>
+                          {
+                            order.shippingAddress
+                              ?.street
+                          }
+                        </p>
+
+                        <p>
+                          {
+                            order.shippingAddress
+                              ?.city
+                          }
+                          ,{" "}
+                          {
+                            order.shippingAddress
+                              ?.state
+                          }
+                        </p>
+
+                        <p>
+                          {
+                            order.shippingAddress
+                              ?.country
+                          }{" "}
+                          -
+                          {" "}
+                          {
+                            order.shippingAddress
+                              ?.zipcode
+                          }
+                        </p>
+
+                      </div>
+
+                    </td>
+
+                    {/* TOTAL */}
+                    <td className="p-4 font-bold text-green-600">
                       ₹{order.totalAmount}
                     </td>
 
-                    <td className="p-3">
+                    {/* PAYMENT */}
+                    <td className="p-4">
 
-                      <select
-                        value={
+                      <div>
+
+                        <p>
+                          {
+                            order.paymentMethod
+                          }
+                        </p>
+
+                        <p
+                          className={`text-sm font-semibold ${
+                            order.paymentStatus ===
+                            "Paid"
+                              ? "text-green-600"
+                              : "text-red-500"
+                          }`}
+                        >
+                          {
+                            order.paymentStatus
+                          }
+                        </p>
+
+                      </div>
+
+                    </td>
+
+                    {/* STATUS */}
+                    <td className="p-4">
+
+                      <span
+                        className={`px-3 py-1 rounded-full text-sm font-semibold
+                        ${
+                          order.orderStatus ===
+                          "Delivered"
+                            ? "bg-green-100 text-green-700"
+                            : order.orderStatus ===
+                              "Cancelled"
+                            ? "bg-red-100 text-red-700"
+                            : "bg-yellow-100 text-yellow-700"
+                        }`}
+                      >
+                        {
                           order.orderStatus
                         }
-                        onChange={(e) =>
-                          updateStatus(
-                            order._id,
-                            e.target.value
-                          )
-                        }
-                        className="border p-2 rounded"
-                      >
-
-                        <option value="processing">
-                          Processing
-                        </option>
-
-                        <option value="shipped">
-                          Shipped
-                        </option>
-
-                        <option value="delivered">
-                          Delivered
-                        </option>
-
-                        <option value="cancelled">
-                          Cancelled
-                        </option>
-
-                      </select>
+                      </span>
 
                     </td>
 

@@ -10,6 +10,8 @@ import {
   updateVendor,
   deleteVendor,
   getVendorProfile,
+  verifyVendor,
+  unverifyVendor,
 } from "../controllers/vendor.controller.js";
 
 import vendorAuth from "../middleware/vendorAuth.js";
@@ -63,5 +65,17 @@ router.delete(
   vendorAuth,
   deleteVendor
 );
+// VERIFY VENDOR
+router.put(
+  "/verify/:id",
 
+  verifyVendor
+);
+
+// UNVERIFY VENDOR
+router.put(
+  "/unverify/:id",
+  
+  unverifyVendor
+);
 export default router;

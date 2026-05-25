@@ -1,35 +1,127 @@
-import React from "react";
+import React, {
+  useEffect,
+  useState,
+} from "react";
+
 import { useNavigate } from "react-router-dom";
+
+import axios from "axios";
 
 export default function Navbar() {
 
   const navigate = useNavigate();
 
+  const [vendor, setVendor] =
+    useState(null);
+
+  // ======================================
+  // FETCH VENDOR PROFILE
+  // ======================================
+  useEffect(() => {
+
+    const fetchVendor =
+      async () => {
+
+        try {
+
+          const token =
+            localStorage.getItem(
+              "vendorToken"
+            );
+
+          if (!token) return;
+
+          const { data } =
+            await axios.get(
+              "http://localhost:5000/api/vendors/profile",
+              {
+                headers: {
+                  Authorization:
+                    `Bearer ${token}`,
+                },
+              }
+            );
+
+          setVendor(data);
+
+        } catch (error) {
+
+          console.log(error);
+        }
+      };
+
+    fetchVendor();
+
+  }, []);
+
+  // ======================================
+  // LOGOUT
+  // ======================================
   const handleLogout = () => {
-    localStorage.removeItem("vendorToken");
-    localStorage.removeItem("vendor");
+
+    localStorage.removeItem(
+      "vendorToken"
+    );
+
+    localStorage.removeItem(
+      "vendor"
+    );
+
     navigate("/vendor/login");
   };
 
   return (
+
     <div className="bg-white shadow px-6 py-4 flex items-center justify-between">
 
-      <h1 className="text-2xl font-bold">Vendor Dashboard</h1>
+      {/* TITLE */}
+      <h1 className="text-2xl font-bold">
+        Vendor Dashboard
+      </h1>
 
+      {/* RIGHT SIDE */}
       <div className="flex items-center gap-4">
 
+        {/* VENDOR INFO */}
+        <div className="flex items-center gap-3">
+
+          {/* PROFILE IMAGE */}
+          <img
+            src={
+              vendor?.logo
+                ? vendor.logo
+                : "https://i.pravatar.cc/150"
+            }
+            alt="Vendor"
+            className="w-11 h-11 rounded-full object-cover border-2 border-gray-300"
+          />
+
+          {/* NAME */}
+          <div className="hidden md:block">
+
+            <h3 className="font-semibold text-sm">
+              {
+                vendor?.shopName
+              }
+            </h3>
+
+            <p className="text-xs text-gray-500">
+              {
+                vendor?.ownerName
+              }
+            </p>
+
+          </div>
+
+        </div>
+
+        {/* LOGOUT */}
         <button
           onClick={handleLogout}
-          className="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600"
+          className="bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600 transition"
         >
           Logout
         </button>
-
-        <img
-          src="https://i.pravatar.cc/40"
-          alt=""
-          className="w-10 h-10 rounded-full"
-        />
 
       </div>
 

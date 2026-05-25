@@ -1,0 +1,276 @@
+[
+  {
+    "_id": "6a10236f0019cf10e27ed791",
+    "user": {
+      "_id": "6a0ffc29d3733fac850473e1",
+      "name": "prince raj",
+      "email": "princeraj@gmail.com"
+    },
+    "shippingAddress": {
+      "email": "princekr497@gmail.com",
+      "city": "patna",
+      "state": "Bihar",
+      "phone": "9905276787"
+    },
+    "totalAmount": 104,
+    "paymentMethod": "COD",
+    "paymentStatus": "Pending",
+    "orderStatus": "Order Placed",
+    "isPaid": false,
+    "items": [],
+    "createdAt": "2026-05-22T09:35:43.059Z",
+    "updatedAt": "2026-05-22T09:35:43.059Z",
+    "__v": 0
+  },
+  {
+    "_id": "6a102968724eb2b76568224a",
+    "user": {
+      "_id": "6a0ffc29d3733fac850473e1",
+      "name": "prince raj",
+      "email": "princeraj@gmail.com"
+    },
+    "shippingAddress": {
+      "email": "princekr497@gmail.com",
+      "city": "patna",
+      "state": "Bihar",
+      "phone": "9933887167"
+    },
+    "totalAmount": 380,
+    "paymentMethod": "COD",
+    "paymentStatus": "Pending",
+    "orderStatus": "Order Placed",
+    "isPaid": false,
+    "items": [],
+    "createdAt": "2026-05-22T10:01:12.087Z",
+    "updatedAt": "2026-05-22T10:01:12.087Z",
+    "__v": 0
+  },
+  {
+    "_id": "6a102b28a70a18c1e8b3ef3c",
+    "user": {
+      "_id": "6a0ffc29d3733fac850473e1",
+      "name": "prince raj",
+      "email": "princeraj@gmail.com"
+    },
+    "items": [
+      {
+        "clientId": "bk03c31x",
+        "name": "Chocolate Cake 500g",
+        "image": "/src/assets/greencart_assets/chocolate_cake_image.png",
+        "quantity": 1,
+        "price": 325,
+        "_id": "6a102b28a70a18c1e8b3ef3d"
+      }
+    ],
+    "shippingAddress": {
+      "email": "princekr497@gmail.com",
+      "city": "patna",
+      "state": "Bihar",
+      "phone": "9905277167"
+    },
+    "totalAmount": 345,
+    "paymentMethod": "Online",
+    "paymentStatus": "Pending",
+    "orderStatus": "Order Placed",
+    "isPaid": false,
+    "createdAt": "2026-05-22T10:08:40.216Z",
+    "updatedAt": "2026-05-22T10:08:40.216Z",
+    "__v": 0
+  },
+  {
+    "_id": "6a1139cb37d3db895a590146",
+    "user": null,
+    "items": [
+      {
+        "clientId": "gd48g45h",
+        "name": "Carrot 500g",
+        "image": "/src/assets/greencart_assets/carrot_image.png",
+        "quantity": 1,
+        "price": 28,
+        "_id": "6a1139cb37d3db895a590147"
+      }
+    ],
+    "shippingAddress": {
+      "email": "princekr497@gmail.com",
+      "city": "patna",
+      "state": "Bihar",
+      "phone": "9905277167"
+    },
+    "totalAmount": 48,
+    "paymentMethod": "Online",
+    "paymentStatus": "Pending",
+    "orderStatus": "Order Placed",
+    "isPaid": false,
+    "createdAt": "2026-05-23T05:23:23.644Z",
+    "updatedAt": "2026-05-23T05:23:23.644Z",
+    "__v": 0
+  },
+  {
+    "_id": "6a1139f737d3db895a590148",
+    "user": null,
+    "items": [
+      {
+        "clientId": "gd48g45h",
+        "name": "Carrot 500g",
+        "image": "/src/assets/greencart_assets/carrot_image.png",
+        "quantity": 1,
+        "price": 28,
+        "_id": "6a1139f737d3db895a590149"
+      },
+      {
+        "clientId": "ek51j12k",
+        "name": "Apple 1 kg",
+        "image": "/src/assets/greencart_assets/apple_image.png",
+        "quantity": 1,
+        "price": 110,
+        "_id": "6a1139f737d3db895a59014a"
+      }
+    ],
+    "shippingAddress": {
+      "email": "princekr497@gmail.com",
+      "city": "patna",
+      "state": "Bihar",
+      "phone": "9905277167"
+    },
+    "totalAmount": 158,
+    "paymentMethod": "Online",
+    "paymentStatus": "Pending",
+    "orderStatus": "Order Placed",
+    "isPaid": false,
+    "createdAt": "2026-05-23T05:24:07.287Z",
+    "updatedAt": "2026-05-23T05:24:07.287Z",
+    "__v": 0
+  },
+  {
+    "_id": "6a113a1137d3db895a59014c",
+    "user": null,
+    "items": [
+      {
+        "clientId": "gd48g45h",
+        "name": "Carrot 500g",
+        "image": "/src/assets/greencart_assets/carrot_image.png",
+        "quantity": 1,
+        "price": 28,
+        "_id": "6a113a1137d3db895a59014d"
+      },
+      {
+        "clientId": "ek51j12k",
+        "name": "Apple 1 kg",
+        "image": "/src/assets/greencart_assets/apple_image.png",
+        "quantity": 1,
+        "price": 110,
+        "_id": "6a113a1137d3db895a59014e"
+      }
+    ],
+    "shippingAddress": {
+      "email": "princekr497@gmail.com",
+      "city": "patna",
+      "state": "Bihar",
+      "phone": "9905276787"
+    },
+    "totalAmount": 158,
+    "paymentMethod": "COD",
+    "paymentStatus": "Pending",
+    "orderStatus": "Order Placed",
+    "isPaid": false,
+    "createdAt": "2026-05-23T05:24:33.382Z",
+    "updatedAt": "2026-05-23T05:24:33.382Z",
+    "__v": 0
+  },
+  {
+    "_id": "6a12a7bb7e5142606aa0e71c",
+    "user": {
+      "_id": "6a115a2a67397c0a5760d1fb",
+      "name": "prince",
+      "email": "luv111@gmail.com"
+    },
+    "items": [
+      {
+        "product": "6a11834c2f5130261b404ae0",
+        "name": "Fresh banana",
+        "image": "https://res.cloudinary.com/xxxx/image/upload/sample.jpg",
+        "quantity": 1,
+        "price": 99,
+        "_id": "6a12a7bb7e5142606aa0e71d"
+      }
+    ],
+    "shippingAddress": {
+      "email": "prince.b.scit@gmail.com",
+      "city": "patna",
+      "state": "Bihar",
+      "phone": "1234567890"
+    },
+    "totalAmount": 119,
+    "paymentMethod": "COD",
+    "paymentStatus": "Pending",
+    "orderStatus": "Order Placed",
+    "isPaid": false,
+    "createdAt": "2026-05-24T07:24:43.622Z",
+    "updatedAt": "2026-05-24T07:24:43.622Z",
+    "__v": 0
+  },
+  {
+    "_id": "6a12a7c07e5142606aa0e71e",
+    "user": {
+      "_id": "6a115a2a67397c0a5760d1fb",
+      "name": "prince",
+      "email": "luv111@gmail.com"
+    },
+    "items": [
+      {
+        "product": "6a11834c2f5130261b404ae0",
+        "name": "Fresh banana",
+        "image": "https://res.cloudinary.com/xxxx/image/upload/sample.jpg",
+        "quantity": 1,
+        "price": 99,
+        "_id": "6a12a7c07e5142606aa0e71f"
+      }
+    ],
+    "shippingAddress": {
+      "email": "prince.b.scit@gmail.com",
+      "city": "patna",
+      "state": "Bihar",
+      "phone": "1234567890"
+    },
+    "totalAmount": 119,
+    "paymentMethod": "Online",
+    "paymentStatus": "Pending",
+    "orderStatus": "Order Placed",
+    "isPaid": false,
+    "createdAt": "2026-05-24T07:24:48.877Z",
+    "updatedAt": "2026-05-24T07:24:48.877Z",
+    "__v": 0
+  },
+  {
+    "_id": "6a12a8117e5142606aa0e722",
+    "user": {
+      "_id": "6a115a2a67397c0a5760d1fb",
+      "name": "prince",
+      "email": "luv111@gmail.com"
+    },
+    "items": [
+      {
+        "product": "6a11834c2f5130261b404ae0",
+        "name": "Fresh banana",
+        "image": "https://res.cloudinary.com/xxxx/image/upload/sample.jpg",
+        "quantity": 1,
+        "price": 99,
+        "_id": "6a12a8117e5142606aa0e723"
+      }
+    ],
+    "shippingAddress": {
+      "email": "prince.b.scit@gmail.com",
+      "city": "patna",
+      "state": "Bihar",
+      "phone": "1234567890"
+    },
+    "totalAmount": 119,
+    "paymentMethod": "COD",
+    "paymentStatus": "Pending",
+    "orderStatus": "Order Placed",
+    "isPaid": false,
+    "createdAt": "2026-05-24T07:26:09.149Z",
+    "updatedAt": "2026-05-24T07:26:09.149Z",
+    "__v": 0
+  }
+]

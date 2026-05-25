@@ -6,6 +6,14 @@ import {
   getAdminProfile,
 } from "../controllers/admin.controller.js";
 
+import {
+  getVendors,
+  getSingleVendor,
+  deleteVendor,
+} from "../controllers/vendor.controller.js";
+
+import adminAuth from "../middleware/adminAuth.js";
+
 const router = express.Router();
 
 // REGISTER
@@ -25,5 +33,10 @@ router.get(
   "/profile",
   getAdminProfile
 );
+
+// ADMIN: VENDOR MANAGEMENT
+router.get("/vendors", adminAuth, getVendors);
+router.get("/vendors/:id", adminAuth, getSingleVendor);
+router.delete("/vendors/:id", adminAuth, deleteVendor);
 
 export default router;

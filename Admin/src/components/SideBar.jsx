@@ -33,16 +33,16 @@ export default function Sidebar() {
           Users
         </NavLink>
 
-        {/* PRODUCTS */}
+        {/* VENDORS */}
         <NavLink
-          to="/admin/products"
+          to="/admin/vendors"
           className={({ isActive }) =>
             `p-2 rounded ${
               isActive ? "bg-white text-black" : ""
             }`
           }
         >
-          Products
+          Vendors
         </NavLink>
 
         {/* 🛒 ORDERS (IMPORTANT - YOU WERE MISSING THIS) */}

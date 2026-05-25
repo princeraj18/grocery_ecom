@@ -31,9 +31,8 @@ const adminSchema =
     }
   );
 
-const Admin = mongoose.model(
-  "Admin",
-  adminSchema
-);
+const Admin =
+  mongoose.models.Admin ||
+  mongoose.model("Admin", adminSchema);
 
 export default Admin;

@@ -1,0 +1,23 @@
+[
+  {
+    "_id": "6a0f1c4c489b34d21d87a8a5",
+    "name": "prince",
+    "email": "prince@gmail.com",
+    "createdAt": "2026-05-21T14:53:00.722Z",
+    "updatedAt": "2026-05-21T14:53:00.722Z"
+  },
+  {
+    "_id": "6a0ffc29d3733fac850473e1",
+    "name": "prince raj",
+    "email": "princeraj@gmail.com",
+    "createdAt": "2026-05-22T06:48:09.264Z",
+    "updatedAt": "2026-05-22T06:48:09.264Z"
+  },
+  {
+    "_id": "6a115a2a67397c0a5760d1fb",
+    "name": "prince",
+    "email": "luv111@gmail.com",
+    "createdAt": "2026-05-23T07:41:30.419Z",
+    "updatedAt": "2026-05-23T07:41:30.419Z"
+  }
+]

@@ -3,11 +3,54 @@ import mongoose from "mongoose";
 const couponSchema =
   new mongoose.Schema(
     {
-      code: String,
+      vendor: {
+        type:
+          mongoose.Schema.Types.ObjectId,
+        ref: "Vendor",
+        required: true,
+      },
 
-      discount: Number,
+      code: {
+        type: String,
+        required: true,
+        uppercase: true,
+        unique: true,
+        trim: true,
+      },
 
-      expiryDate: Date,
+      discountType: {
+        type: String,
+        enum: [
+          "percentage",
+          "fixed",
+        ],
+        default: "percentage",
+      },
+
+      discountValue: {
+        type: Number,
+        required: true,
+      },
+
+      minOrderAmount: {
+        type: Number,
+        default: 0,
+      },
+
+      maxDiscount: {
+        type: Number,
+        default: 0,
+      },
+
+      expiryDate: {
+        type: Date,
+        required: true,
+      },
+
+      isActive: {
+        type: Boolean,
+        default: true,
+      },
     },
     {
       timestamps: true,

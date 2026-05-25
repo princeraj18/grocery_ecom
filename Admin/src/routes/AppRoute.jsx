@@ -13,6 +13,8 @@ import CreateProduct from "../pages/CreateProduct";
 import Order from "../pages/Order";
 import EditProduct from "../pages/EditProduct";
 import UserDetails from "../pages/UserDetails";
+import Vendors from "../pages/Vendors";
+import VendorDetails from "../pages/VendorDetails";
 
 import ProtectedRoute from "./ProtectedRoute";
 
@@ -108,6 +110,28 @@ export default function AppRoutes() {
           <ProtectedRoute>
             <AdminLayout>
               <EditProduct />
+            </AdminLayout>
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
+        path="/admin/vendors"
+        element={
+          <ProtectedRoute>
+            <AdminLayout>
+              <Vendors />
+            </AdminLayout>
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
+        path="/admin/vendors/:id"
+        element={
+          <ProtectedRoute>
+            <AdminLayout>
+              <VendorDetails />
             </AdminLayout>
           </ProtectedRoute>
         }

@@ -374,3 +374,88 @@ export const getVendorProfile =
       });
     }
   };
+
+
+  // ==============================
+// VERIFY VENDOR
+// ==============================
+export const verifyVendor =
+  async (req, res) => {
+
+    try {
+
+      const vendor =
+        await Vendor.findById(
+          req.params.id
+        );
+
+      if (!vendor) {
+        return res.status(404).json({
+          success: false,
+          message: "Vendor not found",
+        });
+      }
+
+      vendor.isVerified = true;
+
+      await vendor.save();
+
+      res.status(200).json({
+        success: true,
+        message: "Vendor verified successfully",
+        vendor,
+      });
+
+    } catch (error) {
+
+      console.log(error);
+
+      res.status(500).json({
+        success: false,
+        message: error.message,
+      });
+    }
+  };
+
+// ==============================
+// UNVERIFY VENDOR
+// ==============================
+export const unverifyVendor =
+  async (req, res) => {
+
+    try {
+
+      const vendor =
+        await Vendor.findById(
+          req.params.id
+        );
+
+      if (!vendor) {
+        return res.status(404).json({
+          success: false,
+          message: "Vendor not found",
+        });
+      }
+
+      vendor.isVerified = false;
+
+      await vendor.save();
+
+      res.status(200).json({
+        success: true,
+        message: "Vendor unverified successfully",
+        vendor,
+      });
+
+    } catch (error) {
+
+      console.log(error);
+
+      res.status(500).json({
+        success: false,
+        message: error.message,
+      });
+    }
+  };
+
+  
