@@ -1,86 +1,135 @@
-/* eslint-disable react-hooks/exhaustive-deps */
-
-import {
+import React, {
   useEffect,
   useState,
 } from "react";
 
 import {
-  useParams,
   useNavigate,
+  useParams,
 } from "react-router-dom";
 
 import api from "../services/api";
 
 export default function EditProduct() {
 
-  const { id } =
-    useParams();
+  const { id } = useParams();
 
-  const navigate =
-    useNavigate();
+  const navigate = useNavigate();
 
-  const [form, setForm] =
+  const [loading, setLoading] =
+    useState(true);
+
+  const [productData, setProductData] =
     useState({
       name: "",
-      price: "",
-      stock: "",
-      description: "",
       category: "",
-      subcategory: "",
+      price: "",
+      offerPrice: "",
+      stockQuantity: "",
+      description: "",
+      inStock: true,
     });
 
-  // FETCH PRODUCT
-  const fetchProduct =
-    async () => {
+  const [images, setImages] =
+    useState([]);
 
-      try {
+  const [previewImages, setPreviewImages] =
+    useState([]);
 
-        const res =
-          await api.get(
-            `/products/${id}`
+  // =========================
+  // FETCH PRODUCT DETAILS
+  // =========================
+  useEffect(() => {
+
+    const fetchProduct =
+      async () => {
+
+        try {
+
+          const { data } =
+            await api.get(
+              `/products/${id}`
+            );
+
+          const product =
+            data.product;
+
+          setProductData({
+            name: product.name || "",
+            category:
+              product.category || "",
+            price: product.price || "",
+            offerPrice:
+              product.offerPrice || "",
+            stockQuantity:
+              product.stockQuantity || "",
+            description:
+              product.description?.join(", ") ||
+              "",
+            inStock:
+              product.inStock,
+          });
+
+          setPreviewImages(
+            product.image || []
           );
 
-        const product =
-          res.data.product;
+          setLoading(false);
 
-        setForm({
-          name:
-            product.name || "",
-          price:
-            product.price || "",
-          stock:
-            product.stock || "",
-          description:
-            product.description || "",
-          category:
-            product.category || "",
-          subcategory:
-            product.subCategory || "",
-        });
+        } catch (error) {
 
-      } catch (err) {
+          console.log(error);
 
-        console.log(err);
-      }
-    };
-
-  useEffect(() => {
+          alert("Failed to load product");
+        }
+      };
 
     fetchProduct();
 
-  }, []);
+  }, [id]);
 
+  // =========================
+  // HANDLE INPUT CHANGE
+  // =========================
   const handleChange = (e) => {
 
-    setForm({
-      ...form,
-      [e.target.name]:
-        e.target.value,
-    });
+    const {
+      name,
+      value,
+      type,
+      checked,
+    } = e.target;
+
+    setProductData((prev) => ({
+      ...prev,
+      [name]:
+        type === "checkbox"
+          ? checked
+          : value,
+    }));
   };
 
+  // =========================
+  // HANDLE IMAGE CHANGE
+  // =========================
+  const handleImageChange = (e) => {
+
+    const files =
+      Array.from(e.target.files);
+
+    setImages(files);
+
+    const previewUrls =
+      files.map((file) =>
+        URL.createObjectURL(file)
+      );
+
+    setPreviewImages(previewUrls);
+  };
+
+  // =========================
   // UPDATE PRODUCT
+  // =========================
   const handleSubmit =
     async (e) => {
 
@@ -88,93 +137,278 @@ export default function EditProduct() {
 
       try {
 
+        const formData =
+          new FormData();
+
+        formData.append(
+          "name",
+          productData.name
+        );
+
+        formData.append(
+          "category",
+          productData.category
+        );
+
+        formData.append(
+          "price",
+          productData.price
+        );
+
+        formData.append(
+          "offerPrice",
+          productData.offerPrice
+        );
+
+        formData.append(
+          "stockQuantity",
+          productData.stockQuantity
+        );
+
+        formData.append(
+          "inStock",
+          productData.inStock
+        );
+
+        formData.append(
+          "description",
+          JSON.stringify(
+            productData.description
+              .split(",")
+              .map((item) =>
+                item.trim()
+              )
+          )
+        );
+
+        // ADD NEW IMAGES
+        images.forEach((image) => {
+
+          formData.append(
+            "image",
+            image
+          );
+        });
+
         await api.put(
           `/products/${id}`,
+          formData,
           {
-            ...form,
+            headers: {
+              "Content-Type":
+                "multipart/form-data",
+            },
           }
         );
 
         alert(
-          "Product updated successfully"
+          "Product Updated Successfully"
         );
 
-        navigate(
-          "/admin/products"
-        );
+        navigate("/admin/products");
 
-      } catch (err) {
+      } catch (error) {
 
-        console.log(err);
+        console.log(error);
 
         alert(
-          "Update failed"
+          "Failed To Update Product"
         );
       }
     };
 
-  return (
-    <div>
+  if (loading) {
 
-      <h1 className="text-2xl font-bold mb-6">
+    return (
+      <div className="p-10 text-xl">
+        Loading...
+      </div>
+    );
+  }
+
+  return (
+
+    <div className="max-w-4xl mx-auto p-10">
+
+      <h1 className="text-3xl font-bold mb-8">
         Edit Product
       </h1>
 
       <form
         onSubmit={handleSubmit}
-        className="bg-white p-6 rounded shadow space-y-4"
+        className="space-y-6 bg-white p-8 rounded-2xl shadow"
       >
 
-        <input
-          name="name"
-          value={form.name}
-          onChange={handleChange}
-          className="w-full border p-3 rounded"
-          placeholder="Product Name"
-        />
+        {/* PRODUCT NAME */}
+        <div>
 
-        <input
-          name="price"
-          value={form.price}
-          onChange={handleChange}
-          className="w-full border p-3 rounded"
-          placeholder="Price"
-        />
+          <label className="font-semibold">
+            Product Name
+          </label>
 
-        <input
-          name="stock"
-          value={form.stock}
-          onChange={handleChange}
-          className="w-full border p-3 rounded"
-          placeholder="Stock"
-        />
+          <input
+            type="text"
+            name="name"
+            value={productData.name}
+            onChange={handleChange}
+            className="w-full border p-3 rounded-lg mt-2"
+          />
 
-        <input
-          name="category"
-          value={form.category}
-          onChange={handleChange}
-          className="w-full border p-3 rounded"
-          placeholder="Category"
-        />
+        </div>
 
-        <input
-          name="subcategory"
-          value={form.subcategory}
-          onChange={handleChange}
-          className="w-full border p-3 rounded"
-          placeholder="Subcategory"
-        />
+        {/* CATEGORY */}
+        <div>
 
-        <textarea
-          name="description"
-          value={form.description}
-          onChange={handleChange}
-          className="w-full border p-3 rounded"
-          placeholder="Description"
-        />
+          <label className="font-semibold">
+            Category
+          </label>
 
+          <input
+            type="text"
+            name="category"
+            value={productData.category}
+            onChange={handleChange}
+            className="w-full border p-3 rounded-lg mt-2"
+          />
+
+        </div>
+
+        {/* PRICE */}
+        <div className="grid grid-cols-2 gap-4">
+
+          <div>
+
+            <label className="font-semibold">
+              Original Price
+            </label>
+
+            <input
+              type="number"
+              name="price"
+              value={productData.price}
+              onChange={handleChange}
+              className="w-full border p-3 rounded-lg mt-2"
+            />
+
+          </div>
+
+          <div>
+
+            <label className="font-semibold">
+              Offer Price
+            </label>
+
+            <input
+              type="number"
+              name="offerPrice"
+              value={productData.offerPrice}
+              onChange={handleChange}
+              className="w-full border p-3 rounded-lg mt-2"
+            />
+
+          </div>
+
+        </div>
+
+        {/* STOCK */}
+        <div>
+
+          <label className="font-semibold">
+            Stock Quantity
+          </label>
+
+          <input
+            type="number"
+            name="stockQuantity"
+            value={
+              productData.stockQuantity
+            }
+            onChange={handleChange}
+            className="w-full border p-3 rounded-lg mt-2"
+          />
+
+        </div>
+
+        {/* DESCRIPTION */}
+        <div>
+
+          <label className="font-semibold">
+            Description
+          </label>
+
+          <textarea
+            rows="4"
+            name="description"
+            value={
+              productData.description
+            }
+            onChange={handleChange}
+            className="w-full border p-3 rounded-lg mt-2"
+          />
+
+          <p className="text-sm text-gray-500 mt-1">
+            Separate using commas
+          </p>
+
+        </div>
+
+        {/* IN STOCK */}
+        <div className="flex items-center gap-3">
+
+          <input
+            type="checkbox"
+            name="inStock"
+            checked={
+              productData.inStock
+            }
+            onChange={handleChange}
+          />
+
+          <label className="font-semibold">
+            In Stock
+          </label>
+
+        </div>
+
+        {/* EXISTING / NEW IMAGES */}
+        <div>
+
+          <label className="font-semibold">
+            Product Images
+          </label>
+
+          <input
+            type="file"
+            multiple
+            onChange={
+              handleImageChange
+            }
+            className="w-full border p-3 rounded-lg mt-2"
+          />
+
+          {/* IMAGE PREVIEW */}
+          <div className="flex gap-4 mt-4 flex-wrap">
+
+            {previewImages.map(
+              (img, index) => (
+
+                <img
+                  key={index}
+                  src={img}
+                  alt=""
+                  className="w-28 h-28 object-cover rounded-lg border"
+                />
+              )
+            )}
+
+          </div>
+
+        </div>
+
+        {/* SUBMIT BUTTON */}
         <button
-          className="bg-black text-white px-4 py-2 rounded"
+          type="submit"
+          className="bg-green-600 hover:bg-green-700 text-white px-8 py-3 rounded-lg"
         >
           Update Product
         </button>

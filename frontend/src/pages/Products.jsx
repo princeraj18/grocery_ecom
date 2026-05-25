@@ -1,24 +1,45 @@
-import React, { useState, useMemo } from "react";
-import { Link } from "react-router-dom";
+import React, {
+  useState,
+  useMemo,
+  useContext,
+} from "react";
 
+import { Link } from "react-router-dom";
+import { ShopContext } from "../context/ShopContext";
 import {
   dummyProducts,
   categories,
   assets,
 } from "../assets/greencart_assets/assets";
 const Products = () => {
-  const [search, setSearch] = useState("");
+
+  const { products } =
+    useContext(ShopContext);
+
+  const [search, setSearch] =
+    useState("");
+
   const [category, setCategory] =
     useState("All");
+
   const [sortPrice, setSortPrice] =
     useState("");
 
   const filteredProducts = useMemo(() => {
-    let filtered = [...dummyProducts];
+
+    // MERGE BOTH PRODUCTS
+    const allProducts = [
+      ...dummyProducts,
+      ...products,
+    ];
+
+    let filtered = [...allProducts];
 
     // Search Filter
     if (search.trim()) {
-      const regex = new RegExp(search, "i");
+
+      const regex =
+        new RegExp(search, "i");
 
       filtered = filtered.filter(
         (product) =>
@@ -29,6 +50,7 @@ const Products = () => {
 
     // Category Filter
     if (category !== "All") {
+
       filtered = filtered.filter(
         (product) =>
           product.category === category
@@ -37,6 +59,7 @@ const Products = () => {
 
     // Price Sorting
     if (sortPrice === "low-high") {
+
       filtered.sort(
         (a, b) =>
           a.offerPrice - b.offerPrice
@@ -44,6 +67,7 @@ const Products = () => {
     }
 
     if (sortPrice === "high-low") {
+
       filtered.sort(
         (a, b) =>
           b.offerPrice - a.offerPrice
@@ -51,8 +75,13 @@ const Products = () => {
     }
 
     return filtered;
-  }, [search, category, sortPrice]);
 
+  }, [
+    search,
+    category,
+    sortPrice,
+    products,
+  ]);
   return (
     <div className="min-h-screen bg-gray-50 px-6 py-10">
       <div className="max-w-7xl mx-auto">
@@ -65,7 +94,7 @@ const Products = () => {
         <div className="bg-white rounded-2xl shadow-md p-5 mb-8">
           <div className="grid md:grid-cols-3 gap-4">
             {/* Search */}
-            <input
+            {/* <input
               type="text"
               placeholder="Search groceries..."
               value={search}
@@ -73,7 +102,7 @@ const Products = () => {
                 setSearch(e.target.value)
               }
               className="border rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-green-500"
-            />
+            /> */}
 
             {/* Category */}
             <select

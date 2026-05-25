@@ -1,32 +1,57 @@
 import dotenv from "dotenv";
-dotenv.config(); 
+dotenv.config();
+
 import express from "express";
 import cors from "cors";
+
 import connectDB from "./config/db.js";
+
 import userRoutes from "./routes/user.routes.js";
 import orderRoutes from "./routes/order.routes.js";
 import paymentRoutes from "./routes/payment.routes.js";
 import cartRoutes from "./routes/cart.routes.js";
-// import reviewRoutes from "./routes/review.routes.js";
 import contactRoutes from "./routes/contact.routes.js";
 import productRoutes from "./routes/product.routes.js";
 import adminRoutes from "./routes/admin.routes.js";
+import vendorRoutes from "./routes/vendor.routes.js";
+import { connectCloudinary } from "./config/cloudinary.js";
 
 connectDB();
+connectCloudinary();
 
 const app = express();
 
-
-
+// ======================
+// MIDDLEWARE
+// ======================
 app.use(cors());
+
 app.use(express.json());
 
+app.use(
+  express.urlencoded({
+    extended: true,
+  })
+);
 
-// const orderRoutes = require("./routes/order.routes.js");
-app.use("/api/orders", orderRoutes);
-app.use("/api/users", userRoutes);
+// ======================
+// ROUTES
+// ======================
+app.use(
+  "/api/orders",
+  orderRoutes
+);
 
-app.use("/api/cart", cartRoutes);
+app.use(
+  "/api/users",
+  userRoutes
+);
+
+app.use(
+  "/api/cart",
+  cartRoutes
+);
+
 app.use(
   "/api/payment",
   paymentRoutes
@@ -36,22 +61,69 @@ app.use(
   "/api/contacts",
   contactRoutes
 );
+
 app.use(
   "/api/products",
   productRoutes
 );
-// app.use("/api/reviews", reviewRoutes);
+
 app.use(
   "/api/admin",
   adminRoutes
 );
+app.use(
+  "/api/vendors",
+  vendorRoutes
+);
+// ======================
+// TEST ROUTE
+// ======================
 app.get("/", (req, res) => {
-  res.send("ShopEase Backend is Running");
+  res.send(
+    "ShopEase Backend Running"
+  );
 });
 
-// port
-const PORT = process.env.PORT || 5000;
+// ======================
+// GLOBAL ERROR HANDLER
+// ======================
+app.use(
+  (
+    err,
+    req,
+    res,
+    next
+  ) => {
 
-app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
-});
+    console.log(
+      "GLOBAL ERROR:",
+      err
+    );
+
+    res.status(500).json({
+      success: false,
+      message:
+        err.message ||
+        "Server Error",
+    });
+  }
+);
+
+// ======================
+// SERVER
+// ======================
+const PORT =
+  process.env.PORT || 5000;
+
+const server = app.listen(
+  PORT,
+  () => {
+
+    console.log(
+      `Server running on port ${PORT}`
+    );
+  }
+);
+
+// Increase timeout
+server.timeout = 120000;

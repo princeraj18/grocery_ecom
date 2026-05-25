@@ -1,282 +1,531 @@
-import React, { useState, useContext, useRef, useEffect } from "react";
-import { ShopContext } from "../context/ShopContext";
+import React, {
+  useState,
+  useContext,
+  useRef,
+  useEffect,
+  useMemo,
+} from "react";
+
 import {
   FaShoppingCart,
   FaUser,
   FaBars,
   FaTimes,
+  FaSearch,
 } from "react-icons/fa";
-import { useNavigate } from "react-router-dom";
+
+import {
+  useNavigate,
+  useLocation,
+} from "react-router-dom";
+
+import {
+  ShopContext,
+} from "../context/ShopContext";
+
+import {
+  dummyProducts,
+} from "../assets/greencart_assets/assets";
 
 export default function Navbar() {
-  const [open, setOpen] = useState(false);
-  const [userMenu, setUserMenu] = useState(false);
+
+  const [open, setOpen] =
+    useState(false);
+
+  const [userMenu, setUserMenu] =
+    useState(false);
+
+  const [showSearch, setShowSearch] =
+    useState(false);
+
+  const [search, setSearch] =
+    useState(
+      localStorage.getItem(
+        "productSearch"
+      ) || ""
+    );
 
   const navigate = useNavigate();
-  const { cartItems } = useContext(ShopContext);
+
+  const location = useLocation();
+
+  const { cartItems, products } =
+    useContext(ShopContext);
 
   const menuRef = useRef();
 
-  const cartCount = cartItems.reduce(
-    (total, item) => total + item.quantity,
-    0
+  const user = JSON.parse(
+    localStorage.getItem("user")
   );
 
-  // Close dropdown when clicked outside
+  // =========================
+  // SHOW SEARCH ONLY ON
+  // HOME & PRODUCTS PAGE
+  // =========================
+  const showSearchBar =
+    location.pathname === "/" ||
+    location.pathname === "/products";
+
+  // =========================
+  // MERGE PRODUCTS
+  // =========================
+  const allProducts = [
+    ...dummyProducts,
+    ...products,
+  ];
+
+  // =========================
+  // SEARCH SUGGESTIONS
+  // =========================
+  const suggestions = useMemo(() => {
+
+    if (!search.trim()) return [];
+
+    const regex = new RegExp(
+      search,
+      "i"
+    );
+
+    return allProducts
+      .filter(
+        (product) =>
+          regex.test(product.name)
+      )
+      .slice(0, 6);
+
+  }, [search, products]);
+
+  // =========================
+  // CART COUNT
+  // =========================
+  const cartCount =
+    cartItems.reduce(
+      (total, item) =>
+        total + item.quantity,
+      0
+    );
+
+  // =========================
+  // CLOSE USER MENU
+  // =========================
   useEffect(() => {
+
     const handler = (e) => {
-      if (menuRef.current && !menuRef.current.contains(e.target)) {
+
+      if (
+        menuRef.current &&
+        !menuRef.current.contains(
+          e.target
+        )
+      ) {
+
         setUserMenu(false);
       }
     };
 
-    document.addEventListener("mousedown", handler);
+    document.addEventListener(
+      "mousedown",
+      handler
+    );
 
     return () => {
-      document.removeEventListener("mousedown", handler);
-    };
-  }, []);
-  const user = JSON.parse(localStorage.getItem("user"));
 
-const handleLogout = () => {
-  localStorage.removeItem("user");
-  navigate("/login");
-  setUserMenu(false);
-};
+      document.removeEventListener(
+        "mousedown",
+        handler
+      );
+    };
+
+  }, []);
+
+  // =========================
+  // HANDLE SEARCH
+  // =========================
+  const handleSearch = (e) => {
+
+    const value = e.target.value;
+
+    setSearch(value);
+
+    localStorage.setItem(
+      "productSearch",
+      value
+    );
+
+    navigate("/products");
+  };
+
+  // =========================
+  // SELECT PRODUCT
+  // =========================
+  const handleSelectProduct = (
+    product
+  ) => {
+
+    setSearch("");
+
+    localStorage.setItem(
+      "productSearch",
+      product.name
+    );
+
+    navigate(
+      `/products/${product._id}`
+    );
+  };
+
+  // =========================
+  // LOGOUT
+  // =========================
+  const handleLogout = () => {
+
+    localStorage.removeItem("user");
+
+    navigate("/login");
+
+    setUserMenu(false);
+  };
 
   return (
-    <nav className="bg-blue-600 text-white px-4 py-3 flex items-center justify-between relative shadow-md">
 
-      {/* Logo */}
-      <div className="text-2xl font-bold">Grocify</div>
+    <nav className="bg-blue-600 text-white px-4 py-3 shadow-md relative z-50">
 
-      {/* Desktop Menu */}
-      <div className="hidden md:flex items-center gap-6 font-medium">
-        <span
-          onClick={() => navigate("/")}
-          className="cursor-pointer hover:text-gray-200"
-        >
-          Home
-        </span>
+      <div className="flex items-center justify-between">
 
-        <span
-          onClick={() => navigate("/products")}
-          className="cursor-pointer hover:text-gray-200"
-        >
-          Products
-        </span>
-
-        <span
-          onClick={() => navigate("/about")}
-          className="cursor-pointer hover:text-gray-200"
-        >
-          About Us
-        </span>
-
-        <span
-          onClick={() => navigate("/contact")}
-          className="cursor-pointer hover:text-gray-200"
-        >
-          Contact Us
-        </span>
-      </div>
-
-      {/* Desktop Icons */}
-      <div className="hidden md:flex items-center gap-5 text-xl relative">
-
-        {/* Cart */}
+        {/* LOGO */}
         <div
-          className="relative cursor-pointer"
-          onClick={() => navigate("/cart")}
+          onClick={() => navigate("/")}
+          className="text-2xl font-bold cursor-pointer"
         >
-          <FaShoppingCart className="text-xl hover:text-gray-200" />
-
-          {cartCount > 0 && (
-            <span className="absolute -top-2 -right-3 bg-red-500 text-white text-[10px] min-w-[18px] h-[18px] rounded-full flex items-center justify-center font-bold">
-              {cartCount}
-            </span>
-          )}
+          Grocify
         </div>
 
-       <div className="relative" ref={menuRef}>
-  <FaUser
-    onClick={() => setUserMenu(!userMenu)}
-    className="cursor-pointer hover:text-gray-200"
-  />
+        {/* DESKTOP MENU */}
+        <div className="hidden lg:flex items-center gap-6 font-medium">
 
-  {userMenu && (
-    <div className="absolute right-0 mt-3 w-48 bg-white text-black rounded-lg shadow-lg overflow-hidden z-50">
-
-      {user ? (
-        <>
-          <div className="px-4 py-3 border-b bg-gray-50 font-medium">
-            Hi, {user.name}
-          </div>
-
-          <div
-            onClick={() => {
-              navigate("/profile");
-              setUserMenu(false);
-            }}
-            className="px-4 py-3 hover:bg-gray-100 cursor-pointer"
+          <span
+            onClick={() =>
+              navigate("/")
+            }
+            className="cursor-pointer hover:text-gray-200"
           >
-            Profile
+            Home
+          </span>
+
+          <span
+            onClick={() =>
+              navigate("/products")
+            }
+            className="cursor-pointer hover:text-gray-200"
+          >
+            Products
+          </span>
+
+          <span
+            onClick={() =>
+              navigate("/about")
+            }
+            className="cursor-pointer hover:text-gray-200"
+          >
+            About Us
+          </span>
+
+          <span
+            onClick={() =>
+              navigate("/contact")
+            }
+            className="cursor-pointer hover:text-gray-200"
+          >
+            Contact Us
+          </span>
+
+        </div>
+
+        {/* RIGHT SIDE */}
+        <div className="hidden lg:flex items-center gap-5 relative">
+
+          {/* SEARCH BAR */}
+          {showSearchBar && (
+
+            <div className="relative">
+
+              <input
+                type="text"
+                value={search}
+                onChange={handleSearch}
+                placeholder="Search products..."
+                className="px-4 py-2 rounded-lg bg-white text-black outline-none w-72"
+              />
+
+              {/* SUGGESTIONS */}
+              {search &&
+                suggestions.length > 0 && (
+
+                <div className="absolute top-14 left-0 w-full bg-white text-black rounded-lg shadow-xl overflow-hidden z-50">
+
+                  {suggestions.map(
+                    (product) => (
+
+                      <div
+                        key={
+                          product._id
+                        }
+                        onClick={() =>
+                          handleSelectProduct(
+                            product
+                          )
+                        }
+                        className="flex items-center gap-3 px-4 py-3 hover:bg-gray-100 cursor-pointer border-b"
+                      >
+
+                        <img
+                          src={
+                            product.image[0]
+                          }
+                          alt=""
+                          className="w-12 h-12 object-cover rounded"
+                        />
+
+                        <div>
+
+                          <p className="font-medium">
+                            {product.name}
+                          </p>
+
+                          <p className="text-sm text-green-600">
+                            ₹
+                            {
+                              product.offerPrice
+                            }
+                          </p>
+
+                        </div>
+
+                      </div>
+                    )
+                  )}
+
+                </div>
+              )}
+
+            </div>
+          )}
+
+          {/* CART */}
+          <div
+            className="relative cursor-pointer text-xl"
+            onClick={() =>
+              navigate("/cart")
+            }
+          >
+
+            <FaShoppingCart />
+
+            {cartCount > 0 && (
+
+              <span className="absolute -top-2 -right-3 bg-red-500 text-white text-[10px] min-w-[18px] h-[18px] rounded-full flex items-center justify-center font-bold">
+
+                {cartCount}
+
+              </span>
+            )}
+
           </div>
 
+          {/* USER */}
           <div
-            onClick={() => {
-              navigate("/orders");
-              setUserMenu(false);
-            }}
-            className="px-4 py-3 hover:bg-gray-100 cursor-pointer"
+            className="relative"
+            ref={menuRef}
           >
-            My Orders
+
+            <FaUser
+              onClick={() =>
+                setUserMenu(
+                  !userMenu
+                )
+              }
+              className="cursor-pointer text-xl"
+            />
+
+            {userMenu && (
+
+              <div className="absolute right-0 mt-3 w-48 bg-white text-black rounded-lg shadow-lg overflow-hidden z-50">
+
+                {user ? (
+                  <>
+
+                    <div className="px-4 py-3 border-b bg-gray-50 font-medium">
+                      Hi, {user.name}
+                    </div>
+
+                    <div
+                      onClick={() =>
+                        navigate(
+                          "/profile"
+                        )
+                      }
+                      className="px-4 py-3 hover:bg-gray-100 cursor-pointer"
+                    >
+                      Profile
+                    </div>
+
+                    <div
+                      onClick={() =>
+                        navigate(
+                          "/orders"
+                        )
+                      }
+                      className="px-4 py-3 hover:bg-gray-100 cursor-pointer"
+                    >
+                      Orders
+                    </div>
+
+                    <div
+                      onClick={
+                        handleLogout
+                      }
+                      className="px-4 py-3 hover:bg-gray-100 cursor-pointer text-red-500"
+                    >
+                      Logout
+                    </div>
+
+                  </>
+                ) : (
+                  <>
+
+                    <div
+                      onClick={() =>
+                        navigate(
+                          "/login"
+                        )
+                      }
+                      className="px-4 py-3 hover:bg-gray-100 cursor-pointer"
+                    >
+                      Login
+                    </div>
+
+                    <div
+                      onClick={() =>
+                        navigate(
+                          "/register"
+                        )
+                      }
+                      className="px-4 py-3 hover:bg-gray-100 cursor-pointer"
+                    >
+                      Register
+                    </div>
+
+                  </>
+                )}
+
+              </div>
+            )}
+
           </div>
 
+        </div>
+
+        {/* MOBILE RIGHT */}
+        <div className="flex lg:hidden items-center gap-4 text-xl">
+
+          {/* SEARCH ICON */}
+          {showSearchBar && (
+            <FaSearch
+              className="cursor-pointer"
+              onClick={() =>
+                setShowSearch(
+                  !showSearch
+                )
+              }
+            />
+          )}
+
+          {/* MENU ICON */}
           <div
-            onClick={handleLogout}
-            className="px-4 py-3 hover:bg-gray-100 cursor-pointer text-red-500"
+            onClick={() =>
+              setOpen(!open)
+            }
+            className="cursor-pointer"
           >
-            Logout
-          </div>
-        </>
-      ) : (
-        <>
-          <div
-            onClick={() => {
-              navigate("/login");
-              setUserMenu(false);
-            }}
-            className="px-4 py-3 hover:bg-gray-100 cursor-pointer"
-          >
-            Login
+
+            {open
+              ? <FaTimes />
+              : <FaBars />}
+
           </div>
 
-          <div
-            onClick={() => {
-              navigate("/register");
-              setUserMenu(false);
-            }}
-            className="px-4 py-3 hover:bg-gray-100 cursor-pointer"
-          >
-            Register
-          </div>
-        </>
-      )}
-    </div>
-  )}
-</div>
+        </div>
+
       </div>
 
-      {/* Mobile Button */}
-      <div
-        className="md:hidden text-2xl cursor-pointer"
-        onClick={() => setOpen(!open)}
-      >
-        {open ? <FaTimes /> : <FaBars />}
-      </div>
+      {/* MOBILE SEARCH */}
+      {showSearch &&
+        showSearchBar && (
 
-      {/* Mobile Menu */}
-      {open && (
-        <div className="absolute top-full left-0 w-full bg-white text-black shadow-lg flex flex-col gap-4 p-4 md:hidden">
+        <div className="mt-4 lg:hidden relative">
 
-          {/* Search */}
           <input
             type="text"
-            placeholder="Search..."
-            className="w-full px-3 py-2 border rounded-md outline-none"
+            value={search}
+            onChange={handleSearch}
+            placeholder="Search products..."
+            className="w-full px-4 py-3 rounded-lg text-black outline-none"
           />
 
-          {/* Mobile Icons */}
-          <div className="flex justify-around text-xl py-2">
+          {/* MOBILE SUGGESTIONS */}
+          {search &&
+            suggestions.length > 0 && (
 
-            {/* Cart */}
-            <div
-              className="relative cursor-pointer"
-              onClick={() => navigate("/cart")}
-            >
-              <FaShoppingCart />
+            <div className="bg-white text-black rounded-lg shadow-lg mt-2 overflow-hidden">
 
-              {cartCount > 0 && (
-                <span className="absolute -top-2 -right-3 bg-red-500 text-white text-[10px] min-w-[18px] h-[18px] rounded-full flex items-center justify-center font-bold">
-                  {cartCount}
-                </span>
+              {suggestions.map(
+                (product) => (
+
+                  <div
+                    key={
+                      product._id
+                    }
+                    onClick={() =>
+                      handleSelectProduct(
+                        product
+                      )
+                    }
+                    className="flex items-center gap-3 px-4 py-3 border-b hover:bg-gray-100 cursor-pointer"
+                  >
+
+                    <img
+                      src={
+                        product.image[0]
+                      }
+                      alt=""
+                      className="w-12 h-12 rounded object-cover"
+                    />
+
+                    <div>
+
+                      <p className="font-medium">
+                        {product.name}
+                      </p>
+
+                      <p className="text-sm text-green-600">
+                        ₹
+                        {
+                          product.offerPrice
+                        }
+                      </p>
+
+                    </div>
+
+                  </div>
+                )
               )}
+
             </div>
+          )}
 
-            {/* User */}
-      <div className="relative">
-  <FaUser
-    onClick={() => setUserMenu(!userMenu)}
-    className="cursor-pointer"
-  />
-
-  {userMenu && (
-    <div className="absolute right-0 mt-3 w-44 bg-white border rounded-lg shadow-lg text-sm z-50">
-
-      {user ? (
-        <>
-          <div className="px-4 py-3 border-b bg-gray-50 font-medium">
-            Hi, {user.name}
-          </div>
-
-          <div
-            onClick={() => {
-              navigate("/profile");
-              setUserMenu(false);
-            }}
-            className="px-4 py-2 hover:bg-gray-100 cursor-pointer"
-          >
-            Profile
-          </div>
-
-          <div
-            onClick={() => {
-              navigate("/orders");
-              setUserMenu(false);
-            }}
-            className="px-4 py-2 hover:bg-gray-100 cursor-pointer"
-          >
-            My Orders
-          </div>
-
-          <div
-            onClick={handleLogout}
-            className="px-4 py-2 hover:bg-gray-100 cursor-pointer text-red-500"
-          >
-            Logout
-          </div>
-        </>
-      ) : (
-        <>
-          <div
-            onClick={() => {
-              navigate("/login");
-              setUserMenu(false);
-            }}
-            className="px-4 py-2 hover:bg-gray-100 cursor-pointer"
-          >
-            Login
-          </div>
-
-          <div
-            onClick={() => {
-              navigate("/register");
-              setUserMenu(false);
-            }}
-            className="px-4 py-2 hover:bg-gray-100 cursor-pointer"
-          >
-            Register
-          </div>
-        </>
-      )}
-    </div>
-  )}
-</div>
-
-          </div>
         </div>
       )}
+
     </nav>
   );
 }

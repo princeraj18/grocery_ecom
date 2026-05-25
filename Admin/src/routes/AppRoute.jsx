@@ -12,6 +12,7 @@ import Register from "../pages/Register";
 import CreateProduct from "../pages/CreateProduct";
 import Order from "../pages/Order";
 import EditProduct from "../pages/EditProduct";
+import UserDetails from "../pages/UserDetails";
 
 import ProtectedRoute from "./ProtectedRoute";
 
@@ -67,6 +68,17 @@ export default function AppRoutes() {
           </ProtectedRoute>
         }
       />
+      <Route
+  path="/admin/users/:id"
+  element={
+    <ProtectedRoute>
+
+  <UserDetails />
+    </ProtectedRoute>
+
+
+  }
+/>
 
       <Route
         path="/admin/products"

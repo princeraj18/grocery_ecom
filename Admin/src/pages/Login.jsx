@@ -30,20 +30,32 @@ export default function Login() {
         }
       );
 
-      // SAVE TOKEN
-      localStorage.setItem(
-        "adminToken",
-        data.token
-      );
+      // Normalize response: backend may return admin fields at top-level
+      const token = data?.token;
+
+      const adminData =
+        data?.admin ?? {
+          _id: data?._id ?? data?.id,
+          name: data?.name,
+          email: data?.email,
+          role: data?.role,
+        };
+
+      // SAVE TOKEN (if present)
+      if (token) {
+        localStorage.setItem("adminToken", token);
+      }
 
       // SAVE ADMIN
-      localStorage.setItem(
-        "admin",
-        JSON.stringify(data.admin)
-      );
+      if (adminData) {
+        localStorage.setItem(
+          "admin",
+          JSON.stringify(adminData)
+        );
+      }
 
       // CONTEXT LOGIN
-      login(data.admin);
+      login(adminData);
 
       alert("Login Successful");
 

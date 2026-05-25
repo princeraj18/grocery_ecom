@@ -54,11 +54,11 @@ export const addToCart = async (
     }
 
     const existingItem =
-      cart.items.find(
-        (item) =>
-          item.productId ===
-          product.productId
-      );
+  cart.items.find(
+    (item) =>
+      item.productId.toString() ===
+      product.productId.toString()
+  );
 
     if (existingItem) {
       existingItem.quantity +=
@@ -106,10 +106,11 @@ export const updateCart = async (
       });
     }
 
-    const item = cart.items.find(
-      (it) =>
-        it.productId === productId
-    );
+   const item = cart.items.find(
+  (it) =>
+    it.productId.toString() ===
+    productId.toString()
+);
 
     if (!item) {
       return res.status(404).json({
@@ -158,11 +159,11 @@ export const removeFromCart =
           });
       }
 
-      cart.items = cart.items.filter(
-        (item) =>
-          item.productId !==
-          productId
-      );
+     cart.items = cart.items.filter(
+  (item) =>
+    item.productId.toString() !==
+    productId.toString()
+);
 
       await cart.save();
 

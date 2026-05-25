@@ -81,3 +81,133 @@ export const getUserProfile = async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 };
+
+// import User from "../models/User.model.js";
+
+// ===================================
+// GET ALL USERS
+// ===================================
+export const getAllUsers = async (
+  req,
+  res
+) => {
+
+  try {
+
+    const search =
+      req.query.search || "";
+
+    const users =
+      await User.find({
+
+        name: {
+          $regex: search,
+          $options: "i",
+        },
+      }).select("-password");
+
+    res.status(200).json({
+      success: true,
+      users,
+    });
+
+  } catch (error) {
+
+    console.log(error);
+
+    res.status(500).json({
+      success: false,
+      message:
+        "Failed to fetch users",
+    });
+  }
+};
+
+// ===================================
+// GET SINGLE USER
+// ===================================
+export const getSingleUser =
+  async (req, res) => {
+
+    try {
+
+      const user =
+        await User.findById(
+          req.params.id
+        ).select("-password");
+
+      if (!user) {
+
+        return res
+          .status(404)
+          .json({
+            success: false,
+            message:
+              "User not found",
+          });
+      }
+
+      res.status(200).json({
+        success: true,
+        user,
+      });
+
+    } catch (error) {
+
+      console.log(error);
+
+      res.status(500).json({
+        success: false,
+        message:
+          "Failed to fetch user",
+      });
+    }
+  };
+
+  // import User from "../models/User.model.js";
+
+// ===================================
+// DELETE USER
+// ===================================
+export const deleteUser =
+  async (req, res) => {
+
+    try {
+
+      const user =
+        await User.findById(
+          req.params.id
+        );
+
+      if (!user) {
+
+        return res
+          .status(404)
+          .json({
+            success: false,
+            message:
+              "User not found",
+          });
+      }
+
+      await User.findByIdAndDelete(
+        req.params.id
+      );
+
+      res.status(200).json({
+        success: true,
+        message:
+          "User deleted successfully",
+      });
+
+    } catch (error) {
+
+      console.log(error);
+
+      res.status(500).json({
+        success: false,
+        message:
+          "Failed to delete user",
+      });
+    }
+  };

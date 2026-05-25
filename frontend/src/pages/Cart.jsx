@@ -47,7 +47,7 @@ const Cart = () => {
           <div className="space-y-4">
             {cartItems.map((item) => (
               <div
-                key={`${item.productId}-${item.size}`}
+                key={item.productId}
                 className="bg-white p-5 rounded-xl shadow-md flex items-center gap-5"
               >
                 <img
@@ -71,13 +71,25 @@ const Cart = () => {
                 </div>
 
                 <div className="flex items-center gap-3">
-                  <button onClick={() => decreaseQuantity(item.productId, item.size, item.quantity)} className="w-8 h-8 bg-gray-200 rounded-full">-</button>
+<button
+  onClick={() =>
+    decreaseQuantity(
+      item.productId
+    )
+  }
+>-</button>
 
                   <span className="font-semibold">
                     {item.quantity}
                   </span>
 
-                  <button onClick={() => increaseQuantity(item.productId, item.size, item.quantity)} className="w-8 h-8 bg-indigo-600 text-white rounded-full">+</button>
+                  <button
+  onClick={() =>
+    increaseQuantity(
+      item.productId
+    )
+  }
+>+</button>
                 </div>
 
                 <div className="w-28 text-right">
@@ -88,7 +100,13 @@ const Cart = () => {
                   </p>
                 </div>
 
-                <button onClick={() => removeFromCart(item.productId, item.size)} className="text-red-500 hover:text-red-700">Remove</button>
+              <button
+  onClick={() =>
+    removeFromCart(
+      item.productId
+    )
+  }
+>Remove</button>
               </div>
             ))}
           </div>

@@ -1,204 +1,207 @@
-/* eslint-disable react-hooks/set-state-in-effect */
+import {
+  useEffect,
+  useState,
+} from "react";
 
-import { useEffect, useState } from "react";
 import api from "../services/api";
 
-export default function User() {
+import {
+  useNavigate,
+} from "react-router-dom";
+
+export default function Users() {
+
+  const navigate =
+    useNavigate();
 
   const [users, setUsers] =
     useState([]);
 
-  const [loading, setLoading] =
-    useState(true);
+  const [search, setSearch] =
+    useState("");
 
+  // =========================
   // FETCH USERS
-  useEffect(() => {
+  // =========================
+  const fetchUsers =
+    async () => {
 
-    const fetchUsers =
-      async () => {
+      try {
 
-        try {
-
-          const { data } =
-            await api.get(
-              "/admin/users"
-            );
-
-          setUsers(
-            data.users || []
+        const { data } =
+          await api.get(
+            `/users?search=${search}`
           );
 
-        } catch (error) {
+        setUsers(data.users);
 
-          console.log(error);
+      } catch (error) {
 
-        } finally {
+        console.log(error);
+      }
+    };
 
-          setLoading(false);
-        }
-      };
+  useEffect(() => {
 
     fetchUsers();
 
-  }, []);
+  }, [search]);
 
+  // =========================
   // DELETE USER
-  const deleteUser =
+  // =========================
+  const handleDelete =
     async (id) => {
 
       const confirmDelete =
         window.confirm(
-          "Delete this user?"
+          "Are you sure you want to delete this user?"
         );
 
-      if (!confirmDelete) return;
+      if (!confirmDelete)
+        return;
 
       try {
 
-        await api.delete(
-          `/admin/users/${id}`
-        );
+        const { data } =
+          await api.delete(
+            `/users/${id}`
+          );
 
-        setUsers(
-          users.filter(
-            (user) =>
-              user._id !== id
-          )
-        );
+        alert(data.message);
+
+        // REFRESH USERS
+        fetchUsers();
 
       } catch (error) {
 
         console.log(error);
 
         alert(
-          "Failed to delete user"
+          error.response?.data
+            ?.message ||
+            "Delete failed"
         );
       }
     };
 
   return (
-    <div>
 
-      <div className="flex items-center justify-between mb-6">
+    <div className="p-10">
+
+      {/* HEADER */}
+      <div className="flex justify-between items-center mb-6">
 
         <h1 className="text-3xl font-bold">
           Users
         </h1>
 
-        <p className="text-gray-500">
-          Total Users:
-          {" "}
-          {users.length}
-        </p>
+        <input
+          type="text"
+          placeholder="Search users..."
+          value={search}
+          onChange={(e) =>
+            setSearch(
+              e.target.value
+            )
+          }
+          className="border p-3 rounded-lg w-72"
+        />
 
       </div>
 
-      <div className="bg-white rounded-2xl shadow overflow-hidden">
+      {/* TABLE */}
+      <div className="overflow-x-auto bg-white shadow rounded-lg">
 
-        {
-          loading ? (
+        <table className="w-full">
 
-            <div className="p-6 text-center">
-              Loading users...
-            </div>
+          <thead className="bg-black text-white">
 
-          ) : (
+            <tr>
 
-            <table className="w-full">
+              <th className="p-4 text-left">
+                Name
+              </th>
 
-              <thead className="bg-gray-100">
+              <th className="p-4 text-left">
+                Email
+              </th>
 
-                <tr>
+              <th className="p-4 text-left">
+                Role
+              </th>
 
-                  <th className="p-4 text-left">
-                    ID
-                  </th>
+              <th className="p-4 text-left">
+                Actions
+              </th>
 
-                  <th className="p-4 text-left">
-                    Name
-                  </th>
+            </tr>
 
-                  <th className="p-4 text-left">
-                    Email
-                  </th>
+          </thead>
 
-                  <th className="p-4 text-left">
-                    Role
-                  </th>
+          <tbody>
 
-                  <th className="p-4 text-left">
-                    Actions
-                  </th>
+            {
+              users.map((user) => (
+
+                <tr
+                  key={user._id}
+                  className="border-b"
+                >
+
+                  <td className="p-4">
+                    {user.name}
+                  </td>
+
+                  <td className="p-4">
+                    {user.email}
+                  </td>
+
+                  <td className="p-4">
+
+                    {
+                      user.isAdmin
+                        ? "Admin"
+                        : "User"
+                    }
+
+                  </td>
+
+                  <td className="p-4 flex gap-3">
+
+                    {/* VIEW */}
+                    <button
+                      onClick={() =>
+                        navigate(
+                          `/admin/users/${user._id}`
+                        )
+                      }
+                      className="bg-blue-600 text-white px-4 py-2 rounded"
+                    >
+                      View
+                    </button>
+
+                    {/* DELETE */}
+                    <button
+                      onClick={() =>
+                        handleDelete(
+                          user._id
+                        )
+                      }
+                      className="bg-red-600 text-white px-4 py-2 rounded"
+                    >
+                      Delete
+                    </button>
+
+                  </td>
 
                 </tr>
+              ))
+            }
 
-              </thead>
+          </tbody>
 
-              <tbody>
-
-                {
-                  users.length > 0 ? (
-
-                    users.map((user) => (
-
-                      <tr
-                        key={user._id}
-                        className="border-t"
-                      >
-
-                        <td className="p-4">
-                          {user._id.slice(0, 8)}...
-                        </td>
-
-                        <td className="p-4">
-                          {user.name}
-                        </td>
-
-                        <td className="p-4">
-                          {user.email}
-                        </td>
-
-                        <td className="p-4">
-                          {user.role}
-                        </td>
-
-                        <td className="p-4">
-
-                          <button
-                            onClick={() =>
-                              deleteUser(
-                                user._id
-                              )
-                            }
-                            className="bg-red-500 text-white px-4 py-2 rounded"
-                          >
-                            Delete
-                          </button>
-
-                        </td>
-
-                      </tr>
-                    ))
-                  ) : (
-
-                    <tr>
-
-                      <td
-                        colSpan="5"
-                        className="text-center p-6"
-                      >
-                        No users found
-                      </td>
-
-                    </tr>
-                  )
-                }
-
-              </tbody>
-
-            </table>
-          )
-        }
+        </table>
 
       </div>
 

@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 import api from "../services/api";
 
 export default function Product() {
@@ -6,24 +7,19 @@ export default function Product() {
   const [products, setProducts] =
     useState([]);
 
-  useEffect(() => {
-
-    fetchProducts();
-
-  }, []);
-
+  // =========================
+  // FETCH PRODUCTS
+  // =========================
   const fetchProducts =
     async () => {
 
       try {
 
         const { data } =
-          await api.get(
-            "/products"
-          );
+          await api.get("/products");
 
         setProducts(
-          data.products
+          data.products || []
         );
 
       } catch (error) {
@@ -32,46 +28,167 @@ export default function Product() {
       }
     };
 
+  // =========================
+  // DELETE PRODUCT
+  // =========================
+  const deleteProduct =
+    async (id) => {
+
+      const confirmDelete =
+        window.confirm(
+          "Are you sure you want to delete this product?"
+        );
+
+      if (!confirmDelete) return;
+
+      try {
+
+        await api.delete(
+          `/products/${id}`
+        );
+
+        // REMOVE PRODUCT FROM UI
+        setProducts((prev) =>
+          prev.filter(
+            (item) => item._id !== id
+          )
+        );
+
+        alert("Product Deleted Successfully");
+
+      } catch (error) {
+
+        console.log(error);
+
+        alert("Failed To Delete Product");
+      }
+    };
+
+  useEffect(() => {
+
+    fetchProducts();
+
+  }, []);
+
   return (
+
     <div className="p-10">
 
-      <h1 className="text-3xl font-bold mb-6">
-        Products
-      </h1>
+      {/* TOP HEADER */}
+      <div className="flex items-center justify-between mb-6">
 
-      <div className="grid grid-cols-4 gap-5">
+        <h1 className="text-3xl font-bold">
+          Products
+        </h1>
+
+        {/* CREATE PRODUCT BUTTON */}
+        <Link
+          to="/admin/products/create"
+          className="bg-black text-white px-5 py-3 rounded-lg hover:bg-gray-800 transition"
+        >
+          + Create Product
+        </Link>
+
+      </div>
+
+      {/* PRODUCTS GRID */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5">
 
         {
-          products.map((product) => (
+          products.length > 0 ? (
 
-            <div
-              key={product._id}
-              className="border rounded-lg p-4"
-            >
+            products.map((product) => (
 
-              <img
-                src={product.image[0]}
-                alt={product.name}
-                className="w-full h-52 object-cover rounded"
-              />
+              <div
+                key={product._id}
+                className="border rounded-xl p-4 shadow hover:shadow-lg transition bg-white"
+              >
 
-              <h2 className="font-bold mt-3">
-                {product.name}
-              </h2>
+                {/* PRODUCT IMAGE */}
+                <img
+                  src={product.image?.[0]}
+                  alt={product.name}
+                  className="w-full h-52 object-cover rounded-lg"
+                />
 
-              <p>
-                ₹{product.price}
-              </p>
+                {/* PRODUCT NAME */}
+                <h2 className="font-bold text-lg mt-4">
+                  {product.name}
+                </h2>
 
-              <p>
-                Stock:
-                {
-                  product.stockQuantity
-                }
-              </p>
+                {/* CATEGORY */}
+                <p className="text-gray-500 text-sm mt-1">
+                  {product.category}
+                </p>
 
+                {/* PRICE */}
+                <div className="mt-3 flex items-center gap-3">
+
+                  <p className="text-xl font-bold text-green-600">
+                    ₹{product.offerPrice}
+                  </p>
+
+                  <p className="line-through text-gray-400">
+                    ₹{product.price}
+                  </p>
+
+                </div>
+
+                {/* STOCK */}
+                <p className="mt-2 text-sm">
+                  Stock:
+                  <span className="font-semibold ml-1">
+                    {product.stockQuantity}
+                  </span>
+                </p>
+
+                {/* STATUS */}
+                <p
+                  className={`mt-2 text-sm font-semibold ${
+                    product.inStock
+                      ? "text-green-600"
+                      : "text-red-500"
+                  }`}
+                >
+                  {
+                    product.inStock
+                      ? "In Stock"
+                      : "Out of Stock"
+                  }
+                </p>
+
+                {/* ACTION BUTTONS */}
+                <div className="flex gap-3 mt-5">
+
+                  {/* EDIT BUTTON */}
+                  <Link
+                    to={`/admin/products/edit/${product._id}`}
+                    className="flex-1 bg-blue-600 hover:bg-blue-700 text-white py-2 rounded-lg text-center transition"
+                  >
+                    Edit
+                  </Link>
+
+                  {/* DELETE BUTTON */}
+                  <button
+                    onClick={() =>
+                      deleteProduct(product._id)
+                    }
+                    className="flex-1 bg-red-600 hover:bg-red-700 text-white py-2 rounded-lg transition"
+                  >
+                    Delete
+                  </button>
+
+                </div>
+
+              </div>
+            ))
+
+          ) : (
+
+            <div className="col-span-full text-center text-gray-500 text-lg">
+              No Products Found
             </div>
-          ))
+          )
         }
 
       </div>

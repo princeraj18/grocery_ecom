@@ -40,27 +40,41 @@ export default function Register() {
         formData
       );
 
-      // SAVE TOKEN
-      localStorage.setItem(
-        "adminToken",
-        data.token
-      );
+      const token = data?.token;
+
+      const adminData =
+        data?.admin ?? {
+          _id: data?._id ?? data?.id,
+          name: data?.name,
+          email: data?.email,
+          role: data?.role,
+        };
+
+      // SAVE TOKEN (if present)
+      if (token) {
+        localStorage.setItem("adminToken", token);
+      }
 
       // SAVE ADMIN
-      localStorage.setItem(
-        "admin",
-        JSON.stringify(data.admin)
-      );
+      if (adminData) {
+        localStorage.setItem(
+          "admin",
+          JSON.stringify(adminData)
+        );
+      }
 
       // CONTEXT LOGIN
-      login(data.admin);
+      login(adminData);
 
-      alert(
-        "Admin Registered Successfully"
-      );
+      alert("Admin Registered Successfully");
 
-      // REDIRECT TO ADMIN PAGE
-      navigate("/admin");
+      // REDIRECT: only go to admin dashboard if we have a token
+      if (token) {
+        navigate("/admin");
+      } else {
+        // no token -> ask user to login
+        navigate("/login");
+      }
 
     } catch (error) {
 
