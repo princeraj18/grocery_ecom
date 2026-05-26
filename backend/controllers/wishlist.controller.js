@@ -1,4 +1,8 @@
 import Wishlist from "../models/wishlist.model.js";
+import mongoose from "mongoose";
+
+const isObjectId = (id) =>
+  mongoose.Types.ObjectId.isValid(id);
 
 // ======================================
 // ADD TO WISHLIST
@@ -23,6 +27,18 @@ export const addToWishlist =
           success: false,
           message:
             "User ID and Product ID required",
+        });
+      }
+
+      if (
+        !isObjectId(userId) ||
+        !isObjectId(productId)
+      ) {
+
+        return res.status(400).json({
+          success: false,
+          message:
+            "Invalid User ID or Product ID",
         });
       }
 
@@ -84,6 +100,18 @@ export const getWishlist =
 
     try {
 
+      if (
+        !isObjectId(req.params.userId)
+      ) {
+
+        return res.status(400).json({
+          success: false,
+          message:
+            "Invalid User ID",
+          wishlist: [],
+        });
+      }
+
       const wishlist =
         await Wishlist.find({
           user: req.params.userId,
@@ -120,6 +148,30 @@ export const removeWishlist =
         userId,
         productId,
       } = req.body;
+
+      if (
+        !userId ||
+        !productId
+      ) {
+
+        return res.status(400).json({
+          success: false,
+          message:
+            "User ID and Product ID required",
+        });
+      }
+
+      if (
+        !isObjectId(userId) ||
+        !isObjectId(productId)
+      ) {
+
+        return res.status(400).json({
+          success: false,
+          message:
+            "Invalid User ID or Product ID",
+        });
+      }
 
       await Wishlist.findOneAndDelete({
         user: userId,

@@ -1,4 +1,5 @@
 import React, {
+  useContext,
   useEffect,
   useState,
 } from "react";
@@ -8,6 +9,9 @@ import axios from "axios";
 import {
   useNavigate,
 } from "react-router-dom";
+import {
+  ShopContext,
+} from "../context/ShopContext";
 
 // import Navbar from "../components/Navbar";
 
@@ -17,6 +21,11 @@ const WishList = () => {
 
   const navigate =
     useNavigate();
+
+  const {
+    fetchWishlist:
+      refreshNavbarWishlist,
+  } = useContext(ShopContext);
 
   const [wishlist, setWishlist] =
     useState([]);
@@ -84,6 +93,8 @@ const WishList = () => {
         );
 
         fetchWishlist();
+
+        await refreshNavbarWishlist();
 
       } catch (error) {
 

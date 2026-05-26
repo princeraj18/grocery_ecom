@@ -25,13 +25,16 @@ import {
 
 import ProductReview from "../components/ProductReview";
 
+const isMongoObjectId = (id) =>
+  /^[a-f\d]{24}$/i.test(id || "");
+
 const ProductDetails = () => {
 
   const { id } = useParams();
 
   const navigate = useNavigate();
 
-  const { addToCart } =
+  const { addToCart, fetchWishlist } =
     useContext(ShopContext);
 
   const [product, setProduct] =
@@ -136,7 +139,8 @@ const ProductDetails = () => {
 
           if (
             !userId ||
-            !product?._id
+            !product?._id ||
+            !isMongoObjectId(product._id)
           )
             return;
 
@@ -191,6 +195,19 @@ const ProductDetails = () => {
           return;
         }
 
+        if (
+          !isMongoObjectId(
+            product?._id
+          )
+        ) {
+
+          alert(
+            "Wishlist is available for database products only"
+          );
+
+          return;
+        }
+
         // REMOVE FROM WISHLIST
         if (
           isWishlisted
@@ -211,6 +228,8 @@ const ProductDetails = () => {
             false
           );
 
+          await fetchWishlist();
+
           alert(
             "Removed from wishlist"
           );
@@ -230,6 +249,8 @@ const ProductDetails = () => {
           setIsWishlisted(
             true
           );
+
+          await fetchWishlist();
 
           alert(
             "Added to wishlist"
