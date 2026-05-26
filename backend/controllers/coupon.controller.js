@@ -1,5 +1,5 @@
 import Coupon from "../models/coupon.model.js";
-
+import Product from "../models/product.model.js";
 // =======================================
 // CREATE COUPON
 // =======================================
@@ -186,6 +186,120 @@ export const toggleCouponStatus =
         success: true,
         message:
           "Coupon updated successfully",
+        coupon,
+      });
+
+    } catch (error) {
+
+      console.log(error);
+
+      res.status(500).json({
+        success: false,
+        message: error.message,
+      });
+    }
+  };
+
+
+  export const validateCoupon =
+  async (req, res) => {
+    try {
+      const {
+        code,
+        cartItems,
+      } = req.body;
+
+      const coupon =
+        await Coupon.findOne({
+          code: code.toUpperCase(),
+          isActive: true,
+        });
+
+      if (!coupon) {
+        return res.status(404).json({
+          success: false,
+          message: "Invalid coupon",
+        });
+      }
+
+      if (
+        new Date() >
+        new Date(coupon.expiryDate)
+      ) {
+        return res.status(400).json({
+          success: false,
+          message: "Coupon expired",
+        });
+      }
+
+      let vendorSubtotal = 0;
+
+      for (const item of cartItems) {
+
+        const product =
+          await Product.findById(
+            item.productId ||
+            item._id
+          );
+
+        if (
+          product &&
+          product.vendor.toString() ===
+          coupon.vendor.toString()
+        ) {
+          vendorSubtotal +=
+            item.price *
+            item.quantity;
+        }
+      }
+
+      if (vendorSubtotal === 0) {
+        return res.status(400).json({
+          success: false,
+          message:
+            "This coupon is not applicable to products in your cart",
+        });
+      }
+
+      if (
+        vendorSubtotal <
+        coupon.minOrderAmount
+      ) {
+        return res.status(400).json({
+          success: false,
+          message:
+            `Minimum order amount ₹${coupon.minOrderAmount}`,
+        });
+      }
+
+      let discount = 0;
+
+      if (
+        coupon.discountType ===
+        "percentage"
+      ) {
+        discount =
+          (vendorSubtotal *
+            coupon.discountValue) /
+          100;
+
+        if (
+          coupon.maxDiscount > 0
+        ) {
+          discount = Math.min(
+            discount,
+            coupon.maxDiscount
+          );
+        }
+      } else {
+        discount =
+          coupon.discountValue;
+      }
+
+      res.status(200).json({
+        success: true,
+        discount,
+        vendorSubtotal,
         coupon,
       });
 

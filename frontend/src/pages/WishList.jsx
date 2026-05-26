@@ -185,8 +185,7 @@ const WishList = () => {
 
             ) : (
 
-              <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-
+<div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
                 {
                   wishlist.map(
                     (item) => {
@@ -197,118 +196,83 @@ const WishList = () => {
                       return (
 
                         <div
-                          key={item._id}
-                          className="bg-white rounded-3xl shadow-md overflow-hidden hover:shadow-xl transition"
-                        >
+  key={item._id}
+  className="bg-white rounded-2xl shadow-sm hover:shadow-lg transition overflow-hidden border"
+>
+  {/* IMAGE */}
+  <div className="relative">
+    <img
+      src={
+        Array.isArray(product?.image)
+          ? product?.image[0]
+          : product?.image
+      }
+      alt={product?.name}
+      className="w-full h-40 object-cover"
+    />
 
-                          {/* IMAGE */}
-                          <img
-                            src={
-                              Array.isArray(
-                                product?.image
-                              )
-                                ? product
-                                    ?.image[0]
-                                : product?.image
-                            }
-                            alt={
-                              product?.name
-                            }
-                            className="w-full h-64 object-cover"
-                          />
+    <span
+      className={`absolute top-2 right-2 text-xs px-2 py-1 rounded-full font-medium ${
+        product?.inStock
+          ? "bg-green-100 text-green-700"
+          : "bg-red-100 text-red-600"
+      }`}
+    >
+      {product?.inStock
+        ? "In Stock"
+        : "Out of Stock"}
+    </span>
+  </div>
 
-                          {/* CONTENT */}
-                          <div className="p-5">
+  {/* CONTENT */}
+  <div className="p-3">
 
-                            <div className="flex items-center justify-between mb-3">
+    <p className="text-xs text-gray-500 mb-1">
+      {product?.category}
+    </p>
 
-                              <span className="bg-green-100 text-green-700 px-3 py-1 rounded-full text-sm">
+    <h2 className="font-semibold text-sm text-gray-800 line-clamp-2 min-h-[40px]">
+      {product?.name}
+    </h2>
 
-                                {
-                                  product?.category
-                                }
+    {/* PRICE */}
+    <div className="flex items-center gap-2 mt-2">
+      <span className="text-lg font-bold text-green-600">
+        ₹{product?.offerPrice}
+      </span>
 
-                              </span>
+      <span className="text-xs text-gray-400 line-through">
+        ₹{product?.price}
+      </span>
+    </div>
 
-                              <span
-                                className={`text-sm font-semibold ${
-                                  product?.inStock
-                                    ? "text-green-600"
-                                    : "text-red-500"
-                                }`}
-                              >
+    {/* BUTTONS */}
+    <div className="flex gap-2 mt-3">
+      <button
+        onClick={() =>
+          navigate(
+            `/products/${product?._id}`
+          )
+        }
+        className="flex-1 bg-black text-white text-xs py-2 rounded-lg hover:bg-gray-800"
+      >
+        View
+      </button>
 
-                                {
-                                  product?.inStock
-                                    ? "In Stock"
-                                    : "Out Of Stock"
-                                }
+      <button
+        onClick={() =>
+          removeItem(
+            product?._id
+          )
+        }
+        className="flex-1 bg-red-500 text-white text-xs py-2 rounded-lg hover:bg-red-600"
+      >
+        Remove
+      </button>
+    </div>
 
-                              </span>
-
-                            </div>
-
-                            <h2 className="text-xl font-bold text-gray-800 line-clamp-2">
-
-                              {
-                                product?.name
-                              }
-
-                            </h2>
-
-                            {/* PRICE */}
-                            <div className="flex items-center gap-3 mt-4">
-
-                              <p className="text-2xl font-bold text-green-600">
-
-                                ₹
-                                {
-                                  product?.offerPrice
-                                }
-
-                              </p>
-
-                              <p className="line-through text-gray-400">
-
-                                ₹
-                                {
-                                  product?.price
-                                }
-
-                              </p>
-
-                            </div>
-
-                            {/* BUTTONS */}
-                            <div className="flex gap-3 mt-6">
-
-                              <button
-                                onClick={() =>
-                                  navigate(
-                                    `/products/${product?._id}`
-                                  )
-                                }
-                                className="flex-1 bg-black text-white py-3 rounded-xl hover:bg-gray-800 transition"
-                              >
-                                View Product
-                              </button>
-
-                              <button
-                                onClick={() =>
-                                  removeItem(
-                                    product?._id
-                                  )
-                                }
-                                className="flex-1 bg-red-500 text-white py-3 rounded-xl hover:bg-red-600 transition"
-                              >
-                                Remove
-                              </button>
-
-                            </div>
-
-                          </div>
-
-                        </div>
+  </div>
+</div>
                       );
                     }
                   )

@@ -12,6 +12,7 @@ import { Link } from "react-router-dom";
 import {
   FaHeart,
   FaRegHeart,
+   FaCheckCircle,
 } from "react-icons/fa";
 
 import { ShopContext } from "../context/ShopContext";
@@ -360,122 +361,112 @@ const Products = () => {
               (item) => (
 
                 <Link
-                  key={item._id}
-                  to={`/products/${item._id}`}
-                  className="bg-white rounded-2xl shadow-md hover:shadow-2xl transition-all duration-300 overflow-hidden group border relative"
-                >
+  key={item._id}
+  to={`/products/${item._id}`}
+  className="bg-white rounded-2xl shadow hover:shadow-xl transition overflow-hidden border relative group"
+>
+  {/* Wishlist */}
+  <button
+    onClick={(e) =>
+      toggleWishlist(
+        e,
+        item._id
+      )
+    }
+    className="absolute top-3 right-3 z-20 bg-white p-2 rounded-full shadow"
+  >
+    {wishlistIds.includes(
+      item._id
+    ) ? (
+      <FaHeart className="text-red-500" />
+    ) : (
+      <FaRegHeart className="text-gray-500" />
+    )}
+  </button>
 
-                  {/* WISHLIST BUTTON */}
-                  <button
-                    onClick={(e) =>
-                      toggleWishlist(
-                        e,
-                        item._id
-                      )
-                    }
-                    className="absolute top-3 right-3 z-10 bg-white p-3 rounded-full shadow-md hover:scale-110 transition"
-                  >
+  {/* Product Image */}
+  <div className="overflow-hidden">
+    <img
+      src={item.image?.[0]}
+      alt={item.name}
+      className="w-full h-52 object-cover group-hover:scale-105 transition duration-300"
+    />
+  </div>
 
-                    {
-                      wishlistIds.includes(
-                        item._id
-                      ) ? (
+  {/* Content */}
+  <div className="p-4">
 
-                        <FaHeart className="text-red-500 text-xl" />
+    <span className="inline-block bg-green-100 text-green-700 text-xs px-2 py-1 rounded-full">
+      {item.category}
+    </span>
 
-                      ) : (
+    <h3 className="font-semibold text-gray-800 mt-3 line-clamp-2 min-h-[48px]">
+      {item.name}
+    </h3>
 
-                        <FaRegHeart className="text-gray-600 text-xl" />
+    {/* Vendor */}
+    {item.vendor && (
+      <div className="mt-2">
 
-                      )
-                    }
+        <p className="text-xs text-gray-500">
+          Sold by
+        </p>
 
-                  </button>
+        <div className="flex items-center gap-1">
 
-                  {/* IMAGE */}
-                  <div className="overflow-hidden">
+          <span className="text-sm font-medium">
+            {item.vendor.shopName}
+          </span>
 
-                    <img
-                      src={
-                        item.image?.[0]
-                      }
-                      alt={
-                        item.name
-                      }
-                      className="w-full h-64 object-cover group-hover:scale-105 transition duration-300"
-                    />
+          {item.vendor.isVerified && (
+            <FaCheckCircle
+              className="text-blue-500"
+              title="Verified Vendor"
+            />
+          )}
 
-                  </div>
+        </div>
 
-                  {/* INFO */}
-                  <div className="p-4">
+      </div>
+    )}
 
-                    <span className="text-xs bg-green-100 text-green-700 px-2 py-1 rounded-full">
+    {/* Price */}
+    <div className="flex items-center gap-2 mt-3">
 
-                      {
-                        item.category
-                      }
+      <p className="text-green-600 font-bold text-lg">
+        ₹{item.offerPrice}
+      </p>
 
-                    </span>
+      <p className="text-gray-400 line-through text-sm">
+        ₹{item.price}
+      </p>
 
-                    <h3 className="font-semibold text-gray-800 mt-3 line-clamp-2">
+    </div>
 
-                      {
-                        item.name
-                      }
+    {/* Stock */}
+    <p
+      className={`text-sm mt-2 ${
+        item.inStock
+          ? "text-green-600"
+          : "text-red-500"
+      }`}
+    >
+      {item.inStock
+        ? "In Stock"
+        : "Out of Stock"}
+    </p>
 
-                    </h3>
+    <button
+      className="w-full mt-4 bg-green-600 hover:bg-green-700 text-white py-2 rounded-lg"
+      onClick={(e) => {
+        e.preventDefault();
+      }}
+    >
+      Add To Cart
+    </button>
 
-                    {/* PRICE */}
-                    <div className="flex items-center gap-2 mt-3">
-
-                      <p className="text-green-600 font-bold text-lg">
-
-                        ₹
-                        {
-                          item.offerPrice
-                        }
-
-                      </p>
-
-                      <p className="text-gray-400 line-through text-sm">
-
-                        ₹
-                        {
-                          item.price
-                        }
-
-                      </p>
-
-                    </div>
-
-                    {/* STOCK */}
-                    <p
-                      className={`text-sm mt-2 ${
-                        item.inStock
-                          ? "text-green-600"
-                          : "text-red-500"
-                      }`}
-                    >
-
-                      {
-                        item.inStock
-                          ? "In Stock"
-                          : "Out of Stock"
-                      }
-
-                    </p>
-
-                    {/* BUTTON */}
-                    <button className="w-full mt-4 bg-green-600 hover:bg-green-700 text-white py-2 rounded-lg transition">
-
-                      Add To Cart
-
-                    </button>
-
-                  </div>
-
-                </Link>
+  </div>
+</Link>
               )
             )
           }

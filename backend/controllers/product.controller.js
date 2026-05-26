@@ -147,13 +147,12 @@ export const getProducts = async (
 ) => {
   try {
 
-    const products =
-      await Product.find()
-        .populate(
-          "vendor",
-          "shopName ownerName"
-        )
-        .sort({ createdAt: -1 });
+    const products = await Product.find()
+  .populate(
+    "vendor",
+    "shopName ownerName isVerified"
+  )
+  .sort({ createdAt: -1 });
 
     res.status(200).json({
       success: true,
@@ -218,10 +217,12 @@ export const getSingleProduct =
         });
       }
 
-      const product = await Product.findById(
-        req.params.id
-      ).populate("vendor", "shopName ownerName");
-
+    const product = await Product.findById(
+  req.params.id
+).populate(
+  "vendor",
+  "shopName ownerName isVerified"
+);
       if (!product) {
 
         return res.status(404).json({

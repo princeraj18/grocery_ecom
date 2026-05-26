@@ -1,6 +1,8 @@
 import React, {
+  useEffect,
   useState,
 } from "react";
+
 
 import axios from "axios";
 
@@ -20,7 +22,21 @@ export default function ProductReview({
 
   const [loading, setLoading] =
     useState(false);
+const [reviews, setReviews] =
+  useState([]);
 
+const [reviewsLoading, setReviewsLoading] =
+  useState(true);
+  const averageRating =
+  reviews.length
+    ? (
+        reviews.reduce(
+          (sum, review) =>
+            sum + review.rating,
+          0
+        ) / reviews.length
+      ).toFixed(1)
+    : 0;
   // ====================================
   // SUBMIT REVIEW
   // ====================================
@@ -65,6 +81,7 @@ export default function ProductReview({
         setRating(0);
 
         setComment("");
+        fetchReviews();
 
       } catch (error) {
 
@@ -81,11 +98,123 @@ export default function ProductReview({
         setLoading(false);
       }
     };
+const fetchReviews =
+  async () => {
+    try {
+      const { data } =
+        await axios.get(
+          `http://localhost:5000/api/reviews/product/${productId}`
+        );
+
+      setReviews(
+        data.reviews || []
+      );
+    } catch (error) {
+      console.log(
+        "FETCH REVIEWS ERROR:",
+        error
+      );
+    } finally {
+      setReviewsLoading(false);
+    }
+  };
+
+
+  useEffect(() => {
+  fetchReviews();
+}, [productId]);
+
 
   return (
 
     <div className="bg-white rounded-2xl shadow-lg p-6 mt-10">
+      <div className="flex items-center gap-3 mb-5">
+  <span className="text-3xl font-bold">
+    {averageRating}
+  </span>
 
+  <span className="text-yellow-500 text-xl">
+    ★★★★★
+  </span>
+
+  <span className="text-gray-500">
+    ({reviews.length} reviews)
+  </span>
+</div>
+{/* PRODUCT REVIEWS */}
+<div className="mb-10">
+
+  <h2 className="text-2xl font-bold mb-5">
+    Customer Reviews
+  </h2>
+
+  {reviewsLoading ? (
+
+    <p>Loading reviews...</p>
+
+  ) : reviews.length === 0 ? (
+
+    <div className="bg-gray-50 rounded-xl p-6 text-center">
+
+      <p className="text-gray-500">
+        No reviews yet.
+      </p>
+
+      <p className="text-sm text-gray-400 mt-1">
+        Be the first to review this product.
+      </p>
+
+    </div>
+
+  ) : (
+
+    <div className="space-y-4">
+
+      {reviews.map((review) => (
+
+        <div
+          key={review._id}
+          className="border rounded-xl p-4"
+        >
+
+          {/* USER + RATING */}
+          <div className="flex justify-between items-center">
+
+            <h3 className="font-semibold">
+              {review.user?.name}
+            </h3>
+
+            <div className="text-yellow-500">
+              {"★".repeat(
+                review.rating
+              )}
+              {"☆".repeat(
+                5 -
+                review.rating
+              )}
+            </div>
+
+          </div>
+
+          {/* DATE */}
+          <p className="text-xs text-gray-400 mt-1">
+            {new Date(
+              review.createdAt
+            ).toLocaleDateString()}
+          </p>
+
+          {/* COMMENT */}
+          <p className="mt-3 text-gray-700">
+            {review.comment}
+          </p>
+
+        </div>
+      ))}
+
+    </div>
+  )}
+
+</div>
       {/* TITLE */}
       <h2 className="text-2xl font-bold mb-6">
         Write a Review

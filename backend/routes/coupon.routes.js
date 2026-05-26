@@ -6,7 +6,8 @@ import {
   createCoupon,
   getVendorCoupons,
   deleteCoupon,
-  toggleCouponStatus,
+  toggleCouponStatus,  validateCoupon,
+
 } from "../controllers/coupon.controller.js";
 
 const router = express.Router();
@@ -46,5 +47,8 @@ router.put(
   vendorAuth,
   toggleCouponStatus
 );
-
+router.post(
+  "/validate",
+  validateCoupon
+);
 export default router;

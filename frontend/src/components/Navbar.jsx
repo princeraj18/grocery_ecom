@@ -215,61 +215,48 @@ useEffect(() => {
 
     <nav className="bg-blue-600 text-white px-4 py-3 shadow-md relative z-50">
 
-      <div className="flex items-center justify-between">
-
+<div className="relative flex items-center justify-between">
         {/* LOGO */}
         <div
             onClick={() => handleNavigation("/")}
-          className="text-2xl font-bold cursor-pointer"
-        >
+className="text-xl md:text-2xl font-bold cursor-pointer whitespace-nowrap"        >
           Grocify
         </div>
 
-        {/* DESKTOP MENU */}
-        <div className="hidden lg:flex items-center gap-6 font-medium">
+       
+       {/* DESKTOP MENU */}
+<div className="hidden   lg:flex items-center gap-8 font-medium absolute left-1/3 -translate-x-1/2">  
+<span
+    onClick={() => handleNavigation("/")}
+    className="cursor-pointer hover:text-gray-200"
+  >
+    Home
+  </span>
 
-          <span
-            onClick={() =>
-              handleNavigation("/")
-            }
-            className="cursor-pointer hover:text-gray-200"
-          >
-            Home
-          </span>
+  <span
+    onClick={() => handleNavigation("/products")}
+    className="cursor-pointer hover:text-gray-200"
+  >
+    Products
+  </span>
 
-          <span
-            onClick={() =>
-              handleNavigation("/products")
-            }
-            className="cursor-pointer hover:text-gray-200"
-          >
-            Products
-          </span>
+  <span
+    onClick={() => navigate("/about")}
+    className="cursor-pointer hover:text-gray-200"
+  >
+    About Us
+  </span>
 
-          <span
-            onClick={() =>
-              navigate("/about")
-            }
-            className="cursor-pointer hover:text-gray-200"
-          >
-            About Us
-          </span>
-
-          <span
-            onClick={() =>
-              navigate("/contact")
-            }
-            className="cursor-pointer hover:text-gray-200"
-          >
-            Contact Us
-          </span>
-
-        </div>
+  <span
+    onClick={() => navigate("/contact")}
+    className="cursor-pointer hover:text-gray-200"
+  >
+    Contact Us
+  </span>
+</div>
 
         {/* RIGHT SIDE */}
-        <div className="hidden lg:flex items-center gap-5 relative">
-
-          {/* SEARCH BAR */}
+<div className="hidden lg:flex items-center gap-5 relative">          {/* SEARCH BAR */}
           {showSearchBar && (
 
             <div className="relative">
@@ -462,35 +449,28 @@ useEffect(() => {
         </div>
 
         {/* MOBILE RIGHT */}
-        <div className="flex lg:hidden items-center gap-4 text-xl">
+{/* MOBILE / TABLET ONLY */}
+<div className="flex lg:hidden items-center gap-4">
 
-          {/* SEARCH ICON */}
-          {showSearchBar && (
-            <FaSearch
-              className="cursor-pointer"
-              onClick={() =>
-                setShowSearch(
-                  !showSearch
-                )
-              }
-            />
-          )}
+  {/* SEARCH ICON */}
+  {showSearchBar && (
+    <button
+      onClick={() => setShowSearch(!showSearch)}
+      className="text-xl"
+    >
+      <FaSearch />
+    </button>
+  )}
 
-          {/* MENU ICON */}
-          <div
-            onClick={() =>
-              setOpen(!open)
-            }
-            className="cursor-pointer"
-          >
+  {/* HAMBURGER MENU */}
+  <button
+    onClick={() => setOpen(!open)}
+    className="text-xl"
+  >
+    {open ? <FaTimes /> : <FaBars />}
+  </button>
 
-            {open
-              ? <FaTimes />
-              : <FaBars />}
-
-          </div>
-
-        </div>
+</div>
 
       </div>
 
@@ -498,15 +478,15 @@ useEffect(() => {
       {showSearch &&
         showSearchBar && (
 
-        <div className="mt-4 lg:hidden relative">
+        <div className="mt-4 xl:hidden relative w-full">
 
-          <input
-            type="text"
-            value={search}
-            onChange={handleSearch}
-            placeholder="Search products..."
-            className="w-full px-4 py-3 rounded-lg text-black outline-none"
-          />
+       <input
+  type="text"
+  value={search}
+  onChange={handleSearch}
+  placeholder="Search products..."
+  className="w-full px-4 py-3 bg-white rounded-lg text-black outline-none border border-gray-200 shadow-sm"
+/>
           
 
           {/* MOBILE SUGGESTIONS */}

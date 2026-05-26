@@ -14,6 +14,7 @@ import {
 import {
   FaHeart,
   FaRegHeart,
+  FaCheckCircle,
 } from "react-icons/fa";
 
 import { ShopContext } from "../context/ShopContext";
@@ -402,6 +403,25 @@ const ProductDetails = () => {
             {product.name}
 
           </h1>
+          <div className="flex items-center gap-3 mt-3">
+  <span className="text-gray-600">
+    Sold by:
+    <span className="font-semibold ml-1">
+      {product.vendor?.shopName}
+    </span>
+  </span>
+
+  {product.vendor?.isVerified ? (
+    <span className="flex items-center gap-1 bg-blue-100 text-blue-700 px-3 py-1 rounded-full text-sm">
+      <FaCheckCircle />
+      Verified Vendor
+    </span>
+  ) : (
+    <span className="bg-red-100 text-red-600 px-3 py-1 rounded-full text-sm">
+      Unverified Vendor
+    </span>
+  )}
+</div>
 
           {/* PRICE */}
           <div className="flex items-center gap-4 mt-5">

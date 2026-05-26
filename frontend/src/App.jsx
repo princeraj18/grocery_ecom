@@ -9,22 +9,36 @@ function App() {
 
   const location = useLocation();
 
+  // =========================
+  // HIDE NAVBAR/FOOTER ROUTES
+  // =========================
+  const hiddenRoutes = [
+    "/login",
+    "/register",
+    "/payment-success",
+    "/payment-cancel",
+  ];
+
   // CHECK IF CURRENT ROUTE IS VENDOR
   const isVendorRoute =
     location.pathname.startsWith("/vendor");
 
+  // CHECK IF NAVBAR SHOULD HIDE
+  const hideLayout =
+    hiddenRoutes.includes(location.pathname) ||
+    isVendorRoute;
+
   return (
     <>
 
-      {/* HIDE USER NAVBAR ON VENDOR ROUTES */}
-      {!isVendorRoute && <Navbar />}
+      {/* NAVBAR */}
+      {!hideLayout && <Navbar />}
 
+      {/* ROUTES */}
       <AppRoutes />
 
-      {/* OPTIONAL:
-         HIDE FOOTER ALSO ON VENDOR ROUTES
-      */}
-      {!isVendorRoute && <Footer />}
+      {/* FOOTER */}
+      {!hideLayout && <Footer />}
 
     </>
   );

@@ -48,149 +48,153 @@ const AppRoutes = () => {
     ) || isVendorRoute;
 
   return (
-    <>
-      {/* {!hideNavbar && <Navbar />} */}
+  <>
+    {/* {!hideNavbar && <Navbar />} */}
 
-      <Routes>
+    <Routes>
 
-        {/* USER ROUTES */}
+      {/* USER ROUTES */}
 
-        <Route
-          path="/"
-          element={
-            <ProtectedRoute>
-              <Home />
-            </ProtectedRoute>
-          }
-        />
+      <Route
+        path="/"
+        element={
+          <ProtectedRoute>
+            <Home />
+          </ProtectedRoute>
+        }
+      />
 
-        <Route
-          path="/products"
-          element={
-            <ProtectedRoute>
-              <Products />
-            </ProtectedRoute>
-          }
-        />
+      <Route
+        path="/products"
+        element={
+          <ProtectedRoute>
+            <Products />
+          </ProtectedRoute>
+        }
+      />
 
-        <Route
-          path="/products/:id"
-          element={
-            <ProtectedRoute>
-              <ProductDetails />
-            </ProtectedRoute>
-          }
-        />
+      <Route
+        path="/products/:id"
+        element={
+          <ProtectedRoute>
+            <ProductDetails />
+          </ProtectedRoute>
+        }
+      />
 
-        <Route
-          path="/category/:category"
-          element={
-            <ProtectedRoute>
-              <CategoryProducts />
-            </ProtectedRoute>
-          }
-        />
-  <Route
-          path="/wishlist"
-          element={
-            <ProtectedRoute>
-              <WishList />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/cart"
-          element={
-            <ProtectedRoute>
-              <Cart />
-            </ProtectedRoute>
-          }
-        />
+      <Route
+        path="/category/:category"
+        element={
+          <ProtectedRoute>
+            <CategoryProducts />
+          </ProtectedRoute>
+        }
+      />
 
-        <Route
-          path="/checkout"
-          element={
-            <ProtectedRoute>
-              <Checkout />
-            </ProtectedRoute>
-          }
-        />
+      <Route
+        path="/wishlist"
+        element={
+          <ProtectedRoute>
+            <WishList />
+          </ProtectedRoute>
+        }
+      />
 
-        <Route
-          path="/login"
-          element={<Login />}
-        />
+      <Route
+        path="/cart"
+        element={
+          <ProtectedRoute>
+            <Cart />
+          </ProtectedRoute>
+        }
+      />
 
-        <Route
-          path="/register"
-          element={<Register />}
-        />
+      <Route
+        path="/checkout"
+        element={
+          <ProtectedRoute>
+            <Checkout />
+          </ProtectedRoute>
+        }
+      />
 
-        <Route
-          path="/profile"
-          element={
-            <ProtectedRoute>
-              <Profile />
-            </ProtectedRoute>
-          }
-        />
+      {/* LOGIN */}
+      <Route
+        path="/login"
+        element={<Login />}
+      />
 
-        <Route
-          path="/orders"
-          element={
-            <ProtectedRoute>
-              <Orders />
-            </ProtectedRoute>
-          }
-        />
+      {/* REGISTER */}
+      <Route
+        path="/register"
+        element={<Register />}
+      />
 
-        <Route
-          path="/about"
-          element={
-            <ProtectedRoute>
-              <AboutUs />
-            </ProtectedRoute>
-          }
-        />
+      <Route
+        path="/profile"
+        element={
+          <ProtectedRoute>
+            <Profile />
+          </ProtectedRoute>
+        }
+      />
 
-        <Route
-          path="/contact"
-          element={
-            <ProtectedRoute>
-              <ContactUs />
-            </ProtectedRoute>
-          }
-        />
+      <Route
+        path="/orders"
+        element={
+          <ProtectedRoute>
+            <Orders />
+          </ProtectedRoute>
+        }
+      />
 
-        <Route
-          path="/payment-success"
-          element={<PaymentSuccess />}
-        />
+      <Route
+        path="/about"
+        element={
+          <ProtectedRoute>
+            <AboutUs />
+          </ProtectedRoute>
+        }
+      />
 
-        <Route
-          path="/payment-cancel"
-          element={
-            <div className="min-h-screen flex items-center justify-center text-3xl font-bold">
-              Payment Cancelled
-            </div>
-          }
-        />
+      <Route
+        path="/contact"
+        element={
+          <ProtectedRoute>
+            <ContactUs />
+          </ProtectedRoute>
+        }
+      />
 
-        {/* Legacy/edit shortcut -> redirect to vendor edit */}
-        <Route path="/edit/:id" element={<EditRedirect />} />
+      <Route
+        path="/payment-success"
+        element={<PaymentSuccess />}
+      />
 
-        {/* ====================== */}
-        {/* VENDOR ROUTES */}
-        {/* ====================== */}
+      <Route
+        path="/payment-cancel"
+        element={
+          <div className="min-h-screen flex items-center justify-center text-3xl font-bold">
+            Payment Cancelled
+          </div>
+        }
+      />
 
-        <Route
-          path="/vendor/*"
-          element={<VendorRoutes />}
-        />
+      {/* Redirect */}
+      <Route
+        path="/edit/:id"
+        element={<EditRedirect />}
+      />
 
-      </Routes>
-    </>
-  );
+      {/* VENDOR ROUTES */}
+      <Route
+        path="/vendor/*"
+        element={<VendorRoutes />}
+      />
+
+    </Routes>
+  </>
+);
 };
 
 export default AppRoutes;

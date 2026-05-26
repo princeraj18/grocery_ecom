@@ -24,16 +24,33 @@ const Checkout = () => {
       pincode: "",
       address: "",
     });
+// COUPON STATES
+const [couponCode, setCouponCode] =
+  useState("");
 
+const [discount, setDiscount] =
+  useState(0);
+
+const [appliedCoupon, setAppliedCoupon] =
+  useState("");
   const SHIPPING_CHARGE = 20;
 
-  const subtotal = cartItems.reduce(
+// ORIGINAL SUBTOTAL
+const originalSubtotal =
+  cartItems.reduce(
     (total, item) =>
-      total + item.price * item.quantity,
+      total +
+      item.price * item.quantity,
     0
   );
 
-  const total = subtotal + SHIPPING_CHARGE;
+// FINAL SUBTOTAL AFTER DISCOUNT
+const subtotal =
+  originalSubtotal - discount;
+
+// FINAL TOTAL
+const total =
+  subtotal + SHIPPING_CHARGE;
 
   const handleChange = (e) => {
     setShippingData({
@@ -85,6 +102,67 @@ const Checkout = () => {
 
     return true;
   };
+  // =========================
+// APPLY COUPON
+// =========================
+// =========================
+// APPLY COUPON
+// =========================
+const handleApplyCoupon = async () => {
+  // REMOVE COUPON
+  if (appliedCoupon) {
+    setAppliedCoupon("");
+    setCouponCode("");
+    setDiscount(0);
+
+    alert("Coupon Removed");
+
+    return;
+  }
+
+  try {
+    const code = couponCode
+      .trim()
+      .toUpperCase();
+
+    if (!code) {
+      return alert("Enter coupon code");
+    }
+
+    const res = await api.post(
+      "/coupons/validate",
+      {
+        code,
+        cartItems,
+        // orderAmount:
+        //   originalSubtotal,
+      }
+    );
+
+    if (res.data.success) {
+      setDiscount(
+        res.data.discount
+      );
+
+      setAppliedCoupon(
+        code
+      );
+
+      alert(
+        "Coupon Applied Successfully"
+      );
+    }
+  } catch (error) {
+    alert(
+      error.response?.data
+        ?.message ||
+        "Invalid Coupon"
+    );
+
+    setDiscount(0);
+    setAppliedCoupon("");
+  }
+};
 
   const handlePlaceOrder = async () => {
     if (!validateForm()) return;
@@ -354,20 +432,102 @@ const Checkout = () => {
                   </div>
                 ))
               )}
+{/* ========================= */}
+{/* COUPON SECTION */}
+{/* ========================= */}
+<div className="mt-5">
 
+  <h3 className="font-semibold mb-3">
+    Apply Coupon
+  </h3>
+
+  <div className="flex gap-2">
+
+    <input
+      type="text"
+      placeholder="Enter Coupon Code"
+      value={couponCode}
+      onChange={(e) =>
+        setCouponCode(
+          e.target.value
+        )
+      }
+      className="flex-1 border rounded-lg px-4 py-2"
+    />
+
+   <button
+  onClick={handleApplyCoupon}
+  className={`px-4 rounded-lg text-white ${
+    appliedCoupon
+      ? "bg-red-600 hover:bg-red-700"
+      : "bg-blue-600 hover:bg-blue-700"
+  }`}
+>
+  {appliedCoupon
+    ? "Applied"
+    : "Apply"}
+</button>
+
+  </div>
+
+  {/* APPLIED COUPON */}
+  {appliedCoupon && (
+
+    <p className="text-green-600 text-sm mt-2">
+
+      Coupon Applied:
+      {" "}
+      {appliedCoupon}
+
+    </p>
+  )}
+
+</div>
               <hr className="my-4" />
 
-              <div className="flex justify-between mb-3">
-                <span>Subtotal</span>
-                <span>₹{subtotal}</span>
-              </div>
+           <div className="flex justify-between mb-3">
 
-              <div className="flex justify-between mb-3">
-                <span>Shipping</span>
-                <span>
-                  ₹{SHIPPING_CHARGE}
-                </span>
-              </div>
+  <span>Original Price</span>
+
+  <span>
+    ₹{originalSubtotal}
+  </span>
+
+</div>
+
+{/* DISCOUNT */}
+{discount > 0 && (
+
+  <div className="flex justify-between mb-3 text-green-600">
+
+    <span>Discount</span>
+
+    <span>
+      - ₹{discount}
+    </span>
+
+  </div>
+)}
+
+<div className="flex justify-between mb-3">
+
+  <span>Subtotal</span>
+
+  <span>
+    ₹{subtotal}
+  </span>
+
+</div>
+
+<div className="flex justify-between mb-3">
+
+  <span>Shipping</span>
+
+  <span>
+    ₹{SHIPPING_CHARGE}
+  </span>
+
+</div>
 
               <hr className="my-4" />
 

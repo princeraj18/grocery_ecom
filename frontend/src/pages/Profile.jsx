@@ -275,23 +275,7 @@ const { user } = useContext(ShopContext);
           </div>
 
           {/* Account Stats */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-14">
-
-            <div className="bg-indigo-50 p-6 rounded-2xl text-center">
-              <h2 className="text-3xl font-bold text-indigo-600">24</h2>
-              <p className="text-gray-600 mt-2">Total Orders</p>
-            </div>
-
-            <div className="bg-purple-50 p-6 rounded-2xl text-center">
-              <h2 className="text-3xl font-bold text-purple-600">8</h2>
-              <p className="text-gray-600 mt-2">Wishlist Items</p>
-            </div>
-
-            <div className="bg-pink-50 p-6 rounded-2xl text-center">
-              <h2 className="text-3xl font-bold text-pink-600">3</h2>
-              <p className="text-gray-600 mt-2">Saved Addresses</p>
-            </div>
-          </div>
+        
         </div>
       </div>
     </div>
