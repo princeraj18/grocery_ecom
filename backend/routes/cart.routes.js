@@ -18,9 +18,6 @@ router.put("/update", updateCart);
 
 router.delete("/remove", removeFromCart);
 
-router.delete(
-  "/clear/:userId",
-  clearCart
-);
+router.delete("/clear", clearCart);
 
 export default router;

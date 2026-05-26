@@ -1,6 +1,5 @@
-// PaymentSuccess.jsx
-
 import React, {
+  useContext,
   useEffect,
   useState,
 } from "react";
@@ -8,6 +7,7 @@ import React, {
 import { Link } from "react-router-dom";
 
 import api from "../api/Axios";
+import { ShopContext } from "../context/ShopContext";
 
 const PaymentSuccess = () => {
   const [order, setOrder] =
@@ -16,38 +16,196 @@ const PaymentSuccess = () => {
   const [loading, setLoading] =
     useState(true);
 
+  const { clearCart } =
+    useContext(ShopContext);
+
   useEffect(() => {
-    const fetchOrder = async () => {
-      try {
-        const orderId =
-          localStorage.getItem(
-            "lastOrderId"
+
+    const verifyAndFetchOrder =
+      async () => {
+
+        try {
+
+          const params =
+            new URLSearchParams(
+              window.location.search
+            );
+
+          const sessionId =
+            params.get(
+              "session_id"
+            );
+
+          const orderId =
+            localStorage.getItem(
+              "lastOrderId"
+            );
+
+          console.log(
+            "Session ID:",
+            sessionId
           );
 
-        if (!orderId) {
+          console.log(
+            "Order ID:",
+            orderId
+          );
+
+          // ====================================
+          // VERIFY STRIPE PAYMENT ONLY ONCE
+          // ====================================
+          if (
+            sessionId &&
+            !localStorage.getItem(
+              "paymentVerified"
+            )
+          ) {
+
+            const verifyRes =
+              await api.post(
+                "/payment/verify-payment",
+                {
+                  sessionId,
+                }
+              );
+
+            if (
+              verifyRes.data.success
+            ) {
+
+              const user =
+                JSON.parse(
+                  localStorage.getItem(
+                    "user"
+                  )
+                );
+
+              // =========================
+              // CLEAR DATABASE CART
+              // =========================
+              await api.delete(
+                "/cart/clear",
+                {
+                  data: {
+                    userId:
+                      user._id,
+                  },
+                }
+              );
+
+              // =========================
+              // CLEAR LOCAL STORAGE CART
+              // =========================
+              localStorage.removeItem(
+                "cart"
+              );
+
+              // =========================
+              // CLEAR CONTEXT CART
+              // =========================
+              await clearCart();
+
+              // =========================
+              // PREVENT RE-RUN
+              // =========================
+              localStorage.setItem(
+                "paymentVerified",
+                "true"
+              );
+            }
+          }
+
+          // ====================================
+          // FOR COD ORDERS
+          // CLEAR CART ONLY ONCE
+          // ====================================
+          if (
+            !sessionId &&
+            !localStorage.getItem(
+              "codCartCleared"
+            )
+          ) {
+
+            const user =
+              JSON.parse(
+                localStorage.getItem(
+                  "user"
+                )
+              );
+
+            if (user?._id) {
+
+              await api.delete(
+                "/cart/clear",
+                {
+                  data: {
+                    userId:
+                      user._id,
+                  },
+                }
+              );
+
+              localStorage.removeItem(
+                "cart"
+              );
+
+              await clearCart();
+
+              localStorage.setItem(
+                "codCartCleared",
+                "true"
+              );
+            }
+          }
+
+          // ====================================
+          // FETCH ORDER
+          // ====================================
+          if (orderId) {
+
+            const res =
+              await api.get(
+                `/orders/${orderId}`
+              );
+
+            console.log(
+              "ORDER RESPONSE:",
+              res.data
+            );
+
+            if (
+              res.data.success
+            ) {
+
+              setOrder(
+                res.data.order
+              );
+            }
+          }
+
+        } catch (error) {
+
+          console.log(
+            "Payment Success Error:",
+            error.response
+              ?.data || error
+          );
+
+        } finally {
+
           setLoading(false);
-          return;
         }
+      };
 
-        const res = await api.get(
-          `/orders/${orderId}`
-        );
+    verifyAndFetchOrder();
 
-        setOrder(res.data.order);
-      } catch (error) {
-        console.log(
-          "Fetch Order Error:",
-          error.response?.data || error
-        );
-      } finally {
-        setLoading(false);
-      }
-    };
+  }, []); // IMPORTANT
 
-    fetchOrder();
-  }, []);
-
+  // ====================================
+  // LOADING
+  // ====================================
   if (loading) {
+
     return (
       <div className="min-h-screen flex justify-center items-center text-2xl font-semibold">
         Loading...
@@ -55,9 +213,14 @@ const PaymentSuccess = () => {
     );
   }
 
+  // ====================================
+  // ORDER NOT FOUND
+  // ====================================
   if (!order) {
+
     return (
       <div className="min-h-screen flex flex-col justify-center items-center">
+
         <h1 className="text-3xl font-bold text-red-500">
           Order Not Found
         </h1>
@@ -68,175 +231,253 @@ const PaymentSuccess = () => {
         >
           Go Home
         </Link>
+
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-100 flex items-center justify-center px-4 py-10">
-      <div className="bg-white shadow-xl rounded-2xl p-8 w-full max-w-4xl">
-        {/* SUCCESS */}
+    <div className="min-h-screen bg-gray-100 py-10 px-4">
+
+      <div className="max-w-5xl mx-auto bg-white shadow-xl rounded-2xl p-8">
+
+        {/* SUCCESS HEADER */}
         <div className="text-center">
+
           <div className="text-7xl mb-4">
             ✅
           </div>
 
           <h1 className="text-4xl font-bold text-green-600">
-            Order Placed Successfully!
+            Payment Successful!
           </h1>
 
           <p className="text-gray-600 mt-3">
-            Thank you for shopping with
-            GreenCart
+            Thank you for shopping
+            with GreenCart
           </p>
+
         </div>
 
         {/* ORDER INFO */}
-        <div className="mt-8 grid md:grid-cols-2 gap-6">
-          <div className="bg-green-50 p-5 rounded-xl">
-            <h2 className="font-bold text-lg mb-3">
+        <div className="grid md:grid-cols-2 gap-6 mt-10">
+
+          {/* PAYMENT DETAILS */}
+          <div className="bg-green-50 p-6 rounded-xl">
+
+            <h2 className="font-bold text-xl mb-4">
               Payment Details
             </h2>
 
             <p>
-              <strong>Method:</strong>{" "}
+              <strong>
+                Order ID:
+              </strong>{" "}
+              {order._id}
+            </p>
+
+            <p>
+              <strong>
+                Payment Method:
+              </strong>{" "}
               {order.paymentMethod}
             </p>
 
             <p>
-              <strong>Status:</strong>{" "}
+              <strong>
+                Payment Status:
+              </strong>{" "}
               {order.paymentStatus}
             </p>
 
             <p>
-              <strong>Order ID:</strong>{" "}
-              {order._id}
+              <strong>
+                Order Status:
+              </strong>{" "}
+              {order.orderStatus}
             </p>
+
           </div>
 
-          <div className="bg-gray-50 p-5 rounded-xl">
-            <h2 className="font-bold text-lg mb-3">
-              Delivery Address
+          {/* DELIVERY DETAILS */}
+          <div className="bg-gray-50 p-6 rounded-xl">
+
+            <h2 className="font-bold text-xl mb-4">
+              Delivery Details
             </h2>
 
             <p>
-              {
-                order.shippingAddress
-                  ?.fullName
-              }
+              {order
+                .shippingAddress
+                ?.fullName ||
+                "Customer"}
             </p>
 
             <p>
               {
-                order.shippingAddress
+                order
+                  .shippingAddress
                   ?.phone
               }
             </p>
 
             <p>
               {
-                order.shippingAddress
+                order
+                  .shippingAddress
                   ?.email
               }
             </p>
 
-            <p>
-              {
-                order.shippingAddress
-                  ?.address
-              }
-            </p>
+            {order
+              .shippingAddress
+              ?.address && (
+              <p>
+                {
+                  order
+                    .shippingAddress
+                    ?.address
+                }
+              </p>
+            )}
 
             <p>
+
               {
-                order.shippingAddress
+                order
+                  .shippingAddress
                   ?.city
               }
-              ,{" "}
-              {
-                order.shippingAddress
-                  ?.state
-              }{" "}
-              -{" "}
-              {
-                order.shippingAddress
-                  ?.pincode
-              }
+
+              {order
+                .shippingAddress
+                ?.state &&
+                `, ${order.shippingAddress.state}`}
+
+              {order
+                .shippingAddress
+                ?.pincode &&
+                ` - ${order.shippingAddress.pincode}`}
+
             </p>
+
           </div>
+
         </div>
 
         {/* PRODUCTS */}
-        <div className="mt-8">
+        <div className="mt-10">
+
           <h2 className="text-2xl font-bold mb-5">
             Ordered Products
           </h2>
 
           <div className="space-y-4">
-            {order.products?.map(
-              (product, index) => (
+
+            {order.items?.map(
+              (
+                item,
+                index
+              ) => (
+
                 <div
                   key={index}
-                  className="flex justify-between items-center border rounded-xl p-4"
+                  className="flex flex-col md:flex-row justify-between items-center border rounded-xl p-4 gap-4"
                 >
+
                   <div className="flex items-center gap-4">
+
                     <img
-                      src={product.image}
-                      alt={product.name}
+                      src={item.image}
+                      alt={item.name}
                       className="w-20 h-20 object-cover rounded-lg"
                     />
 
                     <div>
+
                       <h3 className="font-semibold">
-                        {product.name}
+                        {item.name}
                       </h3>
 
                       <p className="text-sm text-gray-500">
                         Qty:{" "}
                         {
-                          product.quantity
+                          item.quantity
                         }
                       </p>
 
-                      {product.size && (
-                        <p className="text-sm text-gray-500">
-                          Size:{" "}
-                          {product.size}
-                        </p>
-                      )}
+                      <p className="text-sm text-gray-500">
+                        ₹
+                        {
+                          item.price
+                        }{" "}
+                        each
+                      </p>
+
                     </div>
+
                   </div>
 
                   <div className="font-bold text-lg">
+
                     ₹
-                    {product.price *
-                      product.quantity}
+                    {item.price *
+                      item.quantity}
+
                   </div>
+
                 </div>
               )
             )}
+
           </div>
+
         </div>
 
         {/* TOTAL */}
-        <div className="mt-8 border-t pt-5">
+        <div className="mt-8 border-t pt-6">
+
           <div className="flex justify-between text-2xl font-bold">
-            <span>Total Amount</span>
 
             <span>
-              ₹{order.totalAmount}
+              Total Amount
             </span>
+
+            <span>
+              ₹
+              {
+                order.totalAmount
+              }
+            </span>
+
           </div>
+
         </div>
 
-        {/* BUTTON */}
+        {/* CONTINUE SHOPPING */}
         <Link
           to="/"
+          onClick={() => {
+
+            localStorage.removeItem(
+              "paymentVerified"
+            );
+
+            localStorage.removeItem(
+              "codCartCleared"
+            );
+
+            localStorage.removeItem(
+              "lastOrderId"
+            );
+          }}
           className="block text-center mt-8 bg-green-600 hover:bg-green-700 text-white py-3 rounded-lg"
         >
           Continue Shopping
         </Link>
+
       </div>
+
     </div>
   );
 };

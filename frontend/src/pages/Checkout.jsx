@@ -1,12 +1,18 @@
 // Checkout.jsx
 
-import React, { useContext, useState } from "react";
+import React, {
+  useContext,
+  useState,
+} from "react";
+
 import { ShopContext } from "../context/ShopContext";
 import api from "../api/Axios";
 
 const Checkout = () => {
-  const { cartItems, clearCart } =
-    useContext(ShopContext);
+  const {
+    cartItems,
+    clearCart,
+  } = useContext(ShopContext);
 
   const [paymentMethod, setPaymentMethod] =
     useState("cod");
@@ -14,67 +20,88 @@ const Checkout = () => {
   const [loading, setLoading] =
     useState(false);
 
+  // =========================
+  // SHIPPING DATA
+  // =========================
   const [shippingData, setShippingData] =
     useState({
-      fullName: "",
+      firstName: "",
+      lastName: "",
       phone: "",
       email: "",
       city: "",
       state: "",
-      pincode: "",
-      address: "",
+      zipcode: "",
+      street: "",
+      country: "India",
     });
-// COUPON STATES
-const [couponCode, setCouponCode] =
-  useState("");
 
-const [discount, setDiscount] =
-  useState(0);
+  // =========================
+  // COUPON STATES
+  // =========================
+  const [couponCode, setCouponCode] =
+    useState("");
 
-const [appliedCoupon, setAppliedCoupon] =
-  useState("");
+  const [discount, setDiscount] =
+    useState(0);
+
+  const [appliedCoupon, setAppliedCoupon] =
+    useState("");
+
   const SHIPPING_CHARGE = 20;
 
-// ORIGINAL SUBTOTAL
-const originalSubtotal =
-  cartItems.reduce(
-    (total, item) =>
-      total +
-      item.price * item.quantity,
-    0
-  );
+  // =========================
+  // PRICE CALCULATIONS
+  // =========================
+  const originalSubtotal =
+    cartItems.reduce(
+      (total, item) =>
+        total +
+        item.price * item.quantity,
+      0
+    );
 
-// FINAL SUBTOTAL AFTER DISCOUNT
-const subtotal =
-  originalSubtotal - discount;
+  const subtotal =
+    originalSubtotal - discount;
 
-// FINAL TOTAL
-const total =
-  subtotal + SHIPPING_CHARGE;
+  const total =
+    subtotal + SHIPPING_CHARGE;
 
+  // =========================
+  // HANDLE INPUT CHANGE
+  // =========================
   const handleChange = (e) => {
     setShippingData({
       ...shippingData,
-      [e.target.name]: e.target.value,
+      [e.target.name]:
+        e.target.value,
     });
   };
 
+  // =========================
+  // VALIDATE FORM
+  // =========================
   const validateForm = () => {
     if (
-      !shippingData.fullName.trim() ||
+      !shippingData.firstName.trim() ||
+      !shippingData.lastName.trim() ||
       !shippingData.phone.trim() ||
       !shippingData.email.trim() ||
       !shippingData.city.trim() ||
       !shippingData.state.trim() ||
-      !shippingData.pincode.trim() ||
-      !shippingData.address.trim()
+      !shippingData.zipcode.trim() ||
+      !shippingData.street.trim()
     ) {
-      alert("Please fill all shipping details");
+      alert(
+        "Please fill all shipping details"
+      );
       return false;
     }
 
     if (
-      !/^[0-9]{10}$/.test(shippingData.phone)
+      !/^[0-9]{10}$/.test(
+        shippingData.phone
+      )
     ) {
       alert(
         "Please enter a valid 10 digit phone number"
@@ -87,208 +114,285 @@ const total =
         shippingData.email
       )
     ) {
-      alert("Please enter a valid email");
+      alert(
+        "Please enter a valid email"
+      );
       return false;
     }
 
     if (
       !/^[0-9]{6}$/.test(
-        shippingData.pincode
+        shippingData.zipcode
       )
     ) {
-      alert("Please enter valid pincode");
+      alert(
+        "Please enter valid zipcode"
+      );
       return false;
     }
 
     return true;
   };
+
   // =========================
-// APPLY COUPON
-// =========================
-// =========================
-// APPLY COUPON
-// =========================
-const handleApplyCoupon = async () => {
-  // REMOVE COUPON
-  if (appliedCoupon) {
-    setAppliedCoupon("");
-    setCouponCode("");
-    setDiscount(0);
+  // APPLY COUPON
+  // =========================
+  const handleApplyCoupon =
+    async () => {
+      // REMOVE COUPON
+      if (appliedCoupon) {
+        setAppliedCoupon("");
+        setCouponCode("");
+        setDiscount(0);
 
-    alert("Coupon Removed");
-
-    return;
-  }
-
-  try {
-    const code = couponCode
-      .trim()
-      .toUpperCase();
-
-    if (!code) {
-      return alert("Enter coupon code");
-    }
-
-    const res = await api.post(
-      "/coupons/validate",
-      {
-        code,
-        cartItems,
-        // orderAmount:
-        //   originalSubtotal,
-      }
-    );
-
-    if (res.data.success) {
-      setDiscount(
-        res.data.discount
-      );
-
-      setAppliedCoupon(
-        code
-      );
-
-      alert(
-        "Coupon Applied Successfully"
-      );
-    }
-  } catch (error) {
-    alert(
-      error.response?.data
-        ?.message ||
-        "Invalid Coupon"
-    );
-
-    setDiscount(0);
-    setAppliedCoupon("");
-  }
-};
-
-  const handlePlaceOrder = async () => {
-    if (!validateForm()) return;
-
-    if (cartItems.length === 0) {
-      alert("Your cart is empty");
-      return;
-    }
-
-    try {
-      setLoading(true);
-
-      const user = JSON.parse(
-        localStorage.getItem("user")
-      );
-
-      if (!user?._id) {
-        alert("Please login first");
+        alert("Coupon Removed");
         return;
       }
 
-      // =========================
-      // CASH ON DELIVERY
-      // =========================
-      if (paymentMethod === "cod") {
-        const res = await api.post(
-          "/orders/create",
-          {
-            userId: user._id,
+      try {
+        const code =
+          couponCode
+            .trim()
+            .toUpperCase();
 
-            products: cartItems.map((item) => ({
-              productId:
-                item.productId ||
-                item._id,
+        if (!code) {
+          return alert(
+            "Enter coupon code"
+          );
+        }
 
-              name: item.name,
+        const res =
+          await api.post(
+            "/coupons/validate",
+            {
+              code,
+              cartItems,
+            }
+          );
 
-              image: item.image,
+        if (res.data.success) {
+          setDiscount(
+            res.data.discount
+          );
 
-              price: item.price,
+          setAppliedCoupon(
+            code
+          );
 
-              quantity: item.quantity,
-
-              size: item.size || "Default",
-            })),
-
-            shippingAddress: shippingData,
-
-            totalAmount: total,
-
-            paymentMethod: "COD",
-
-            paymentStatus: "Pending",
-          }
+          alert(
+            "Coupon Applied Successfully"
+          );
+        }
+      } catch (error) {
+        alert(
+          error.response?.data
+            ?.message ||
+            "Invalid Coupon"
         );
+
+        setDiscount(0);
+        setAppliedCoupon("");
+      }
+    };
+
+  // =========================
+  // PLACE ORDER
+  // =========================
+  const handlePlaceOrder =
+    async () => {
+      if (!validateForm()) return;
+
+      if (
+        cartItems.length === 0
+      ) {
+        alert(
+          "Your cart is empty"
+        );
+        return;
+      }
+
+      try {
+        setLoading(true);
+
+        const user = JSON.parse(
+          localStorage.getItem(
+            "user"
+          )
+        );
+
+        if (!user?._id) {
+          alert(
+            "Please login first"
+          );
+          return;
+        }
+
+        // =========================
+        // CASH ON DELIVERY
+        // =========================
+        if (
+          paymentMethod === "cod"
+        ) {
+          const res =
+            await api.post(
+              "/orders/create",
+              {
+                userId: user._id,
+
+                products:
+                  cartItems.map(
+                    (item) => ({
+                      productId:
+                        item.productId ||
+                        item._id,
+
+                      name:
+                        item.name,
+
+                      image:
+                        item.image,
+
+                      price:
+                        item.price,
+
+                      quantity:
+                        item.quantity,
+
+                      size:
+                        item.size ||
+                        "Default",
+                    })
+                  ),
+
+                shippingAddress:
+                  shippingData,
+
+                totalAmount:
+                  total,
+
+                paymentMethod:
+                  "COD",
+
+                paymentStatus:
+                  "Pending",
+              }
+            );
+
+          localStorage.setItem(
+            "lastOrderId",
+            res.data.order._id
+          );
+
+          // CLEAR DATABASE CART
+          await api.delete(
+            "/cart/clear",
+            {
+              data: {
+                userId:
+                  user._id,
+              },
+            }
+          );
+
+          // CLEAR CONTEXT
+          await clearCart();
+
+          // CLEAR LOCAL STORAGE
+          localStorage.removeItem(
+            "cart"
+          );
+
+          window.location.href =
+            "/payment-success";
+
+          return;
+        }
+
+        // =========================
+        // STRIPE PAYMENT
+        // =========================
+        const res =
+          await api.post(
+            "/payment/create-checkout-session",
+            {
+              userId: user._id,
+
+              cartItems,
+
+              shippingAddress:
+                shippingData,
+
+              totalAmount:
+                total,
+            }
+          );
 
         localStorage.setItem(
           "lastOrderId",
-          res.data.order._id
+          res.data.orderId
         );
 
-        await clearCart();
-
         window.location.href =
-          "/payment-success";
+          res.data.url;
+      } catch (error) {
+        console.log(error);
 
-        return;
+        alert(
+          error.response?.data
+            ?.message ||
+            "Failed to place order"
+        );
+      } finally {
+        setLoading(false);
       }
-
-      // =========================
-      // STRIPE PAYMENT
-      // =========================
-      const res = await api.post(
-        "/payment/create-checkout-session",
-        {
-          userId: user._id,
-
-          cartItems,
-
-          shippingAddress: shippingData,
-
-          totalAmount: total,
-        }
-      );
-
-      localStorage.setItem(
-        "lastOrderId",
-        res.data.orderId
-      );
-
-      window.location.href = res.data.url;
-    } catch (error) {
-      console.log(error);
-
-      alert(
-        error.response?.data?.message ||
-          "Failed to place order"
-      );
-    } finally {
-      setLoading(false);
-    }
-  };
+    };
 
   return (
     <div className="min-h-screen bg-gray-50 py-10 px-4 lg:px-10">
+
       <div className="max-w-7xl mx-auto">
+
         <h1 className="text-4xl font-bold mb-10">
           Checkout
         </h1>
 
         <div className="grid lg:grid-cols-3 gap-8">
+
           {/* LEFT SIDE */}
           <div className="lg:col-span-2 space-y-8">
+
             {/* SHIPPING */}
             <div className="bg-white rounded-2xl shadow-md p-6">
+
               <h2 className="text-2xl font-semibold mb-6">
                 Shipping Address
               </h2>
 
               <div className="grid md:grid-cols-2 gap-5">
+
                 <input
                   type="text"
-                  name="fullName"
-                  placeholder="Full Name"
-                  value={shippingData.fullName}
-                  onChange={handleChange}
+                  name="firstName"
+                  placeholder="First Name"
+                  value={
+                    shippingData.firstName
+                  }
+                  onChange={
+                    handleChange
+                  }
+                  className="border rounded-lg px-4 py-3"
+                />
+
+                <input
+                  type="text"
+                  name="lastName"
+                  placeholder="Last Name"
+                  value={
+                    shippingData.lastName
+                  }
+                  onChange={
+                    handleChange
+                  }
                   className="border rounded-lg px-4 py-3"
                 />
 
@@ -296,8 +400,12 @@ const handleApplyCoupon = async () => {
                   type="tel"
                   name="phone"
                   placeholder="Phone Number"
-                  value={shippingData.phone}
-                  onChange={handleChange}
+                  value={
+                    shippingData.phone
+                  }
+                  onChange={
+                    handleChange
+                  }
                   className="border rounded-lg px-4 py-3"
                 />
 
@@ -305,8 +413,12 @@ const handleApplyCoupon = async () => {
                   type="email"
                   name="email"
                   placeholder="Email Address"
-                  value={shippingData.email}
-                  onChange={handleChange}
+                  value={
+                    shippingData.email
+                  }
+                  onChange={
+                    handleChange
+                  }
                   className="border rounded-lg px-4 py-3"
                 />
 
@@ -314,8 +426,12 @@ const handleApplyCoupon = async () => {
                   type="text"
                   name="city"
                   placeholder="City"
-                  value={shippingData.city}
-                  onChange={handleChange}
+                  value={
+                    shippingData.city
+                  }
+                  onChange={
+                    handleChange
+                  }
                   className="border rounded-lg px-4 py-3"
                 />
 
@@ -323,44 +439,60 @@ const handleApplyCoupon = async () => {
                   type="text"
                   name="state"
                   placeholder="State"
-                  value={shippingData.state}
-                  onChange={handleChange}
+                  value={
+                    shippingData.state
+                  }
+                  onChange={
+                    handleChange
+                  }
                   className="border rounded-lg px-4 py-3"
                 />
 
                 <input
                   type="text"
-                  name="pincode"
+                  name="zipcode"
                   placeholder="Pincode"
-                  value={shippingData.pincode}
-                  onChange={handleChange}
+                  value={
+                    shippingData.zipcode
+                  }
+                  onChange={
+                    handleChange
+                  }
                   className="border rounded-lg px-4 py-3"
                 />
               </div>
 
               <textarea
                 rows="4"
-                name="address"
+                name="street"
                 placeholder="Full Address"
-                value={shippingData.address}
-                onChange={handleChange}
+                value={
+                  shippingData.street
+                }
+                onChange={
+                  handleChange
+                }
                 className="w-full mt-5 border rounded-lg px-4 py-3"
               />
             </div>
 
             {/* PAYMENT */}
             <div className="bg-white rounded-2xl shadow-md p-6">
+
               <h2 className="text-2xl font-semibold mb-6">
                 Payment Method
               </h2>
 
               <div className="space-y-4">
+
                 <label className="flex items-center gap-3 border rounded-lg p-4 cursor-pointer">
+
                   <input
                     type="radio"
                     value="cod"
                     checked={
-                      paymentMethod === "cod"
+                      paymentMethod ===
+                      "cod"
                     }
                     onChange={(e) =>
                       setPaymentMethod(
@@ -373,6 +505,7 @@ const handleApplyCoupon = async () => {
                 </label>
 
                 <label className="flex items-center gap-3 border rounded-lg p-4 cursor-pointer">
+
                   <input
                     type="radio"
                     value="card"
@@ -395,149 +528,180 @@ const handleApplyCoupon = async () => {
 
           {/* RIGHT SIDE */}
           <div>
+
             <div className="bg-white rounded-2xl shadow-md p-6 sticky top-5">
+
               <h2 className="text-2xl font-semibold mb-6">
                 Order Summary
               </h2>
 
-              {cartItems.length === 0 ? (
-                <p>Your cart is empty</p>
+              {cartItems.length ===
+              0 ? (
+                <p>
+                  Your cart is empty
+                </p>
               ) : (
-                cartItems.map((item, index) => (
-                  <div
-                    key={index}
-                    className="flex justify-between mb-4"
-                  >
-                    <div>
-                      <p className="font-medium">
-                        {item.name}
-                      </p>
+                cartItems.map(
+                  (
+                    item,
+                    index
+                  ) => (
+                    <div
+                      key={index}
+                      className="flex justify-between mb-4"
+                    >
+                      <div>
 
-                      <p className="text-sm text-gray-500">
-                        Qty: {item.quantity}
-                      </p>
-
-                      {item.size && (
-                        <p className="text-sm text-gray-500">
-                          Size: {item.size}
+                        <p className="font-medium">
+                          {item.name}
                         </p>
-                      )}
+
+                        <p className="text-sm text-gray-500">
+                          Qty:{" "}
+                          {
+                            item.quantity
+                          }
+                        </p>
+
+                        {item.size && (
+                          <p className="text-sm text-gray-500">
+                            Size:{" "}
+                            {
+                              item.size
+                            }
+                          </p>
+                        )}
+                      </div>
+
+                      <span>
+                        ₹
+                        {item.price *
+                          item.quantity}
+                      </span>
                     </div>
-
-                    <span>
-                      ₹
-                      {item.price *
-                        item.quantity}
-                    </span>
-                  </div>
-                ))
+                  )
+                )
               )}
-{/* ========================= */}
-{/* COUPON SECTION */}
-{/* ========================= */}
-<div className="mt-5">
 
-  <h3 className="font-semibold mb-3">
-    Apply Coupon
-  </h3>
+              {/* COUPON */}
+              <div className="mt-5">
 
-  <div className="flex gap-2">
+                <h3 className="font-semibold mb-3">
+                  Apply Coupon
+                </h3>
 
-    <input
-      type="text"
-      placeholder="Enter Coupon Code"
-      value={couponCode}
-      onChange={(e) =>
-        setCouponCode(
-          e.target.value
-        )
-      }
-      className="flex-1 border rounded-lg px-4 py-2"
-    />
+                <div className="flex gap-2">
 
-   <button
-  onClick={handleApplyCoupon}
-  className={`px-4 rounded-lg text-white ${
-    appliedCoupon
-      ? "bg-red-600 hover:bg-red-700"
-      : "bg-blue-600 hover:bg-blue-700"
-  }`}
->
-  {appliedCoupon
-    ? "Applied"
-    : "Apply"}
-</button>
+                  <input
+                    type="text"
+                    placeholder="Enter Coupon Code"
+                    value={
+                      couponCode
+                    }
+                    onChange={(e) =>
+                      setCouponCode(
+                        e.target.value
+                      )
+                    }
+                    className="flex-1 border rounded-lg px-4 py-2"
+                  />
 
-  </div>
+                  <button
+                    onClick={
+                      handleApplyCoupon
+                    }
+                    className={`px-4 rounded-lg text-white ${
+                      appliedCoupon
+                        ? "bg-red-600 hover:bg-red-700"
+                        : "bg-blue-600 hover:bg-blue-700"
+                    }`}
+                  >
+                    {appliedCoupon
+                      ? "Applied"
+                      : "Apply"}
+                  </button>
+                </div>
 
-  {/* APPLIED COUPON */}
-  {appliedCoupon && (
+                {appliedCoupon && (
+                  <p className="text-green-600 text-sm mt-2">
+                    Coupon Applied:{" "}
+                    {
+                      appliedCoupon
+                    }
+                  </p>
+                )}
+              </div>
 
-    <p className="text-green-600 text-sm mt-2">
-
-      Coupon Applied:
-      {" "}
-      {appliedCoupon}
-
-    </p>
-  )}
-
-</div>
               <hr className="my-4" />
 
-           <div className="flex justify-between mb-3">
+              <div className="flex justify-between mb-3">
 
-  <span>Original Price</span>
+                <span>
+                  Original Price
+                </span>
 
-  <span>
-    ₹{originalSubtotal}
-  </span>
+                <span>
+                  ₹
+                  {
+                    originalSubtotal
+                  }
+                </span>
+              </div>
 
-</div>
+              {discount > 0 && (
+                <div className="flex justify-between mb-3 text-green-600">
 
-{/* DISCOUNT */}
-{discount > 0 && (
+                  <span>
+                    Discount
+                  </span>
 
-  <div className="flex justify-between mb-3 text-green-600">
+                  <span>
+                    - ₹
+                    {discount}
+                  </span>
+                </div>
+              )}
 
-    <span>Discount</span>
+              <div className="flex justify-between mb-3">
 
-    <span>
-      - ₹{discount}
-    </span>
+                <span>
+                  Subtotal
+                </span>
 
-  </div>
-)}
+                <span>
+                  ₹{subtotal}
+                </span>
+              </div>
 
-<div className="flex justify-between mb-3">
+              <div className="flex justify-between mb-3">
 
-  <span>Subtotal</span>
+                <span>
+                  Shipping
+                </span>
 
-  <span>
-    ₹{subtotal}
-  </span>
-
-</div>
-
-<div className="flex justify-between mb-3">
-
-  <span>Shipping</span>
-
-  <span>
-    ₹{SHIPPING_CHARGE}
-  </span>
-
-</div>
+                <span>
+                  ₹
+                  {
+                    SHIPPING_CHARGE
+                  }
+                </span>
+              </div>
 
               <hr className="my-4" />
 
               <div className="flex justify-between text-xl font-bold">
+
                 <span>Total</span>
-                <span>₹{total}</span>
+
+                <span>
+                  ₹{total}
+                </span>
               </div>
 
               <button
-                onClick={handlePlaceOrder}
+                onClick={
+                  handlePlaceOrder
+                }
                 disabled={loading}
                 className="w-full mt-6 bg-green-600 hover:bg-green-700 text-white py-3 rounded-lg"
               >

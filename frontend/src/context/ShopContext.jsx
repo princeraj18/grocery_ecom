@@ -6,62 +6,173 @@ import {
 
 import api from "../api/Axios";
 
+// =========================
+// CREATE CONTEXT
+// =========================
 export const ShopContext =
   createContext();
 
+// =========================
+// PROVIDER
+// =========================
 const ShopContextProvider = ({
   children,
 }) => {
 
+  // =========================
+  // STATES
+  // =========================
   const [products, setProducts] =
     useState([]);
 
   const [cartItems, setCartItems] =
     useState([]);
-const [wishlistItems, setWishlistItems] =
-  useState([]);
-  const [loadingProducts, setLoadingProducts] =
-    useState(true);
+
+  const [wishlistItems, setWishlistItems] =
+    useState([]);
+
+  const [
+    loadingProducts,
+    setLoadingProducts,
+  ] = useState(true);
 
   const [user, setUser] =
     useState(
       JSON.parse(
-        localStorage.getItem("user")
+        localStorage.getItem(
+          "user"
+        )
       ) || null
     );
 
   // =========================
   // FETCH PRODUCTS
   // =========================
-  const fetchProducts = async () => {
+  const fetchProducts =
+    async () => {
+      try {
+        setLoadingProducts(
+          true
+        );
 
-    try {
+        const { data } =
+          await api.get(
+            "/products"
+          );
 
-      setLoadingProducts(true);
+        console.log(
+          "PRODUCTS:",
+          data.products
+        );
 
-      const { data } =
-        await api.get("/products");
+        setProducts(
+          data.products || []
+        );
 
-      console.log(
-        "PRODUCTS:",
-        data.products
-      );
+      } catch (error) {
 
-      setProducts(data.products);
+        console.log(
+          "FETCH PRODUCTS ERROR:",
+          error
+        );
 
-    } catch (error) {
+      } finally {
 
-      console.log(
-        "FETCH PRODUCTS ERROR:",
-        error
-      );
+        setLoadingProducts(
+          false
+        );
+      }
+    };
 
-    } finally {
+  // =========================
+  // FETCH CART
+  // =========================
+  const fetchCart =
+    async () => {
 
-      setLoadingProducts(false);
-    }
-  };
+      try {
 
+        if (!user?._id) {
+          setCartItems([]);
+          return;
+        }
+
+        const { data } =
+          await api.get(
+            `/cart/${user._id}`
+          );
+
+        console.log(
+          "CART DATA:",
+          data
+        );
+
+        setCartItems(
+          data?.cart?.items || []
+        );
+
+      } catch (error) {
+
+        console.log(
+          "FETCH CART ERROR:",
+          error
+        );
+
+        setCartItems([]);
+      }
+    };
+
+  // =========================
+  // FETCH WISHLIST
+  // =========================
+  const fetchWishlist =
+    async () => {
+
+      try {
+
+        if (!user?._id) {
+
+          setWishlistItems(
+            []
+          );
+
+          return;
+        }
+
+        const { data } =
+          await api.get(
+            `/wishlist/${user._id}`
+          );
+
+        console.log(
+          "WISHLIST DATA:",
+          data
+        );
+
+        setWishlistItems(
+          Array.isArray(
+            data.wishlist
+          )
+            ? data.wishlist
+            : []
+        );
+
+      } catch (error) {
+
+        console.log(
+          "FETCH WISHLIST ERROR:",
+          error
+        );
+
+        setWishlistItems(
+          []
+        );
+      }
+    };
+
+  // =========================
+  // INITIAL LOAD
+  // =========================
   useEffect(() => {
 
     fetchProducts();
@@ -69,150 +180,97 @@ const [wishlistItems, setWishlistItems] =
   }, []);
 
   // =========================
-  // FETCH CART
+  // LOAD USER DATA
   // =========================
-  const fetchCart = async () => {
+  useEffect(() => {
 
-    try {
+    const loadData =
+      async () => {
 
-      if (!user?._id) return;
+        if (user?._id) {
 
-      const { data } =
-        await api.get(
-          `/cart/${user._id}`
-        );
+          await fetchCart();
 
-      setCartItems(
-        data.cart.items || []
-      );
+          await fetchWishlist();
 
-    } catch (error) {
+        } else {
 
-      console.log(
-        "FETCH CART ERROR:",
-        error
-      );
-    }
-  };
+          setCartItems([]);
 
-// FETCH WISHLIST
-// =========================
-const fetchWishlist = async () => {
+          setWishlistItems([]);
+        }
+      };
 
-  try {
+    loadData();
 
-    if (!user?._id) {
+  }, [user]);
 
-      setWishlistItems([]);
-
-      return;
-    }
-
-    const { data } =
-      await api.get(
-        `/wishlist/${user._id}`
-      );
-
-    console.log(
-      "WISHLIST DATA:",
-      data
-    );
-
-    // IMPORTANT FIX
-    setWishlistItems(
-      Array.isArray(data.wishlist)
-        ? data.wishlist
-        : []
-    );
-
-  } catch (error) {
-
-    console.log(
-      "FETCH WISHLIST ERROR:",
-      error
-    );
-
-    setWishlistItems([]);
-  }
-};
-useEffect(() => {
-
-  const loadData = async () => {
-
-    if (user?._id) {
-
-      await fetchCart();
-
-      await fetchWishlist();
-    }
-  };
-
-  loadData();
-
-}, [user]);
   // =========================
   // ADD TO CART
   // =========================
-  const addToCart = async (
-    product
-  ) => {
+  const addToCart =
+    async (product) => {
 
-    try {
+      try {
 
-      if (!user) {
+        if (!user) {
+
+          alert(
+            "Please login first"
+          );
+
+          return;
+        }
+
+        const cartProduct = {
+
+          productId:
+            product._id,
+
+          name:
+            product.name,
+
+          image:
+            product.image?.[0] ||
+            "",
+
+          category:
+            product.category,
+
+          price:
+            product.offerPrice,
+
+          quantity: 1,
+        };
+
+        const { data } =
+          await api.post(
+            "/cart/add",
+            {
+              userId:
+                user._id,
+
+              product:
+                cartProduct,
+            }
+          );
+
+        setCartItems(
+          data.cart.items
+        );
 
         alert(
-          "Please login first"
+          "Added To Cart"
         );
 
-        return;
+      } catch (error) {
+
+        console.log(
+          "ADD TO CART ERROR:",
+          error
+        );
       }
-
-      const cartProduct = {
-
-        productId:
-          product._id,
-
-        name:
-          product.name,
-
-        image:
-          product.image?.[0] || "",
-
-        category:
-          product.category,
-
-        price:
-          product.offerPrice,
-
-        quantity: 1,
-      };
-
-      const { data } =
-        await api.post(
-          "/cart/add",
-          {
-            userId: user._id,
-            product: cartProduct,
-          }
-        );
-
-      setCartItems(
-        data.cart.items
-      );
-
-      alert(
-        "Added To Cart"
-      );
-
-    } catch (error) {
-
-      console.log(
-        "ADD TO CART ERROR:",
-        error
-      );
-    }
-  };
+    };
 
   // =========================
   // INCREASE QUANTITY
@@ -241,7 +299,8 @@ useEffect(() => {
               productId,
 
               quantity:
-                item.quantity + 1,
+                item.quantity +
+                1,
             }
           );
 
@@ -251,7 +310,10 @@ useEffect(() => {
 
       } catch (error) {
 
-        console.log(error);
+        console.log(
+          "INCREASE ERROR:",
+          error
+        );
       }
     };
 
@@ -272,9 +334,11 @@ useEffect(() => {
 
         if (!item) return;
 
-        if (item.quantity <= 1) {
+        if (
+          item.quantity <= 1
+        ) {
 
-          removeFromCart(
+          await removeFromCart(
             productId
           );
 
@@ -291,7 +355,8 @@ useEffect(() => {
               productId,
 
               quantity:
-                item.quantity - 1,
+                item.quantity -
+                1,
             }
           );
 
@@ -301,7 +366,10 @@ useEffect(() => {
 
       } catch (error) {
 
-        console.log(error);
+        console.log(
+          "DECREASE ERROR:",
+          error
+        );
       }
     };
 
@@ -332,131 +400,194 @@ useEffect(() => {
 
       } catch (error) {
 
-        console.log(error);
+        console.log(
+          "REMOVE CART ERROR:",
+          error
+        );
       }
     };
 
-    // =========================
-// ADD TO WISHLIST
-// =========================
-const addToWishlist =
-  async (productId) => {
+  // =========================
+  // CLEAR CART
+  // =========================
+  const clearCart =
+    async () => {
 
-    try {
+      try {
 
-      const { data } =
-        await api.post(
-          "/wishlist/add",
+        setCartItems([]);
+
+        if (!user?._id)
+          return;
+
+        await api.delete(
+          "/cart/clear",
           {
-            userId: user._id,
-            productId,
+            data: {
+              userId:
+                user._id,
+            },
           }
         );
 
-      fetchWishlist();
+      } catch (error) {
 
-      return data;
+        console.log(
+          "CLEAR CART ERROR:",
+          error
+        );
+      }
+    };
 
-    } catch (error) {
+  // =========================
+  // ADD TO WISHLIST
+  // =========================
+  const addToWishlist =
+    async (productId) => {
 
-      console.log(
-        "ADD WISHLIST ERROR:",
-        error
-      );
-    }
-  };
+      try {
 
-// =========================
-// REMOVE FROM WISHLIST
-// =========================
-const removeFromWishlist =
-  async (productId) => {
+        if (!user) {
 
-    try {
+          alert(
+            "Please login first"
+          );
 
-      await api.delete(
-        "/wishlist/remove",
-        {
-          data: {
-            userId: user._id,
-            productId,
-          },
+          return;
         }
-      );
 
-      fetchWishlist();
+        const { data } =
+          await api.post(
+            "/wishlist/add",
+            {
+              userId:
+                user._id,
 
-    } catch (error) {
+              productId,
+            }
+          );
 
-      console.log(
-        "REMOVE WISHLIST ERROR:",
-        error
-      );
-    }
-  };
+        await fetchWishlist();
+
+        return data;
+
+      } catch (error) {
+
+        console.log(
+          "ADD WISHLIST ERROR:",
+          error
+        );
+      }
+    };
+
+  // =========================
+  // REMOVE FROM WISHLIST
+  // =========================
+  const removeFromWishlist =
+    async (productId) => {
+
+      try {
+
+        await api.delete(
+          "/wishlist/remove",
+          {
+            data: {
+              userId:
+                user._id,
+
+              productId,
+            },
+          }
+        );
+
+        await fetchWishlist();
+
+      } catch (error) {
+
+        console.log(
+          "REMOVE WISHLIST ERROR:",
+          error
+        );
+      }
+    };
 
   // =========================
   // LOGIN USER
   // =========================
-  const loginUser = (
-    userData
-  ) => {
+  const loginUser =
+    (userData) => {
 
-    setUser(userData);
+      setUser(userData);
 
-    localStorage.setItem(
-      "user",
-      JSON.stringify(userData)
-    );
-  };
+      localStorage.setItem(
+        "user",
+        JSON.stringify(
+          userData
+        )
+      );
+    };
 
   // =========================
   // LOGOUT USER
   // =========================
-  const logoutUser = () => {
+  const logoutUser =
+    () => {
 
-    setUser(null);
+      setUser(null);
 
-    setCartItems([]);
+      setCartItems([]);
 
-    localStorage.removeItem(
-      "user"
-    );
+      setWishlistItems([]);
 
-    localStorage.removeItem(
-      "token"
-    );
+      localStorage.removeItem(
+        "user"
+      );
+
+      localStorage.removeItem(
+        "token"
+      );
+
+      localStorage.removeItem(
+        "cart"
+      );
+    };
+
+  // =========================
+  // PROVIDER VALUE
+  // =========================
+  const value = {
+
+    // PRODUCTS
+    products,
+    loadingProducts,
+
+    // CART
+    cartItems,
+    addToCart,
+    increaseQuantity,
+    decreaseQuantity,
+    removeFromCart,
+    clearCart,
+
+    // WISHLIST
+    wishlistItems,
+    addToWishlist,
+    removeFromWishlist,
+
+    // USER
+    user,
+    loginUser,
+    logoutUser,
+
+    // FETCHERS
+    fetchCart,
+    fetchWishlist,
   };
 
   return (
 
     <ShopContext.Provider
-      value={{
-
-        products,
-
-        loadingProducts,
-
-        cartItems,
-
-        addToCart,
-
-        increaseQuantity,
-
-        decreaseQuantity,
-
-        removeFromCart,
-
-        user,
-
-        loginUser,
-
-        logoutUser,
-        wishlistItems,
-        addToWishlist,
-        removeFromWishlist,
-
-      }}
+      value={value}
     >
 
       {children}

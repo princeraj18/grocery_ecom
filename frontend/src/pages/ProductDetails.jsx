@@ -300,9 +300,7 @@ const ProductDetails = () => {
 
       addToCart(product);
 
-      alert(
-        "Product Added To Cart"
-      );
+     
     };
 
   return (

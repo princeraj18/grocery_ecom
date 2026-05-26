@@ -187,7 +187,7 @@ export const clearCart = async (
   res
 ) => {
   try {
-    const { userId } = req.params;
+    const { userId } = req.body;
 
     const cart = await Cart.findOne({
       user: userId,
@@ -204,13 +204,11 @@ export const clearCart = async (
 
     await cart.save();
 
-    res.status(200).json({
+    res.json({
       success: true,
       message: "Cart cleared",
     });
   } catch (error) {
-    console.log(error);
-
     res.status(500).json({
       success: false,
       message: error.message,

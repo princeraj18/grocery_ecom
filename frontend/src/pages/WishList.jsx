@@ -9,7 +9,7 @@ import {
   useNavigate,
 } from "react-router-dom";
 
-import Navbar from "../components/Navbar";
+// import Navbar from "../components/Navbar";
 
 // import Sidebar from "../components/Sidebar";
 
@@ -119,7 +119,7 @@ const WishList = () => {
 
         <div className="flex-1">
 
-          <Navbar />
+          {/* <Navbar /> */}
 
           <div className="p-10 text-2xl font-bold">
             Loading Wishlist...
