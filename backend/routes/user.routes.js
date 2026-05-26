@@ -6,6 +6,8 @@ import {
   getUserProfile,
   getAllUsers,
   getSingleUser,
+  forgotPassword, // New controller
+  resetPassword,  // New controller
   
   deleteUser
 
@@ -34,4 +36,7 @@ router.delete(
   "/:id",
   deleteUser
 );
+
+router.post("/forgot-password", forgotPassword); // NEW
+router.post("/reset-password", resetPassword);   // NEW
 export default router;

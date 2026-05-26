@@ -6,7 +6,8 @@ import jwt from "jsonwebtoken";
 import { cloudinary } from "../config/cloudinary.js";
 import fs from "fs";
 import path from "path";
-
+import crypto from "crypto";
+import nodemailer from "nodemailer";
 // ==============================
 // REGISTER VENDOR
 // ==============================
@@ -458,4 +459,87 @@ export const unverifyVendor =
     }
   };
 
-  
+
+// ==============================
+// FORGOT PASSWORD (VENDOR)
+// ==============================
+export const forgotVendorPassword = async (req, res) => {
+  try {
+    const { email } = req.body;
+    const vendor = await Vendor.findOne({ email });
+
+    if (!vendor) {
+      return res.status(404).json({ success: false, message: "Vendor with this email does not exist." });
+    }
+
+    // Generate a secure random token
+    const resetToken = crypto.randomBytes(32).toString("hex");
+
+    // Save token and 1-hour expiration time
+    vendor.resetPasswordToken = resetToken;
+    vendor.resetPasswordExpires = Date.now() + 3600000; 
+    await vendor.save();
+
+    const transporter = nodemailer.createTransport({
+      service: "Gmail",
+      auth: {
+        user: process.env.EMAIL_USER,
+        pass: process.env.EMAIL_PASS,
+      },
+    });
+
+    // Link points specifically to the vendor reset route variant
+    const resetUrl = `${process.env.FRONTEND_URL}/vendor/reset-password/${resetToken}`;
+
+    const mailOptions = {
+      to: vendor.email,
+      from: process.env.EMAIL_USER,
+      subject: "Vendor Password Reset Request",
+      html: `
+        <h3>Vendor Portal Recovery</h3>
+        <p>You requested a password reset for your vendor profile.</p>
+        <p>Please click the link below to safely reset your credentials (valid for 1 hour):</p>
+        <a href="${resetUrl}" target="_blank">${resetUrl}</a>
+      `,
+    };
+
+    await transporter.sendMail(mailOptions);
+
+    res.status(200).json({ success: true, message: "Vendor reset link sent to email." });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+
+// ==============================
+// RESET PASSWORD (VENDOR)
+// ==============================
+export const resetVendorPassword = async (req, res) => {
+  try {
+    const { token, password } = req.body;
+
+    const vendor = await Vendor.findOne({
+      resetPasswordToken: token,
+      resetPasswordExpires: { $gt: Date.now() },
+    });
+
+    if (!vendor) {
+      return res.status(400).json({ success: false, message: "Token is invalid or has expired." });
+    }
+
+    // Securely hash the new incoming password string
+    const salt = await bcrypt.genSalt(10);
+    vendor.password = await bcrypt.hash(password, salt);
+
+    // Clear session tokens from document tracking
+    vendor.resetPasswordToken = undefined;
+    vendor.resetPasswordExpires = undefined;
+    await vendor.save();
+
+    res.status(200).json({ success: true, message: "Password updated successfully." });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ success: false, message: error.message });
+  }
+};

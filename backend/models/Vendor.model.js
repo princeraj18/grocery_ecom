@@ -47,6 +47,8 @@ const vendorSchema =
         type: String,
         default: "vendor",
       },
+      resetPasswordToken: String,
+      resetPasswordExpires: Date,
     },
     {
       timestamps: true,

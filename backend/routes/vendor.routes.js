@@ -12,6 +12,8 @@ import {
   getVendorProfile,
   verifyVendor,
   unverifyVendor,
+  forgotVendorPassword,
+  resetVendorPassword
 } from "../controllers/vendor.controller.js";
 
 import vendorAuth from "../middleware/vendorAuth.js";
@@ -78,4 +80,6 @@ router.put(
   
   unverifyVendor
 );
+router.post("/forgot-password", forgotVendorPassword); // NEW
+router.post("/reset-password", resetVendorPassword);   // NEW
 export default router;

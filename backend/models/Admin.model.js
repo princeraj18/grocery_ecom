@@ -25,6 +25,8 @@ const adminSchema =
         type: String,
         default: "admin",
       },
+      resetPasswordToken: String,
+      resetPasswordExpires: Date,
     },
     {
       timestamps: true,

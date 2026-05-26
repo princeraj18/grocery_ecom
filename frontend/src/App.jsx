@@ -17,6 +17,8 @@ function App() {
     "/register",
     "/payment-success",
     "/payment-cancel",
+    "/forgot-password",
+    "/reset-password",
   ];
 
   // CHECK IF CURRENT ROUTE IS VENDOR

@@ -18,6 +18,8 @@ import VendorLogin from "../pages/VendorLogin";
 import VendorRegister from "../pages/VendorRegister";
 
 import VendorProtectedRoute from "./VendorProtectedRoute";
+import VendorForgotPassword from "../pages/VendorForgotPassword";
+import VendorResetPassword from "../pages/VendorResetPage";
 
 export default function VendorRoutes() {
 
@@ -37,6 +39,10 @@ export default function VendorRoutes() {
         element={<VendorRegister />}
       />
 
+      <Route path="/forgot-password" element={<VendorForgotPassword />} />
+      {/* RESET PASSWORD */}
+   <Route path="/reset-password/:token" element={<VendorResetPassword />} />
+    
       {/* DASHBOARD */}
       <Route
         path="dashboard"
@@ -77,7 +83,6 @@ export default function VendorRoutes() {
         }
       />
 
-      {/* ORDERS */}
       <Route
         path="orders"
         element={

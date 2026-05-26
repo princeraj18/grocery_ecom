@@ -20,6 +20,8 @@ const userSchema =
         required: true,
         minlength: 6,
       },
+      resetPasswordToken: String,
+    resetPasswordExpires: Date,
     },
     {
       timestamps: true,

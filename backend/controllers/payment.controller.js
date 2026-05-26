@@ -5,7 +5,7 @@ import Payment from "../models/payment.model.js";
 import Order from "../models/Order.model.js";
 
 import mongoose from "mongoose";
-
+import { sendInvoiceEmail } from "../utils/emailService.js";
 // ===================================
 // CREATE STRIPE CHECKOUT SESSION
 // ===================================
@@ -146,10 +146,7 @@ export const createCheckoutSession = async (
 // ===================================
 // VERIFY PAYMENT
 // ===================================
-export const verifyPayment = async (
-  req,
-  res
-) => {
+export const verifyPayment = async (req, res) => {
   try {
     const { sessionId } = req.body;
 
@@ -161,49 +158,57 @@ export const verifyPayment = async (
     }
 
     // Retrieve Stripe Session
-    const session =
-      await stripe.checkout.sessions.retrieve(
-        sessionId
-      );
+    const session = await stripe.checkout.sessions.retrieve(sessionId);
 
     // Payment Successful
-    if (
-      session.payment_status === "paid"
-    ) {
-      // Update Payment
-      const payment =
-        await Payment.findOneAndUpdate(
-          {
-            paymentId: session.id,
-          },
-          {
-            paymentStatus: "Success",
+    if (session.payment_status === "paid") {
+      // Update Payment Documentation Matrix
+      const payment = await Payment.findOneAndUpdate(
+        { paymentId: session.id },
+        {
+          paymentStatus: "Success",
+          transactionId: session.payment_intent,
+        },
+        { new: true }
+      );
 
-            transactionId:
-              session.payment_intent,
-          },
-          {
-            new: true,
-          }
-        );
-
-      // Update Order
+      // Update Order Target
       if (payment) {
-        await Order.findByIdAndUpdate(
-          payment.order,
-          {
-            paymentStatus: "Success",
+const updatedOrder =
+  await Order.findByIdAndUpdate(
+    payment.order,
+    {
+      paymentStatus: "Paid",
+      isPaid: true,
+      orderStatus: "Processing",
+    },
+    {
+      new: true,
+    }
+  );
 
-            // move to processing after successful payment
-            orderStatus: "Processing",
-          }
-        );
+        // =========================================================================
+        // AUTOMATED HOOK RUNS IN background PROCESS (Prevents blocking Client response paths)
+        // =========================================================================
+      if (
+  updatedOrder &&
+  updatedOrder.shippingAddress?.email
+) {
+sendInvoiceEmail(updatedOrder)
+  .then(() =>
+    console.log("Invoice Sent")
+  )
+  .catch((err) =>
+    console.log(
+      "Invoice Error:",
+      err.message
+    )
+  );}
       }
 
       return res.status(200).json({
         success: true,
-        message:
-          "Payment verified successfully",
+        message: "Payment verified successfully",
       });
     }
 
@@ -212,11 +217,7 @@ export const verifyPayment = async (
       message: "Payment not completed",
     });
   } catch (error) {
-    console.log(
-      "VERIFY PAYMENT ERROR:",
-      error
-    );
-
+    console.log("VERIFY PAYMENT ERROR:", error);
     res.status(500).json({
       success: false,
       message: error.message,

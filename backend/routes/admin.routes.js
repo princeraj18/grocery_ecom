@@ -4,6 +4,8 @@ import {
   registerAdmin,
   loginAdmin,
   getAdminProfile,
+  forgotAdminPassword,
+  resetAdminPassword,
 } from "../controllers/admin.controller.js";
 
 import {
@@ -38,5 +40,7 @@ router.get(
 router.get("/vendors", adminAuth, getVendors);
 router.get("/vendors/:id", adminAuth, getSingleVendor);
 router.delete("/vendors/:id", adminAuth, deleteVendor);
+router.post("/forgot-password", forgotAdminPassword);
+router.post("/reset-password", resetAdminPassword);
 
 export default router;

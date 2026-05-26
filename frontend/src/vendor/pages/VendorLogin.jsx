@@ -126,26 +126,25 @@ export default function VendorLogin() {
           </div>
 
           {/* PASSWORD */}
-          <div>
+        {/* PASSWORD */}
+<div>
+  <label className="font-semibold">Password</label>
+  <input
+    type="password"
+    name="password"
+    value={formData.password}
+    onChange={handleChange}
+    required
+    className="w-full border p-3 rounded-lg mt-2"
+  />
+</div>
 
-            <label className="font-semibold">
-              Password
-            </label>
-
-            <input
-              type="password"
-              name="password"
-              value={
-                formData.password
-              }
-              onChange={
-                handleChange
-              }
-              required
-              className="w-full border p-3 rounded-lg mt-2"
-            />
-
-          </div>
+{/* FORGOT PASSWORD */}
+<div className="flex justify-end text-sm">
+  <Link to="/vendor/forgot-password" className="text-green-600 hover:underline">
+    Forgot Password?
+  </Link>
+</div>
 
           {/* BUTTON */}
           <button

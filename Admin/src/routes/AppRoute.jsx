@@ -19,6 +19,8 @@ import VendorDetails from "../pages/VendorDetails";
 import ProtectedRoute from "./ProtectedRoute";
 
 import AdminLayout from "../layout/AdminLayout";
+import AdminForgotPassword from "../pages/AdminForgotPassword";
+import AdminResetPassword from "../pages/AdminResetPassword";
 
 export default function AppRoutes() {
 
@@ -36,6 +38,8 @@ export default function AppRoutes() {
         path="/register"
         element={<Register />}
       />
+      <Route path="/admin/forgot-password" element={<AdminForgotPassword />} />
+<Route path="/admin/reset-password/:token" element={<AdminResetPassword />} />
 
       {/* ROOT */}
       <Route

@@ -25,6 +25,8 @@ import Navbar from "../components/Navbar";
 import WishList from "../pages/WishList";
 // IMPORT VENDOR ROUTES
 import VendorRoutes from "../vendor/routes/VendorRoutes";
+import ForgotPassword from "../pages/ForgotPassword";
+import ResetPassword from "../pages/ResetPassword";
 
 const AppRoutes = () => {
 
@@ -36,6 +38,8 @@ const AppRoutes = () => {
     "/register",
     "/payment-success",
     "/payment-cancel",
+    "/forgot-password",
+    "/reset-password",
   ];
 
   // HIDE NAVBAR ON ALL VENDOR ROUTES
@@ -129,7 +133,8 @@ const AppRoutes = () => {
         path="/register"
         element={<Register />}
       />
-
+<Route path="/forgot-password" element={<ForgotPassword />} />
+<Route path="/reset-password/:token" element={<ResetPassword />} />
       <Route
         path="/profile"
         element={
