@@ -7,8 +7,8 @@ export default function Sidebar() {
 
   const menus = [
     {
-      name: "Dashboard",
-      path: "/vendor/dashboard",
+      name: "Analytics",
+      path: "/vendor/analytics",
     },
     {
       name: "Products",
@@ -25,11 +25,8 @@ export default function Sidebar() {
     {
       name: "Coupons",
       path: "/vendor/coupons",
-    },
-    {
-      name: "Analytics",
-      path: "/vendor/analytics",
-    },
+    }
+   ,
     {
       name: "Reviews",
       path: "/vendor/reviews",

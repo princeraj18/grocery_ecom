@@ -71,7 +71,7 @@ alert("Registration Successful");
 
 // navigate("/vendor/dashboard");
 window.location.href =
-  "/vendor/dashboard";
+  "/vendor/analytics";
 
       } catch (error) {
 

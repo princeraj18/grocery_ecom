@@ -18,7 +18,8 @@ const ShopContextProvider = ({
 
   const [cartItems, setCartItems] =
     useState([]);
-
+const [wishlistItems, setWishlistItems] =
+  useState([]);
   const [loadingProducts, setLoadingProducts] =
     useState(true);
 
@@ -94,15 +95,61 @@ const ShopContextProvider = ({
     }
   };
 
-  useEffect(() => {
+// FETCH WISHLIST
+// =========================
+const fetchWishlist = async () => {
+
+  try {
+
+    if (!user?._id) {
+
+      setWishlistItems([]);
+
+      return;
+    }
+
+    const { data } =
+      await api.get(
+        `/wishlist/${user._id}`
+      );
+
+    console.log(
+      "WISHLIST DATA:",
+      data
+    );
+
+    // IMPORTANT FIX
+    setWishlistItems(
+      Array.isArray(data.wishlist)
+        ? data.wishlist
+        : []
+    );
+
+  } catch (error) {
+
+    console.log(
+      "FETCH WISHLIST ERROR:",
+      error
+    );
+
+    setWishlistItems([]);
+  }
+};
+useEffect(() => {
+
+  const loadData = async () => {
 
     if (user?._id) {
 
-      fetchCart();
+      await fetchCart();
+
+      await fetchWishlist();
     }
+  };
 
-  }, [user]);
+  loadData();
 
+}, [user]);
   // =========================
   // ADD TO CART
   // =========================
@@ -289,6 +336,65 @@ const ShopContextProvider = ({
       }
     };
 
+    // =========================
+// ADD TO WISHLIST
+// =========================
+const addToWishlist =
+  async (productId) => {
+
+    try {
+
+      const { data } =
+        await api.post(
+          "/wishlist/add",
+          {
+            userId: user._id,
+            productId,
+          }
+        );
+
+      fetchWishlist();
+
+      return data;
+
+    } catch (error) {
+
+      console.log(
+        "ADD WISHLIST ERROR:",
+        error
+      );
+    }
+  };
+
+// =========================
+// REMOVE FROM WISHLIST
+// =========================
+const removeFromWishlist =
+  async (productId) => {
+
+    try {
+
+      await api.delete(
+        "/wishlist/remove",
+        {
+          data: {
+            userId: user._id,
+            productId,
+          },
+        }
+      );
+
+      fetchWishlist();
+
+    } catch (error) {
+
+      console.log(
+        "REMOVE WISHLIST ERROR:",
+        error
+      );
+    }
+  };
+
   // =========================
   // LOGIN USER
   // =========================
@@ -346,6 +452,10 @@ const ShopContextProvider = ({
         loginUser,
 
         logoutUser,
+        wishlistItems,
+        addToWishlist,
+        removeFromWishlist,
+
       }}
     >
 

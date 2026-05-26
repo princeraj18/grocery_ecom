@@ -76,7 +76,7 @@ export default function Navbar() {
 
       {/* TITLE */}
       <h1 className="text-2xl font-bold">
-        Vendor Dashboard
+        Vendor Panel
       </h1>
 
       {/* RIGHT SIDE */}

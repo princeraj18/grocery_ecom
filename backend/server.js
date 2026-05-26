@@ -21,6 +21,13 @@ import vendorAnalyticsRoutes
 from "./routes/vendorAnalytics.routes.js";
 import couponRoutes
 from "./routes/coupon.routes.js";
+import reviewRoutes from "./routes/review.routes.js";
+import wishlistRoutes
+from "./routes/wishlist.routes.js";
+
+
+
+
 connectDB();
 connectCloudinary();
 
@@ -92,6 +99,10 @@ app.use(
   analyticsRoutes
 );
 app.use(
+  "/api/wishlist",
+  wishlistRoutes
+);
+app.use(
   "/api/vendor",
   vendorAnalyticsRoutes
 );
@@ -99,6 +110,7 @@ app.use(
   "/api/coupons",
   couponRoutes
 );
+app.use("/api/reviews", reviewRoutes);
 // Serve local uploads as a fallback when Cloudinary isn't available
 app.use("/uploads", express.static(path.join(process.cwd(), "uploads")));
 // ======================

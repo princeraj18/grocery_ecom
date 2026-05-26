@@ -22,7 +22,7 @@ import CategoryProducts from "../pages/CategoryProducts";
 
 import ProtectedRoute from "../components/ProtectedRoutes";
 import Navbar from "../components/Navbar";
-
+import WishList from "../pages/WishList";
 // IMPORT VENDOR ROUTES
 import VendorRoutes from "../vendor/routes/VendorRoutes";
 
@@ -90,7 +90,14 @@ const AppRoutes = () => {
             </ProtectedRoute>
           }
         />
-
+  <Route
+          path="/wishlist"
+          element={
+            <ProtectedRoute>
+              <WishList />
+            </ProtectedRoute>
+          }
+        />
         <Route
           path="/cart"
           element={

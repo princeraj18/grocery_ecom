@@ -1,57 +1,34 @@
 import Review from "../models/review.model.js";
+// import Review from "../models/review.model.js";
+import Product from "../models/product.model.js";
+export const createReview = async (req, res) => {
+  try {
+    console.log("REVIEW BODY:", req.body);
 
-// =========================
-// CREATE REVIEW
-// =========================
-export const createReview =
-  async (req, res) => {
-    try {
-      const {
-        name,
-        email,
-        message,
-      } = req.body;
+    const { user, product, rating, comment } = req.body;
 
-      // Validation
-      if (
-        !name ||
-        !email ||
-        !message
-      ) {
-        return res.status(400).json({
-          success: false,
-          message:
-            "All fields are required",
-        });
-      }
+    const review = await Review.create({
+      user,
+      product,
+      rating,
+      comment,
+    });
 
-      // Save Review
-      const review =
-        await Review.create({
-          name,
-          email,
-          message,
-        });
+    res.status(201).json({
+      success: true,
+      message: "Review submitted successfully",
+      review,
+    });
 
-      res.status(201).json({
-        success: true,
-        message:
-          "Message sent successfully",
-        review,
-      });
-    } catch (error) {
-      console.log(
-        "CREATE REVIEW ERROR:",
-        error
-      );
+  } catch (error) {
+    console.log("CREATE REVIEW ERROR:", error);
 
-      res.status(500).json({
-        success: false,
-        message:
-          "Server Error",
-      });
-    }
-  };
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
 
 // =========================
 // GET ALL REVIEWS
@@ -119,3 +96,79 @@ export const deleteReview =
       });
     }
   };
+
+
+
+  export const getProductReviews = async (
+  req,
+  res
+) => {
+  try {
+    const reviews = await Review.find({
+      product: req.params.productId,
+    })
+      .populate("user", "name")
+      .sort({ createdAt: -1 });
+
+    res.status(200).json({
+      success: true,
+      reviews,
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+
+export const getVendorReviews = async (
+  req,
+  res
+) => {
+  try {
+    const vendorId = req.vendor._id;
+
+    // Get all products owned by vendor
+    const products = await Product.find({
+      vendor: vendorId,
+    }).select("_id");
+
+    const productIds = products.map(
+      (product) => product._id
+    );
+
+    // Get reviews for those products only
+    const reviews = await Review.find({
+      product: {
+        $in: productIds,
+      },
+    })
+      .populate(
+        "user",
+        "name email"
+      )
+      .populate(
+        "product",
+        "name image category"
+      )
+      .sort({
+        createdAt: -1,
+      });
+
+    res.status(200).json({
+      success: true,
+      reviews,
+    });
+  } catch (error) {
+    console.log(
+      "GET VENDOR REVIEWS ERROR:",
+      error
+    );
+
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};

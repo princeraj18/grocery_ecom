@@ -12,8 +12,8 @@ import {
   FaBars,
   FaTimes,
   FaSearch,
+  FaHeart,
 } from "react-icons/fa";
-
 import {
   useNavigate,
   useLocation,
@@ -44,14 +44,23 @@ export default function Navbar() {
         "productSearch"
       ) || ""
     );
-
+const clearSearch = () => {
+  setSearch("");
+  localStorage.removeItem("productSearch");
+};
+const handleNavigation = (path) => {
+  clearSearch();
+  navigate(path);
+};
   const navigate = useNavigate();
 
   const location = useLocation();
 
-  const { cartItems, products } =
-    useContext(ShopContext);
-
+const {
+  cartItems,
+  wishlistItems,
+  products,
+} = useContext(ShopContext);
   const menuRef = useRef();
 
   const user = JSON.parse(
@@ -105,6 +114,10 @@ export default function Navbar() {
       0
     );
 
+const wishlistCount =
+  Array.isArray(wishlistItems)
+    ? wishlistItems.length
+    : 0;
   // =========================
   // CLOSE USER MENU
   // =========================
@@ -138,6 +151,18 @@ export default function Navbar() {
 
   }, []);
 
+
+  // =========================
+// CLEAR SEARCH ON ROUTE CHANGE
+// =========================
+useEffect(() => {
+  if (
+    location.pathname !== "/" &&
+    location.pathname !== "/products"
+  ) {
+    clearSearch();
+  }
+}, [location.pathname]);
   // =========================
   // HANDLE SEARCH
   // =========================
@@ -194,7 +219,7 @@ export default function Navbar() {
 
         {/* LOGO */}
         <div
-          onClick={() => navigate("/")}
+            onClick={() => handleNavigation("/")}
           className="text-2xl font-bold cursor-pointer"
         >
           Grocify
@@ -205,7 +230,7 @@ export default function Navbar() {
 
           <span
             onClick={() =>
-              navigate("/")
+              handleNavigation("/")
             }
             className="cursor-pointer hover:text-gray-200"
           >
@@ -214,7 +239,7 @@ export default function Navbar() {
 
           <span
             onClick={() =>
-              navigate("/products")
+              handleNavigation("/products")
             }
             className="cursor-pointer hover:text-gray-200"
           >
@@ -311,27 +336,38 @@ export default function Navbar() {
             </div>
           )}
 
-          {/* CART */}
-          <div
-            className="relative cursor-pointer text-xl"
-            onClick={() =>
-              navigate("/cart")
-            }
-          >
+         {/* WISHLIST */}
+<div
+  className="relative cursor-pointer text-xl hover:text-red-200"
+  onClick={() => navigate("/wishlist")}
+>
 
-            <FaShoppingCart />
+  <FaHeart />
 
-            {cartCount > 0 && (
+  {wishlistCount > 0 && (
 
-              <span className="absolute -top-2 -right-3 bg-red-500 text-white text-[10px] min-w-[18px] h-[18px] rounded-full flex items-center justify-center font-bold">
+    <span className="absolute -top-2 -right-3 bg-red-500 text-white text-[10px] min-w-[18px] h-[18px] rounded-full flex items-center justify-center font-bold">
 
-                {cartCount}
+      {wishlistCount}
 
-              </span>
-            )}
+    </span>
+  )}
 
-          </div>
+</div>
 
+{/* CART */}
+<div
+  className="relative cursor-pointer text-xl"
+  onClick={() => navigate("/cart")}
+>
+  <FaShoppingCart />
+
+  {cartCount > 0 && (
+    <span className="absolute -top-2 -right-3 bg-red-500 text-white text-[10px] min-w-[18px] h-[18px] rounded-full flex items-center justify-center font-bold">
+      {cartCount}
+    </span>
+  )}
+</div>
           {/* USER */}
           <div
             className="relative"
@@ -471,6 +507,7 @@ export default function Navbar() {
             placeholder="Search products..."
             className="w-full px-4 py-3 rounded-lg text-black outline-none"
           />
+          
 
           {/* MOBILE SUGGESTIONS */}
           {search &&
@@ -525,7 +562,128 @@ export default function Navbar() {
 
         </div>
       )}
+{/* MOBILE MENU */}
+{open && (
+  <div className="lg:hidden mt-4 bg-blue-700 rounded-lg p-4 flex flex-col gap-4">
 
+    <span
+      onClick={() => {
+        handleNavigation("/");
+        setOpen(false);
+      }}
+      className="cursor-pointer"
+    >
+      Home
+    </span>
+
+    <span
+      onClick={() => {
+        handleNavigation("/products");
+        setOpen(false);
+      }}
+      className="cursor-pointer"
+    >
+      Products
+    </span>
+
+    <span
+      onClick={() => {
+        navigate("/about");
+        setOpen(false);
+      }}
+      className="cursor-pointer"
+    >
+      About Us
+    </span>
+
+    <span
+      onClick={() => {
+        navigate("/contact");
+        setOpen(false);
+      }}
+      className="cursor-pointer"
+    >
+      Contact Us
+    </span>
+
+    <span
+      onClick={() => {
+        navigate("/wishlist");
+        setOpen(false);
+      }}
+      className="cursor-pointer"
+    >
+      Wishlist
+    </span>
+
+    <span
+      onClick={() => {
+        navigate("/cart");
+        setOpen(false);
+      }}
+      className="cursor-pointer"
+    >
+      Cart ({cartCount})
+    </span>
+
+    {user ? (
+      <>
+        <span
+          onClick={() => {
+            navigate("/profile");
+            setOpen(false);
+          }}
+          className="cursor-pointer"
+        >
+          Profile
+        </span>
+
+        <span
+          onClick={() => {
+            navigate("/orders");
+            setOpen(false);
+          }}
+          className="cursor-pointer"
+        >
+          Orders
+        </span>
+
+        <span
+          onClick={() => {
+            handleLogout();
+            setOpen(false);
+          }}
+          className="cursor-pointer text-red-300"
+        >
+          Logout
+        </span>
+      </>
+    ) : (
+      <>
+        <span
+          onClick={() => {
+            navigate("/login");
+            setOpen(false);
+          }}
+          className="cursor-pointer"
+        >
+          Login
+        </span>
+
+        <span
+          onClick={() => {
+            navigate("/register");
+            setOpen(false);
+          }}
+          className="cursor-pointer"
+        >
+          Register
+        </span>
+      </>
+    )}
+
+  </div>
+)}
     </nav>
   );
 }
