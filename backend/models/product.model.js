@@ -1,80 +1,77 @@
 import mongoose from "mongoose";
 
-const productSchema =
-  new mongoose.Schema(
-    {
-      vendor: {
-        type:
-          mongoose.Schema.Types.ObjectId,
-        ref: "Vendor",
-        required: true,
-      },
+const variantSchema = new mongoose.Schema({
+  size: {
+    type: String,
+    required: true,
+  },
 
-      name: {
-        type: String,
-        required: true,
-        trim: true,
-      },
+  price: {
+    type: Number,
+    required: true,
+  },
 
-      description: {
-        type: [String],
-        default: [],
-      },
+  offerPrice: {
+    type: Number,
+    required: true,
+  },
 
-      category: {
-        type: String,
-        required: true,
-        enum: [
-          "Vegetables",
-          "Fruits",
-          "Drinks",
-          "Instant",
-          "Dairy",
-          "Bakery",
-          "Grains",
-        ],
-      },
+  stockQuantity: {
+    type: Number,
+    default: 0,
+  },
+});
 
-      price: {
-        type: Number,
-        required: true,
-      },
-
-      offerPrice: {
-        type: Number,
-        required: true,
-      },
-
-      image: {
-        type: [String],
-        required: true,
-      },
-
-      inStock: {
-        type: Boolean,
-        default: true,
-      },
-
-      stockQuantity: {
-        type: Number,
-        default: 0,
-      },
-
-      bestseller: {
-        type: Boolean,
-        default: false,
-      },
+const productSchema = new mongoose.Schema(
+  {
+    vendor: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Vendor",
+      required: true,
     },
-    {
-      timestamps: true,
-    }
-  );
+
+    name: {
+      type: String,
+      required: true,
+      trim: true,
+    },
+
+    description: {
+      type: [String],
+      default: [],
+    },
+
+    // Category Reference
+    category: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Category",
+      required: true,
+    },
+
+    variants: [variantSchema],
+
+    image: {
+      type: [String],
+      required: true,
+    },
+
+    inStock: {
+      type: Boolean,
+      default: true,
+    },
+
+    bestseller: {
+      type: Boolean,
+      default: false,
+    },
+  },
+  {
+    timestamps: true,
+  }
+);
 
 const Product =
   mongoose.models.Product ||
-  mongoose.model(
-    "Product",
-    productSchema
-  );
+  mongoose.model("Product", productSchema);
 
 export default Product;

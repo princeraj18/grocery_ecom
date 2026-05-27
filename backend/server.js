@@ -1,7 +1,10 @@
 import dotenv from "dotenv";
 dotenv.config();
-
+console.log("ENV TEST");
+console.log(process.env.CLOUD_NAME);
 import express from "express";
+import { connectCloudinary } from "./config/cloudinary.js";
+
 import cors from "cors";
 
 import connectDB from "./config/db.js";
@@ -14,7 +17,6 @@ import contactRoutes from "./routes/contact.routes.js";
 import productRoutes from "./routes/product.routes.js";
 import adminRoutes from "./routes/admin.routes.js";
 import vendorRoutes from "./routes/vendor.routes.js";
-import { connectCloudinary } from "./config/cloudinary.js";
 import dashboardRoutes from "./routes/dashboard.routes.js";
 import analyticsRoutes from "./routes/analytics.routes.js";
 import vendorAnalyticsRoutes
@@ -24,12 +26,14 @@ from "./routes/coupon.routes.js";
 import reviewRoutes from "./routes/review.routes.js";
 import wishlistRoutes
 from "./routes/wishlist.routes.js";
+import categoryRoutes from "./routes/category.routes.js";
 
 
 
 
 connectDB();
-connectCloudinary();
+// Ensure Cloudinary is checked at startup so controllers can skip cloud operations when unavailable
+await connectCloudinary();
 
 import path from "path";
 
@@ -79,6 +83,10 @@ app.use(
 app.use(
   "/api/products",
   productRoutes
+);
+app.use(
+  "/api/categories",
+  categoryRoutes
 );
 
 app.use(

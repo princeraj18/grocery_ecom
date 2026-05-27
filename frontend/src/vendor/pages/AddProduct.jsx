@@ -1,58 +1,127 @@
-import React, {
-  useState,
-} from "react";
-
+import React, { useState, useEffect } from "react";
 import axios from "axios";
 
 import Sidebar from "../components/Sidebar";
 import Navbar from "../components/Navbar";
 
 export default function AddProduct() {
+  const [formData, setFormData] = useState({
+    name: "",
+    description: "",
+    category: "",
+    stockQuantity: "",
+  });
 
-  const [formData, setFormData] =
-    useState({
-      name: "",
-      description: "",
-      category: "",
+  const [images, setImages] = useState([]);
+  const [categories, setCategories] = useState([]);
+  const [loadingCategories, setLoadingCategories] =
+    useState(true);
+
+  const [variants, setVariants] = useState([
+    {
+      size: "",
       price: "",
       offerPrice: "",
-      stockQuantity: "",
-    });
-
-  const [images, setImages] =
-    useState([]);
+    },
+  ]);
 
   // =========================
-  // HANDLE INPUT CHANGE
+  // FETCH CATEGORIES
+  // =========================
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        setLoadingCategories(true);
+
+        const res = await axios.get(
+          "http://localhost:5000/api/categories"
+        );
+
+        setCategories(
+          res.data.categories || []
+        );
+      } catch (error) {
+        console.log(
+          "CATEGORY FETCH ERROR:",
+          error
+        );
+      } finally {
+        setLoadingCategories(false);
+      }
+    };
+
+    fetchCategories();
+  }, []);
+
+  // =========================
+  // INPUT CHANGE
   // =========================
   const handleChange = (e) => {
-
-    setFormData({
-      ...formData,
+    setFormData((prev) => ({
+      ...prev,
       [e.target.name]:
         e.target.value,
-    });
+    }));
   };
 
   // =========================
-  // HANDLE IMAGE CHANGE
+  // IMAGE CHANGE
   // =========================
   const handleImages = (e) => {
-
-    setImages(e.target.files);
+    setImages(
+      Array.from(e.target.files)
+    );
   };
 
   // =========================
-  // SUBMIT FORM
+  // VARIANT CHANGE
+  // =========================
+  const handleVariantChange = (
+    index,
+    field,
+    value
+  ) => {
+    const updated = [...variants];
+
+    updated[index][field] =
+      value;
+
+    setVariants(updated);
+  };
+
+  const addVariant = () => {
+    setVariants([
+      ...variants,
+      {
+        size: "",
+        price: "",
+        offerPrice: "",
+      },
+    ]);
+  };
+
+  const removeVariant = (
+    index
+  ) => {
+    if (variants.length === 1)
+      return;
+
+    setVariants(
+      variants.filter(
+        (_, i) => i !== index
+      )
+    );
+  };
+
+  // =========================
+  // SUBMIT
   // =========================
   const handleSubmit = async (
     e
   ) => {
-
     e.preventDefault();
 
     try {
-
       const token =
         localStorage.getItem(
           "vendorToken"
@@ -77,41 +146,29 @@ export default function AddProduct() {
       );
 
       data.append(
-        "price",
-        formData.price
-      );
-
-      data.append(
-        "offerPrice",
-        formData.offerPrice
-      );
-
-      data.append(
         "stockQuantity",
         formData.stockQuantity
       );
 
-      // APPEND IMAGES
-      for (
-        let i = 0;
-        i < images.length;
-        i++
-      ) {
+      data.append(
+        "variants",
+        JSON.stringify(variants)
+      );
 
+      images.forEach((image) => {
         data.append(
           "images",
-          images[i]
+          image
         );
-      }
-
+      });
+console.log("SELECTED CATEGORY:", formData.category);
       const res =
         await axios.post(
           "http://localhost:5000/api/products",
           data,
           {
             headers: {
-              Authorization:
-                `Bearer ${token}`,
+              Authorization: `Bearer ${token}`,
               "Content-Type":
                 "multipart/form-data",
             },
@@ -124,20 +181,27 @@ export default function AddProduct() {
 
       console.log(res.data);
 
-      // RESET FORM
       setFormData({
         name: "",
         description: "",
         category: "",
-        price: "",
-        offerPrice: "",
         stockQuantity: "",
       });
 
+      setVariants([
+        {
+          size: "",
+          price: "",
+          offerPrice: "",
+        },
+      ]);
+
       setImages([]);
 
+      document.getElementById(
+        "product-images"
+      ).value = "";
     } catch (error) {
-
       console.log(error);
 
       alert(
@@ -149,57 +213,48 @@ export default function AddProduct() {
   };
 
   return (
-
     <div className="flex min-h-screen bg-gray-100">
-
-      {/* SIDEBAR */}
       <Sidebar />
 
-      {/* MAIN CONTENT */}
       <div className="flex-1">
-
-        {/* NAVBAR */}
         <Navbar />
 
-        {/* PAGE CONTENT */}
         <div className="p-6">
-
-          <div className="bg-white rounded-2xl shadow-lg p-8 max-w-4xl mx-auto">
-
-            {/* TITLE */}
+          <div className="bg-white rounded-2xl shadow-lg p-8 max-w-5xl mx-auto">
             <h1 className="text-3xl font-bold mb-8 text-gray-800">
               Add Product
             </h1>
 
-            {/* FORM */}
             <form
-              onSubmit={handleSubmit}
+              onSubmit={
+                handleSubmit
+              }
               className="space-y-6"
             >
-
               {/* PRODUCT NAME */}
               <div>
-
-                <label className="block mb-2 font-semibold text-gray-700">
+                <label className="block mb-2 font-semibold">
                   Product Name
                 </label>
 
                 <input
                   type="text"
                   name="name"
-                  value={formData.name}
-                  placeholder="Enter product name"
-                  onChange={handleChange}
-                  className="border border-gray-300 p-3 w-full rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
+                  value={
+                    formData.name
+                  }
+                  onChange={
+                    handleChange
+                  }
+                  placeholder="Enter Product Name"
+                  className="border p-3 rounded-lg w-full"
                   required
                 />
-
               </div>
 
               {/* DESCRIPTION */}
               <div>
-
-                <label className="block mb-2 font-semibold text-gray-700">
+                <label className="block mb-2 font-semibold">
                   Description
                 </label>
 
@@ -208,19 +263,19 @@ export default function AddProduct() {
                   value={
                     formData.description
                   }
-                  placeholder="Enter product description"
-                  onChange={handleChange}
+                  onChange={
+                    handleChange
+                  }
                   rows="4"
-                  className="border border-gray-300 p-3 w-full rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
+                  placeholder="Enter Product Description"
+                  className="border p-3 rounded-lg w-full"
                   required
                 />
-
               </div>
 
               {/* CATEGORY */}
               <div>
-
-                <label className="block mb-2 font-semibold text-gray-700">
+                <label className="block mb-2 font-semibold">
                   Category
                 </label>
 
@@ -229,146 +284,249 @@ export default function AddProduct() {
                   value={
                     formData.category
                   }
-                  onChange={handleChange}
-                  className="border border-gray-300 p-3 w-full rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
+                  onChange={
+                    handleChange
+                  }
+                  className="border p-3 rounded-lg w-full"
                   required
                 >
-
                   <option value="">
-                    Select Category
+                    {loadingCategories
+                      ? "Loading Categories..."
+                      : "Select Category"}
                   </option>
 
-                  <option value="Vegetables">
-                    Vegetables
-                  </option>
-
-                  <option value="Fruits">
-                    Fruits
-                  </option>
-
-                  <option value="Drinks">
-                    Drinks
-                  </option>
-
-                  <option value="Instant">
-                    Instant
-                  </option>
-
-                  <option value="Dairy">
-                    Dairy
-                  </option>
-
-                  <option value="Bakery">
-                    Bakery
-                  </option>
-
-                  <option value="Grains">
-                    Grains
-                  </option>
-
+                  {categories.map(
+                    (cat) => (
+                   <option
+  key={cat._id}
+  value={cat._id}
+>
+  {cat.text}
+</option>
+                    )
+                  )}
                 </select>
-
               </div>
 
-              {/* PRICE SECTION */}
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              {/* VARIANTS */}
+              <div>
+                <label className="block mb-3 font-semibold">
+                  Product Variants
+                </label>
 
-                {/* PRICE */}
-                <div>
+                {variants.map(
+                  (
+                    variant,
+                    index
+                  ) => (
+                    <div
+                      key={
+                        index
+                      }
+                      className="grid md:grid-cols-4 gap-3 mb-3 border rounded-lg p-4"
+                    >
+                      <select
+                        value={
+                          variant.size
+                        }
+                        onChange={(
+                          e
+                        ) =>
+                          handleVariantChange(
+                            index,
+                            "size",
+                            e.target
+                              .value
+                          )
+                        }
+                        className="border p-3 rounded"
+                        required
+                      >
+                        <option value="">
+                          Select Size
+                        </option>
 
-                  <label className="block mb-2 font-semibold text-gray-700">
-                    Price
-                  </label>
+                        <option value="100ml">
+                          100 ml
+                        </option>
 
-                  <input
-                    type="number"
-                    name="price"
-                    value={formData.price}
-                    placeholder="Price"
-                    onChange={handleChange}
-                    className="border border-gray-300 p-3 w-full rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
-                    required
-                  />
+                        <option value="250ml">
+                          250 ml
+                        </option>
 
-                </div>
+                        <option value="500ml">
+                          500 ml
+                        </option>
 
-                {/* OFFER PRICE */}
-                <div>
+                        <option value="1L">
+                          1 L
+                        </option>
 
-                  <label className="block mb-2 font-semibold text-gray-700">
-                    Offer Price
-                  </label>
+                        <option value="2L">
+                          2 L
+                        </option>
 
-                  <input
-                    type="number"
-                    name="offerPrice"
-                    value={
-                      formData.offerPrice
-                    }
-                    placeholder="Offer Price"
-                    onChange={handleChange}
-                    className="border border-gray-300 p-3 w-full rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
-                    required
-                  />
+                        <option value="250g">
+                          250 g
+                        </option>
 
-                </div>
+                        <option value="500g">
+                          500 g
+                        </option>
 
-                {/* STOCK */}
-                <div>
+                        <option value="1kg">
+                          1 Kg
+                        </option>
 
-                  <label className="block mb-2 font-semibold text-gray-700">
-                    Stock Quantity
-                  </label>
+                        <option value="2kg">
+                          2 Kg
+                        </option>
 
-                  <input
-                    type="number"
-                    name="stockQuantity"
-                    value={
-                      formData.stockQuantity
-                    }
-                    placeholder="Stock Quantity"
-                    onChange={handleChange}
-                    className="border border-gray-300 p-3 w-full rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
-                    required
-                  />
+                        <option value="5kg">
+                          5 Kg
+                        </option>
+                      </select>
 
-                </div>
+                      <input
+                        type="number"
+                        placeholder="Price"
+                        value={
+                          variant.price
+                        }
+                        onChange={(
+                          e
+                        ) =>
+                          handleVariantChange(
+                            index,
+                            "price",
+                            e.target
+                              .value
+                          )
+                        }
+                        className="border p-3 rounded"
+                        required
+                      />
 
+                      <input
+                        type="number"
+                        placeholder="Offer Price"
+                        value={
+                          variant.offerPrice
+                        }
+                        onChange={(
+                          e
+                        ) =>
+                          handleVariantChange(
+                            index,
+                            "offerPrice",
+                            e.target
+                              .value
+                          )
+                        }
+                        className="border p-3 rounded"
+                        required
+                      />
+
+                      <button
+                        type="button"
+                        onClick={() =>
+                          removeVariant(
+                            index
+                          )
+                        }
+                        className="bg-red-500 text-white rounded px-4"
+                      >
+                        Remove
+                      </button>
+                    </div>
+                  )
+                )}
+
+                <button
+                  type="button"
+                  onClick={
+                    addVariant
+                  }
+                  className="bg-blue-600 text-white px-4 py-2 rounded"
+                >
+                  + Add Variant
+                </button>
+              </div>
+
+              {/* STOCK */}
+              <div>
+                <label className="block mb-2 font-semibold">
+                  Stock Quantity
+                </label>
+
+                <input
+                  type="number"
+                  name="stockQuantity"
+                  value={
+                    formData.stockQuantity
+                  }
+                  onChange={
+                    handleChange
+                  }
+                  className="border p-3 rounded-lg w-full"
+                  required
+                />
               </div>
 
               {/* IMAGES */}
               <div>
-
-                <label className="block mb-2 font-semibold text-gray-700">
+                <label className="block mb-2 font-semibold">
                   Upload Images
                 </label>
 
                 <input
+                  id="product-images"
                   type="file"
                   multiple
-                  onChange={handleImages}
-                  className="border border-gray-300 p-3 w-full rounded-lg"
+                  accept="image/*"
+                  onChange={
+                    handleImages
+                  }
+                  className="border p-3 rounded-lg w-full"
                   required
                 />
-
               </div>
 
-              {/* BUTTON */}
+              {/* IMAGE PREVIEW */}
+              {images.length >
+                0 && (
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                  {images.map(
+                    (
+                      img,
+                      index
+                    ) => (
+                      <img
+                        key={
+                          index
+                        }
+                        src={URL.createObjectURL(
+                          img
+                        )}
+                        alt="preview"
+                        className="h-24 w-full object-cover rounded border"
+                      />
+                    )
+                  )}
+                </div>
+              )}
+
               <button
                 type="submit"
-                className="bg-green-600 hover:bg-green-700 text-white px-8 py-3 rounded-lg font-semibold transition duration-300"
+                className="bg-green-600 hover:bg-green-700 text-white px-8 py-3 rounded-lg font-semibold"
               >
                 Add Product
               </button>
-
             </form>
-
           </div>
-
         </div>
-
       </div>
-
     </div>
   );
 }

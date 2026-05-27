@@ -21,6 +21,7 @@ import ProtectedRoute from "./ProtectedRoute";
 import AdminLayout from "../layout/AdminLayout";
 import AdminForgotPassword from "../pages/AdminForgotPassword";
 import AdminResetPassword from "../pages/AdminResetPassword";
+import AddCategory from "../pages/AddCategory";
 
 export default function AppRoutes() {
 
@@ -87,37 +88,17 @@ export default function AppRoutes() {
 />
 
       <Route
-        path="/admin/products"
+        path="/admin/categories/create"
         element={
           <ProtectedRoute>
-            <AdminLayout>
-              <Product />
-            </AdminLayout>
+          <AddCategory/>
           </ProtectedRoute>
         }
       />
 
-      <Route
-        path="/admin/products/create"
-        element={
-          <ProtectedRoute>
-            <AdminLayout>
-              <CreateProduct />
-            </AdminLayout>
-          </ProtectedRoute>
-        }
-      />
+      
 
-      <Route
-        path="/admin/products/edit/:id"
-        element={
-          <ProtectedRoute>
-            <AdminLayout>
-              <EditProduct />
-            </AdminLayout>
-          </ProtectedRoute>
-        }
-      />
+  
 
       <Route
         path="/admin/vendors"

@@ -1,6 +1,7 @@
 import Product from "../models/Product.model.js";
+import Category from "../models/Category.model.js";
 import mongoose from "mongoose";
-import { cloudinary } from "../config/cloudinary.js";
+import { cloudinary, isCloudAvailable } from "../config/cloudinary.js";
 import fs from "fs";
 import path from "path";
 
@@ -32,14 +33,40 @@ export const createProduct = async (
       });
     }
 
-    const {
-      name,
-      description,
-      category,
-      price,
-      offerPrice,
-      stockQuantity,
-    } = req.body;
+   const {
+  name,
+  description,
+  category,
+} = req.body;
+
+console.log("CATEGORY RECEIVED:", category);
+console.log("IS VALID OBJECT ID:", mongoose.Types.ObjectId.isValid(category));
+if (
+  !mongoose.Types.ObjectId.isValid(
+    category
+  )
+) {
+  return res.status(400).json({
+    success: false,
+    message: "Invalid category id",
+  });
+}
+
+const categoryExists =
+  await Category.findById(category);
+
+if (!categoryExists) {
+  return res.status(404).json({
+    success: false,
+    message: "Category not found",
+  });
+}
+const variants = JSON.parse(
+  req.body.variants || "[]"
+);
+  
+
+   
 
     // IMAGE URLS - upload buffers to Cloudinary with a local fallback
     const uploadToCloudinary = (buffer, filename) =>
@@ -65,57 +92,106 @@ export const createProduct = async (
 
     const imageUrls = [];
 
-    for (const file of req.files) {
-      try {
-        const result = await uploadWithTimeout(
-          file.buffer,
-          file.originalname || file.filename
-        );
+    // If Cloudinary isn't available, skip uploads and save files locally
+    if (!isCloudAvailable()) {
+      console.log("Cloudinary not available - saving product images locally");
+      const uploadsDir = path.join(process.cwd(), "uploads");
+      if (!fs.existsSync(uploadsDir)) {
+        fs.mkdirSync(uploadsDir, { recursive: true });
+      }
+      // Try unsigned upload if preset provided, otherwise save locally
+      const uploadPreset = process.env.CLOUDINARY_UPLOAD_PRESET;
+      if (uploadPreset) {
+        // attempt unsigned upload for each file
+        for (const file of req.files) {
+          const filename = file.originalname || file.filename || `file-${Date.now()}`;
+          // read buffer from disk if needed
+          const buffer = file.buffer || fs.readFileSync(file.path);
+          try {
+            
+            const cloudName = process.env.CLOUD_NAME;
+              const url = `https://api.cloudinary.com/v1_1/${cloudName}/auto/upload`;
+            const form = new FormData();
+            form.append('file', buffer, filename);
+            form.append('upload_preset', uploadPreset);
 
-        imageUrls.push(result.secure_url || result.url || "");
-      } catch (err) {
-        // Fallback: save to local uploads/ and serve from /uploads
-        const uploadsDir = path.join(process.cwd(), "uploads");
-        if (!fs.existsSync(uploadsDir)) {
-          fs.mkdirSync(uploadsDir, { recursive: true });
+            const resp = await fetch(url, { method: 'POST', body: form });
+            const json = await resp.json();
+            if (!resp.ok) throw new Error(JSON.stringify(json));
+
+            imageUrls.push(json.secure_url || json.url);
+          } catch (e) {
+            const safeName = `${Date.now()}-${(file.originalname || file.filename || "file").replace(/\s+/g, "-")}`;
+            const filePath = path.join(uploadsDir, safeName);
+            fs.writeFileSync(filePath, buffer);
+            const base = process.env.BASE_URL || `http://localhost:${process.env.PORT || 5000}`;
+            const urlLocal = `${base}/uploads/${safeName}`;
+            imageUrls.push(urlLocal);
+            console.warn("Unsigned Cloudinary upload failed, saved locally:", filePath, "error:", e.message || e);
+          }
         }
+      } else {
+        for (const file of req.files) {
+          const safeName = `${Date.now()}-${(file.originalname || file.filename || "file").replace(/\s+/g, "-")}`;
+          const filePath = path.join(uploadsDir, safeName);
+          const buffer = file.buffer || fs.readFileSync(file.path);
+          fs.writeFileSync(filePath, buffer);
 
-        const safeName = `${Date.now()}-${(file.originalname || file.filename || "file").replace(/\s+/g, "-")}`;
-        const filePath = path.join(uploadsDir, safeName);
-        fs.writeFileSync(filePath, file.buffer);
+          const base = process.env.BASE_URL || `http://localhost:${process.env.PORT || 5000}`;
+          const url = `${base}/uploads/${safeName}`;
+          imageUrls.push(url);
+        }
+      }
+    } else {
+      for (const file of req.files) {
+        try {
+          const buffer = file.buffer || fs.readFileSync(file.path);
+          const result = await uploadWithTimeout(
+            buffer,
+            file.originalname || file.filename
+          );
 
-        const base = process.env.BASE_URL || `http://localhost:${process.env.PORT || 5000}`;
-        const url = `${base}/uploads/${safeName}`;
+          imageUrls.push(result.secure_url || result.url || "");
+        } catch (err) {
+          // Fallback: save to local uploads/ and serve from /uploads
+          const uploadsDir = path.join(process.cwd(), "uploads");
+          if (!fs.existsSync(uploadsDir)) {
+            fs.mkdirSync(uploadsDir, { recursive: true });
+          }
 
-        imageUrls.push(url);
+          const safeName = `${Date.now()}-${(file.originalname || file.filename || "file").replace(/\s+/g, "-")}`;
+          const buffer = file.buffer || fs.readFileSync(file.path);
+          const filePath = path.join(uploadsDir, safeName);
+          fs.writeFileSync(filePath, buffer);
 
-        console.warn("Cloudinary upload failed, saved locally:", filePath, "error:", err.message || err);
+          const base = process.env.BASE_URL || `http://localhost:${process.env.PORT || 5000}`;
+          const url = `${base}/uploads/${safeName}`;
+
+          imageUrls.push(url);
+
+          console.warn("Cloudinary upload failed, saved locally:", filePath, "error:", err.message || err);
+        }
       }
     }
 
     // CREATE PRODUCT
-    const product =
-      await Product.create({
-        vendor: req.vendor._id,
+    const product = await Product.create({
+  vendor: req.vendor._id,
 
-        name,
+  name,
 
-        description: [description],
+  description: [description],
 
-        category,
+  category,
 
-        price,
+  variants,
 
-        offerPrice,
+  image: imageUrls,
 
-        image: imageUrls,
+  inStock: true,
 
-        stockQuantity,
-
-        inStock: true,
-
-        bestseller: false,
-      });
+  bestseller: false,
+});
 
     res.status(201).json({
       success: true,
@@ -147,12 +223,18 @@ export const getProducts = async (
 ) => {
   try {
 
-    const products = await Product.find()
+  const products = await Product.find()
   .populate(
     "vendor",
     "shopName ownerName isVerified"
   )
-  .sort({ createdAt: -1 });
+  .populate(
+    "category",
+    "text image bgColor"
+  )
+  .sort({
+    createdAt: -1,
+  });
 
     res.status(200).json({
       success: true,
@@ -217,12 +299,17 @@ export const getSingleProduct =
         });
       }
 
-    const product = await Product.findById(
+ const product = await Product.findById(
   req.params.id
-).populate(
-  "vendor",
-  "shopName ownerName isVerified"
-);
+)
+  .populate(
+    "vendor",
+    "shopName ownerName isVerified"
+  )
+  .populate(
+    "category",
+    "text image bgColor"
+  );
       if (!product) {
 
         return res.status(404).json({
@@ -295,22 +382,28 @@ export const updateProduct =
         req.body.name ||
         product.name;
 
-      product.category =
-        req.body.category ||
-        product.category;
+      if (req.body.category) {
+  const categoryExists =
+    await Category.findById(
+      req.body.category
+    );
 
-      product.price =
-        req.body.price ||
-        product.price;
+  if (!categoryExists) {
+    return res.status(404).json({
+      success: false,
+      message: "Category not found",
+    });
+  }
 
-      product.offerPrice =
-        req.body.offerPrice ||
-        product.offerPrice;
+  product.category =
+    req.body.category;
+}
 
-      product.stockQuantity =
-        req.body.stockQuantity ||
-        product.stockQuantity;
-
+      if (req.body.variants) {
+  product.variants = JSON.parse(
+    req.body.variants
+  );
+}
       product.inStock =
         req.body.inStock ??
         product.inStock;

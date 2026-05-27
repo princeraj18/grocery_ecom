@@ -24,7 +24,8 @@ const ShopContextProvider = ({
   // =========================
   const [products, setProducts] =
     useState([]);
-
+const [categories, setCategories] =
+  useState([]);
   const [cartItems, setCartItems] =
     useState([]);
 
@@ -83,6 +84,34 @@ const ShopContextProvider = ({
         );
       }
     };
+
+    // =========================
+// FETCH CATEGORIES
+// =========================
+const fetchCategories =
+  async () => {
+    try {
+
+      const { data } =
+        await api.get(
+          "/categories"
+        );
+
+      if (data.success) {
+
+        setCategories(
+          data.categories || []
+        );
+      }
+
+    } catch (error) {
+
+      console.log(
+        "FETCH CATEGORY ERROR:",
+        error
+      );
+    }
+  };
 
   // =========================
   // FETCH CART
@@ -175,9 +204,11 @@ const ShopContextProvider = ({
   // =========================
   useEffect(() => {
 
-    fetchProducts();
+  fetchProducts();
 
-  }, []);
+  fetchCategories();
+
+}, []);
 
   // =========================
   // LOAD USER DATA
@@ -556,33 +587,28 @@ const ShopContextProvider = ({
   // PROVIDER VALUE
   // =========================
   const value = {
+  products,
+  categories,
+  loadingProducts,
 
-    // PRODUCTS
-    products,
-    loadingProducts,
+  cartItems,
+  addToCart,
+  increaseQuantity,
+  decreaseQuantity,
+  removeFromCart,
+  clearCart,
 
-    // CART
-    cartItems,
-    addToCart,
-    increaseQuantity,
-    decreaseQuantity,
-    removeFromCart,
-    clearCart,
+  wishlistItems,
+  addToWishlist,
+  removeFromWishlist,
 
-    // WISHLIST
-    wishlistItems,
-    addToWishlist,
-    removeFromWishlist,
+  user,
+  loginUser,
+  logoutUser,
 
-    // USER
-    user,
-    loginUser,
-    logoutUser,
-
-    // FETCHERS
-    fetchCart,
-    fetchWishlist,
-  };
+  fetchCart,
+  fetchWishlist,
+};
 
   return (
 

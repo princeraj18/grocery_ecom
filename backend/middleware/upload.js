@@ -1,9 +1,20 @@
 import multer from "multer";
 
-// Use memory storage so controller can decide to upload to Cloudinary
-// and fallback to local disk if Cloudinary is unavailable.
-const storage = multer.memoryStorage();
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, "uploads/");
+  },
 
-const upload = multer({ storage });
+  filename: (req, file, cb) => {
+    cb(
+      null,
+      Date.now() + "-" + file.originalname
+    );
+  },
+});
+
+const upload = multer({
+  storage,
+});
 
 export default upload;

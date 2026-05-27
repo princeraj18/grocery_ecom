@@ -57,6 +57,19 @@ export default function Sidebar() {
           Orders
         </NavLink>
 
+        <NavLink
+  to="/admin/categories/create"
+  className={({ isActive }) =>
+    `p-2 rounded ${
+      isActive
+        ? "bg-white text-black"
+        : ""
+    }`
+  }
+>
+  Add Category
+</NavLink>
+
       </div>
     </div>
   )

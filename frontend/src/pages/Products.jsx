@@ -4,34 +4,33 @@ import { Link } from "react-router-dom";
 import { FaHeart, FaRegHeart, FaCheckCircle, FaSlidersH } from "react-icons/fa";
 
 import { ShopContext } from "../context/ShopContext";
-import { dummyProducts, categories } from "../assets/greencart_assets/assets";
 
 const isMongoObjectId = (id) => /^[a-f\d]{24}$/i.test(id || "");
 
 const Products = () => {
-  const { products, addToCart, fetchWishlist } = useContext(ShopContext);
+const {
+  products,
+  categories,
+  loadingProducts,
+  addToCart,
+  addToWishlist,
+  removeFromWishlist,
+  
+  wishlistItems,
+} = useContext(ShopContext);
   const [search, setSearch] = useState(localStorage.getItem("productSearch") || "");
   const [category, setCategory] = useState("All");
   const [sortPrice, setSortPrice] = useState("");
-  const [wishlistIds, setWishlistIds] = useState([]);
 
   const user = JSON.parse(localStorage.getItem("user"));
   const userId = user?._id;
-
-  useEffect(() => {
-    const fetchWishlist = async () => {
-      try {
-        const { data } = await axios.get(
-          `http://localhost:5000/api/wishlist/${userId}`
-        );
-        setWishlistIds(data.wishlist.map((item) => item.product?._id));
-      } catch (error) {
-        console.log("WISHLIST ERROR:", error);
-      }
-    };
-
-    if (userId) fetchWishlist();
-  }, [userId]);
+const wishlistIds = useMemo(() => {
+  return wishlistItems.map(
+    (item) =>
+      item.product?._id ||
+      item.productId
+  );
+}, [wishlistItems]);
 
   useEffect(() => {
     const syncSearch = () => setSearch(localStorage.getItem("productSearch") || "");
@@ -40,53 +39,56 @@ const Products = () => {
     return () => window.removeEventListener("storage", syncSearch);
   }, []);
 
-  const toggleWishlist = async (e, productId) => {
-    e.preventDefault();
+  const toggleWishlist = async (
+  e,
+  productId
+) => {
+  e.preventDefault();
 
-    if (!userId) {
-      alert("Please login first");
-      return;
-    }
+  if (!userId) {
+    alert("Please login first");
+    return;
+  }
 
-    if (!isMongoObjectId(productId)) {
-      alert("Wishlist is available for database products only");
-      return;
+  try {
+    if (
+      wishlistIds.includes(
+        productId
+      )
+    ) {
+      await removeFromWishlist(
+        productId
+      );
+    } else {
+      await addToWishlist(
+        productId
+      );
     }
-
-    try {
-      if (wishlistIds.includes(productId)) {
-        await axios.delete("http://localhost:5000/api/wishlist/remove", {
-          data: { userId, productId },
-        });
-        setWishlistIds(wishlistIds.filter((id) => id !== productId));
-        await fetchWishlist();
-      } else {
-        await axios.post("http://localhost:5000/api/wishlist/add", {
-          userId,
-          productId,
-        });
-        setWishlistIds([...wishlistIds, productId]);
-        await fetchWishlist();
-      }
-    } catch (error) {
-      console.log("WISHLIST TOGGLE ERROR:", error);
-    }
-  };
+  } catch (error) {
+    console.log(
+      "WISHLIST ERROR:",
+      error
+    );
+  }
+};
 
   const filteredProducts = useMemo(() => {
-    const allProducts = [...dummyProducts, ...products];
-    let filtered = [...allProducts];
-
+  let filtered = [...products];
     if (search.trim()) {
       const regex = new RegExp(search, "i");
       filtered = filtered.filter(
-        (product) => regex.test(product.name) || regex.test(product.category)
-      );
+  (product) =>
+    regex.test(product.name) ||
+    regex.test(product.category?.text || "")
+);
     }
 
     if (category !== "All") {
-      filtered = filtered.filter((product) => product.category === category);
-    }
+filtered = filtered.filter(
+  (product) =>
+    product.category?.toLowerCase() ===
+    category?.toLowerCase()
+);    }
 
     if (sortPrice === "low-high") {
       filtered.sort((a, b) => a.offerPrice - b.offerPrice);
@@ -103,7 +105,15 @@ const Products = () => {
     e.preventDefault();
     addToCart(item);
   };
-
+if (loadingProducts) {
+  return (
+    <div className="min-h-screen flex justify-center items-center">
+      <h2 className="text-2xl font-semibold">
+        Loading Products...
+      </h2>
+    </div>
+  );
+}
   return (
     <div className="min-h-screen bg-[#f6f7f1] px-4 py-6 sm:px-6 lg:px-8">
       <div className="mx-auto max-w-7xl">
@@ -160,18 +170,20 @@ const Products = () => {
                 All Categories
               </button>
               {categories.map((cat) => (
-                <button
-                  key={cat.path}
-                  onClick={() => setCategory(cat.path)}
-                  className={`rounded px-3 py-2 text-left text-sm font-bold ${
-                    category === cat.path
-                      ? "bg-[#e9f6eb] text-[#0c831f]"
-                      : "bg-slate-50 text-slate-700"
-                  }`}
-                >
-                  {cat.text}
-                </button>
-              ))}
+  <button
+    key={cat._id}
+    onClick={() =>
+      setCategory(cat.path)
+    }
+    className={`rounded px-3 py-2 text-left text-sm font-bold ${
+      category === cat.path
+        ? "bg-[#e9f6eb] text-[#0c831f]"
+        : "bg-slate-50 text-slate-700"
+    }`}
+  >
+    {cat.text}
+  </button>
+))}
             </div>
 
             <label className="mt-5 block text-xs font-black uppercase text-slate-500">
@@ -204,10 +216,15 @@ const Products = () => {
 
             <div className="grid grid-cols-2 gap-3 md:grid-cols-3 xl:grid-cols-4">
               {filteredProducts.map((item) => {
-                const discount = Math.max(
-                  1,
-                  Math.round(((item.price - item.offerPrice) / item.price) * 100)
-                );
+             const discount =
+  item.price > 0
+    ? Math.round(
+        ((item.price -
+          item.offerPrice) /
+          item.price) *
+          100
+      )
+    : 0;
 
                 return (
                   <Link
@@ -230,16 +247,19 @@ const Products = () => {
                         )}
                       </button>
                       <img
-                        src={item.image?.[0]}
-                        alt={item.name}
+ src={
+    Array.isArray(item.image)
+      ? item.image[0]
+      : item.image
+  }                        alt={item.name}
                         className="h-32 w-32 object-contain transition group-hover:scale-105"
                       />
                     </div>
 
                     <div className="pt-3">
-                      <p className="text-xs font-bold text-slate-500">
-                        {item.category}
-                      </p>
+                     <p className="text-xs font-bold text-slate-500">
+  {item.category?.text}
+</p>
                       <h3 className="mt-1 min-h-[40px] text-sm font-black leading-snug text-slate-900 line-clamp-2">
                         {item.name}
                       </h3>

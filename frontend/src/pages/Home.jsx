@@ -1,19 +1,35 @@
 import React from "react";
+import { useContext } from "react";
+import { ShopContext } from "../context/ShopContext";
 import { Link, useNavigate } from "react-router-dom";
 import { FaArrowRight, FaClock, FaPercent, FaShieldAlt } from "react-icons/fa";
-
 import {
-  dummyProducts,
-  categories,
+  
   assets,
   features,
 } from "../assets/greencart_assets/assets";
-
 const Home = () => {
   const navigate = useNavigate();
-  const heroProducts = dummyProducts.slice(0, 5);
-  const bestDeals = dummyProducts.slice(0, 10);
+const {
+  categories,
+  products,
+   loadingProducts,
+} = useContext(ShopContext);
 
+const heroProducts =
+  products.slice(0, 5);
+
+const bestDeals =
+  products.slice(0, 10);
+if (loadingProducts) {
+  return (
+    <div className="min-h-screen flex justify-center items-center">
+      <h2 className="text-2xl font-semibold">
+        Loading Products...
+      </h2>
+    </div>
+  );
+}
   return (
     <div className="min-h-screen bg-[#f6f7f1] text-slate-900">
       <section className="px-4 py-5 sm:px-6 lg:px-10">
@@ -81,14 +97,18 @@ const Home = () => {
               </p>
               <h2 className="mt-2 text-2xl font-black">Handpicked daily</h2>
               <div className="mt-4 grid grid-cols-3 gap-3">
-                {heroProducts.slice(0, 3).map((product) => (
-                  <img
-                    key={product._id}
-                    src={product.image[0]}
-                    alt={product.name}
-                    className="h-20 w-full rounded bg-white object-contain p-2"
-                  />
-                ))}
+               {heroProducts.slice(0, 3).map((product) => (
+  <img
+    key={product._id}
+    src={
+      Array.isArray(product.image)
+        ? product.image[0]
+        : product.image
+    }
+    alt={product.name}
+    className="h-20 w-full rounded bg-white object-contain p-2"
+  />
+))}
               </div>
             </div>
           </div>
@@ -111,30 +131,53 @@ const Home = () => {
           </div>
 
           <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-7">
-            {categories.map((category) => (
-              <Link
-                key={category.path}
-                to={`/category/${category.path}`}
-                className="group rounded-[8px] border border-slate-200 bg-white p-3 shadow-sm transition hover:-translate-y-0.5 hover:border-[#0c831f]"
-              >
-                <div
-                  className="flex aspect-square items-center justify-center rounded-[8px]"
-                  style={{ backgroundColor: category.bgColor }}
-                >
-                  <img
-                    src={category.image}
-                    alt={category.text}
-                    className="h-24 w-24 object-contain transition group-hover:scale-105"
-                  />
-                </div>
-                <h3 className="mt-3 text-sm font-black leading-tight">
-                  {category.text}
-                </h3>
-                <p className="mt-1 text-xs font-semibold text-slate-500">
-                  Fresh picks
-                </p>
-              </Link>
-            ))}
+           {categories.length > 0 ? (
+
+  categories.map((category) => (
+
+    <Link
+      key={category._id}
+      to={`/category/${category.path}`}
+      className="group rounded-[8px] border border-slate-200 bg-white p-3 shadow-sm transition hover:-translate-y-0.5 hover:border-[#0c831f]"
+    >
+
+      <div
+        className="flex aspect-square items-center justify-center rounded-[8px]"
+        style={{
+          backgroundColor:
+            category.bgColor,
+        }}
+      >
+
+        <img
+          src={category.image}
+          alt={category.text}
+          className="h-24 w-24 object-contain transition group-hover:scale-105"
+        />
+
+      </div>
+
+      <h3 className="mt-3 text-sm font-black leading-tight">
+        {category.text}
+      </h3>
+
+      <p className="mt-1 text-xs font-semibold text-slate-500">
+        Fresh Picks
+      </p>
+
+    </Link>
+  ))
+
+) : (
+
+  <div className="col-span-full text-center py-10">
+
+    <p className="text-gray-500">
+      Loading Categories...
+    </p>
+
+  </div>
+)}
           </div>
         </div>
       </section>
@@ -161,24 +204,29 @@ const Home = () => {
               >
                 <div className="relative flex aspect-square items-center justify-center rounded-[8px] bg-[#f7f8f3]">
                   <span className="absolute left-2 top-2 rounded bg-[#0c831f] px-2 py-1 text-[11px] font-black text-white">
-                    {Math.max(
-                      1,
-                      Math.round(
-                        ((product.price - product.offerPrice) / product.price) *
-                          100
-                      )
-                    )}
+                   {product.price > 0
+  ? Math.round(
+      ((product.price -
+        product.offerPrice) /
+        product.price) *
+        100
+    )
+  : 0}
                     % OFF
                   </span>
                   <img
-                    src={product.image[0]}
+                    src={
+  Array.isArray(product.image)
+    ? product.image[0]
+    : product.image
+}
                     alt={product.name}
                     className="h-32 w-32 object-contain transition group-hover:scale-105"
                   />
                 </div>
-                <p className="mt-3 text-xs font-semibold text-slate-500">
-                  {product.category}
-                </p>
+                <p className="text-xs font-semibold text-slate-500">
+  {product.category?.text}
+</p>
                 <h3 className="mt-1 min-h-[40px] text-sm font-black leading-snug line-clamp-2">
                   {product.name}
                 </h3>

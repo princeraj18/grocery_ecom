@@ -332,6 +332,9 @@ export default function EditProduct() {
                   <option value="Dairy">
                     Dairy
                   </option>
+                  <option value="Snacks">
+                    Snacks
+                  </option>
 
                   <option value="Bakery">
                     Bakery

@@ -18,129 +18,109 @@ import {
 } from "react-icons/fa";
 
 import { ShopContext } from "../context/ShopContext";
-
-import {
-  dummyProducts,
-} from "../assets/greencart_assets/assets";
-
 import ProductReview from "../components/ProductReview";
 
-const isMongoObjectId = (id) =>
-  /^[a-f\d]{24}$/i.test(id || "");
-
 const ProductDetails = () => {
-
   const { id } = useParams();
-
   const navigate = useNavigate();
 
-  const { addToCart, fetchWishlist } =
-    useContext(ShopContext);
+  const {
+    addToCart,
+    fetchWishlist,
+  } = useContext(ShopContext);
 
   const [product, setProduct] =
     useState(null);
 
-  const [dbProducts, setDbProducts] =
+  const [relatedProducts, setRelatedProducts] =
     useState([]);
 
   const [mainImage, setMainImage] =
     useState(0);
 
+  const [selectedVariant, setSelectedVariant] =
+    useState(null);
+
   const [isWishlisted, setIsWishlisted] =
     useState(false);
 
-  // =========================================
-  // USER
-  // =========================================
   const user =
     JSON.parse(
       localStorage.getItem("user")
-    );
+    ) || null;
 
-  const userId =
-    user?._id;
+  const userId = user?._id;
 
-  // =========================================
-  // FETCH PRODUCTS
-  // =========================================
+  // =====================================
+  // FETCH PRODUCT
+  // =====================================
   useEffect(() => {
-
-    const fetchProducts =
+    const fetchProduct =
       async () => {
-
         try {
+          const { data } =
+            await axios.get(
+              `http://localhost:5000/api/products/${id}`
+            );
 
-          const response =
+          const productData =
+            data.product;
+
+          setProduct(productData);
+
+          if (
+            productData.variants &&
+            productData.variants.length > 0
+          ) {
+            setSelectedVariant(
+              productData.variants[0]
+            );
+          }
+
+          const allProductsRes =
             await axios.get(
               "http://localhost:5000/api/products"
             );
 
-          const apiProducts =
-            Array.isArray(
-              response.data
-            )
-              ? response.data
-              : response.data
-                  .products || [];
+          const allProducts =
+            allProductsRes.data.products ||
+            [];
 
-          setDbProducts(
-            apiProducts
+          const related =
+            allProducts
+              .filter(
+                (item) =>
+                  item._id !==
+                    productData._id &&
+                  item.category?._id ===
+                    productData.category?._id
+              )
+              .slice(0, 4);
+
+          setRelatedProducts(
+            related
           );
-
-          const allProducts = [
-            ...dummyProducts,
-            ...apiProducts,
-          ];
-
-          const foundProduct =
-            allProducts.find(
-              (item) =>
-                item._id === id
-            );
-
-          setProduct(
-            foundProduct
-          );
-
         } catch (error) {
-
           console.log(
-            "API ERROR:",
+            "PRODUCT FETCH ERROR:",
             error
           );
-
-          const foundProduct =
-            dummyProducts.find(
-              (item) =>
-                item._id === id
-            );
-
-          setProduct(
-            foundProduct
-          );
-
-          setDbProducts([]);
         }
       };
 
-    fetchProducts();
-
+    fetchProduct();
   }, [id]);
 
-  // =========================================
+  // =====================================
   // CHECK WISHLIST
-  // =========================================
+  // =====================================
   useEffect(() => {
-
     const checkWishlist =
       async () => {
-
         try {
-
           if (
             !userId ||
-            !product?._id ||
-            !isMongoObjectId(product._id)
+            !product?._id
           )
             return;
 
@@ -159,60 +139,33 @@ const ProductDetails = () => {
           setIsWishlisted(
             exists
           );
-
         } catch (error) {
-
           console.log(
-            "CHECK WISHLIST ERROR:",
+            "Wishlist Error:",
             error
           );
         }
       };
 
     checkWishlist();
+  }, [userId, product]);
 
-  }, [
-    userId,
-    product,
-  ]);
-
-  // =========================================
+  // =====================================
   // TOGGLE WISHLIST
-  // =========================================
+  // =====================================
   const toggleWishlist =
-    async (e) => {
-
-      e.stopPropagation();
-
+    async () => {
       try {
-
         if (!userId) {
-
           alert(
             "Please login first"
           );
-
           return;
         }
 
-        if (
-          !isMongoObjectId(
-            product?._id
-          )
-        ) {
-
-          alert(
-            "Wishlist is available for database products only"
-          );
-
-          return;
-        }
-
-        // REMOVE FROM WISHLIST
         if (
           isWishlisted
         ) {
-
           await axios.delete(
             "http://localhost:5000/api/wishlist/remove",
             {
@@ -233,10 +186,7 @@ const ProductDetails = () => {
           alert(
             "Removed from wishlist"
           );
-
         } else {
-
-          // ADD TO WISHLIST
           await axios.post(
             "http://localhost:5000/api/wishlist/add",
             {
@@ -256,131 +206,78 @@ const ProductDetails = () => {
             "Added to wishlist"
           );
         }
-
       } catch (error) {
-
         console.log(
-          "WISHLIST ERROR:",
+          "Wishlist Error:",
           error
-        );
-
-        alert(
-          "Wishlist action failed"
         );
       }
     };
 
-  // =========================================
-  // LOADING
-  // =========================================
+  // =====================================
+  // ADD TO CART
+  // =====================================
+  const handleAddToCart =
+    () => {
+      addToCart({
+        ...product,
+        offerPrice:
+          selectedVariant?.offerPrice,
+        price:
+          selectedVariant?.price,
+        selectedSize:
+          selectedVariant?.size,
+      });
+    };
+
   if (!product) {
-
     return (
-
       <div className="text-center py-20">
-
         <h1 className="text-3xl font-bold">
           Loading Product...
         </h1>
-
       </div>
     );
   }
 
-  // =========================================
-  // ALL PRODUCTS
-  // =========================================
-  const allProducts = [
-    ...dummyProducts,
-    ...(Array.isArray(
-      dbProducts
-    )
-      ? dbProducts
-      : []),
-  ];
-
-  // =========================================
-  // RELATED PRODUCTS
-  // =========================================
-  const relatedProducts =
-    allProducts
-      .filter(
-        (item) =>
-          item.category ===
-            product.category &&
-          item._id !==
-            product._id
-      )
-      .slice(0, 4);
-
-  // =========================================
-  // ADD TO CART
-  // =========================================
-  const handleAddToCart =
-    () => {
-
-      addToCart(product);
-
-     
-    };
-
   return (
-
     <div className="max-w-7xl mx-auto py-10 px-6">
-
-      {/* ========================================= */}
       {/* PRODUCT SECTION */}
-      {/* ========================================= */}
       <div className="grid md:grid-cols-2 gap-10">
 
-        {/* PRODUCT IMAGES */}
+        {/* IMAGES */}
         <div>
-
           <div className="relative">
-
             <img
               src={
                 product.image?.[
                   mainImage
                 ]
               }
-              alt={
-                product.name
-              }
+              alt={product.name}
               className="w-full h-[500px] object-cover rounded-2xl border"
             />
 
-            {/* WISHLIST BUTTON */}
             <button
-              onClick={(e) =>
-                toggleWishlist(e)
+              onClick={
+                toggleWishlist
               }
-              className="absolute top-5 right-5 bg-white p-4 rounded-full shadow-lg hover:scale-110 transition duration-300 z-50"
+              className="absolute top-5 right-5 bg-white p-4 rounded-full shadow-lg"
             >
-
               {isWishlisted ? (
-
-                <FaHeart className="text-red-500 text-2xl cursor-pointer" />
-
+                <FaHeart className="text-red-500 text-2xl" />
               ) : (
-
-                <FaRegHeart className="text-gray-600 hover:text-red-500 text-2xl cursor-pointer transition" />
-
+                <FaRegHeart className="text-gray-600 text-2xl" />
               )}
-
             </button>
-
           </div>
 
-          {/* THUMBNAILS */}
           <div className="flex gap-3 mt-4 flex-wrap">
-
             {product.image?.map(
               (
                 img,
                 index
               ) => (
-
                 <img
                   key={index}
                   src={img}
@@ -390,7 +287,7 @@ const ProductDetails = () => {
                       index
                     )
                   }
-                  className={`w-24 h-24 object-cover rounded-lg border cursor-pointer transition ${
+                  className={`w-24 h-24 object-cover rounded-lg border cursor-pointer ${
                     mainImage ===
                     index
                       ? "border-green-600 border-2"
@@ -399,128 +296,148 @@ const ProductDetails = () => {
                 />
               )
             )}
-
           </div>
-
         </div>
 
-        {/* PRODUCT DETAILS */}
+        {/* DETAILS */}
         <div>
-
-          {/* CATEGORY */}
           <span className="bg-green-100 text-green-700 px-3 py-1 rounded-full text-sm">
-
-            {
-              product.category
-            }
-
+            {product.category?.text}
           </span>
 
-          {/* NAME */}
           <h1 className="text-4xl font-bold mt-4">
-
             {product.name}
-
           </h1>
-          <div className="flex items-center gap-3 mt-3">
-  <span className="text-gray-600">
-    Sold by:
-    <span className="font-semibold ml-1">
-      {product.vendor?.shopName}
-    </span>
-  </span>
 
-  {product.vendor?.isVerified ? (
-    <span className="flex items-center gap-1 bg-blue-100 text-blue-700 px-3 py-1 rounded-full text-sm">
-      <FaCheckCircle />
-      Verified Vendor
-    </span>
-  ) : (
-    <span className="bg-red-100 text-red-600 px-3 py-1 rounded-full text-sm">
-      Unverified Vendor
-    </span>
-  )}
-</div>
+          {/* VENDOR */}
+          <div className="flex items-center gap-3 mt-3">
+            <span className="text-gray-600">
+              Sold by:
+              <span className="font-semibold ml-1">
+                {
+                  product.vendor
+                    ?.shopName
+                }
+              </span>
+            </span>
+
+            {product.vendor
+              ?.isVerified ? (
+              <span className="flex items-center gap-1 bg-blue-100 text-blue-700 px-3 py-1 rounded-full text-sm">
+                <FaCheckCircle />
+                Verified Vendor
+              </span>
+            ) : (
+              <span className="bg-red-100 text-red-600 px-3 py-1 rounded-full text-sm">
+                Unverified Vendor
+              </span>
+            )}
+          </div>
 
           {/* PRICE */}
           <div className="flex items-center gap-4 mt-5">
-
             <p className="text-3xl font-bold text-green-600">
-
               ₹
               {
-                product.offerPrice
+                selectedVariant?.offerPrice
               }
-
             </p>
 
             <p className="text-xl text-gray-400 line-through">
-
               ₹
               {
-                product.price
+                selectedVariant?.price
               }
-
             </p>
+          </div>
 
+          {/* SIZE SELECTOR */}
+          <div className="mt-6">
+            <h3 className="font-semibold mb-3">
+              Available Sizes
+            </h3>
+
+            <div className="flex gap-3 flex-wrap">
+              {product.variants?.map(
+                (
+                  variant,
+                  index
+                ) => (
+                  <button
+                    key={index}
+                    onClick={() =>
+                      setSelectedVariant(
+                        variant
+                      )
+                    }
+                    className={`px-4 py-2 border rounded-lg ${
+                      selectedVariant?.size ===
+                      variant.size
+                        ? "bg-green-600 text-white border-green-600"
+                        : ""
+                    }`}
+                  >
+                    {variant.size}
+                  </button>
+                )
+              )}
+            </div>
           </div>
 
           {/* STOCK */}
           <p
-            className={`mt-4 font-medium ${
+            className={`mt-5 font-medium ${
               product.inStock
                 ? "text-green-600"
                 : "text-red-500"
             }`}
           >
-
             {product.inStock
               ? "In Stock"
               : "Out of Stock"}
-
           </p>
 
           {/* DESCRIPTION */}
           <div className="mt-6">
-
             <h3 className="font-semibold text-lg mb-3">
-
               Product Details
-
             </h3>
 
             <ul className="list-disc pl-5 text-gray-600 space-y-2">
-
-              {product.description?.map(
-                (
-                  desc,
-                  index
-                ) => (
-
-                  <li
-                    key={index}
-                  >
-                    {desc}
-                  </li>
+              {Array.isArray(
+                product.description
+              ) ? (
+                product.description.map(
+                  (
+                    desc,
+                    index
+                  ) => (
+                    <li
+                      key={index}
+                    >
+                      {desc}
+                    </li>
+                  )
                 )
+              ) : (
+                <li>
+                  {
+                    product.description
+                  }
+                </li>
               )}
-
             </ul>
-
           </div>
 
           {/* BUTTONS */}
           <div className="flex gap-4 mt-10">
-
             <button
               onClick={
                 handleAddToCart
               }
-              className="bg-green-600 hover:bg-green-700 text-white px-8 py-3 rounded-lg transition"
+              className="bg-green-600 hover:bg-green-700 text-white px-8 py-3 rounded-lg"
             >
-
               Add To Cart
-
             </button>
 
             <button
@@ -529,93 +446,62 @@ const ProductDetails = () => {
                   "/products"
                 )
               }
-              className="border border-gray-400 px-8 py-3 rounded-lg hover:bg-gray-100 transition"
+              className="border px-8 py-3 rounded-lg"
             >
-
               Continue Shopping
-
             </button>
-
           </div>
-
         </div>
-
       </div>
 
-      {/* ========================================= */}
-      {/* PRODUCT REVIEW SECTION */}
-      {/* ========================================= */}
+      {/* REVIEWS */}
       <div className="mt-20">
-
         <ProductReview
           productId={
             product._id
           }
           userId={userId}
         />
-
       </div>
 
-      {/* ========================================= */}
       {/* RELATED PRODUCTS */}
-      {/* ========================================= */}
       <div className="mt-20">
-
         <h2 className="text-3xl font-bold mb-8">
-
           Related Products
-
         </h2>
 
         <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-
           {relatedProducts.map(
             (item) => (
-
               <div
                 key={
                   item._id
                 }
-                className="bg-white rounded-2xl shadow-md hover:shadow-xl transition overflow-hidden border"
+                className="bg-white rounded-2xl shadow-md border overflow-hidden"
               >
-
                 <img
                   src={
                     item.image?.[0]
                   }
-                  alt={item.name}
+                  alt={
+                    item.name
+                  }
                   className="w-full h-52 object-cover"
                 />
 
                 <div className="p-4">
-
-                  <h3 className="font-semibold text-lg line-clamp-2">
-
+                  <h3 className="font-semibold">
                     {item.name}
-
                   </h3>
 
-                  <div className="flex items-center gap-2 mt-2">
-
-                    <p className="text-green-600 font-bold text-lg">
-
-                      ₹
-                      {
-                        item.offerPrice
-                      }
-
-                    </p>
-
-                    <p className="text-gray-400 line-through text-sm">
-
-                      ₹
-                      {
-                        item.price
-                      }
-
-                    </p>
-
-                  </div>
+                  <p className="text-green-600 font-bold mt-2">
+                    ₹
+                    {
+                      item
+                        .variants?.[0]
+                        ?.offerPrice
+                    }
+                  </p>
 
                   <button
                     onClick={() =>
@@ -623,23 +509,16 @@ const ProductDetails = () => {
                         `/products/${item._id}`
                       )
                     }
-                    className="w-full mt-4 bg-green-600 hover:bg-green-700 text-white py-2 rounded-lg transition"
+                    className="w-full mt-4 bg-green-600 text-white py-2 rounded-lg"
                   >
-
                     View Product
-
                   </button>
-
                 </div>
-
               </div>
             )
           )}
-
         </div>
-
       </div>
-
     </div>
   );
 };
