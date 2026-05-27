@@ -45,71 +45,74 @@ const AppRoutes = () => {
   // HIDE NAVBAR ON ALL VENDOR ROUTES
   const isVendorRoute =
     location.pathname.startsWith("/vendor");
-
+const user = JSON.parse(
+  localStorage.getItem("user")
+);
   const hideNavbar =
     hideNavbarRoutes.includes(
       location.pathname
     ) || isVendorRoute;
 
-  return (
+ return (
   <>
-    {/* {!hideNavbar && <Navbar />} */}
+    {!hideNavbar && <Navbar />}
 
     <Routes>
 
-      {/* USER ROUTES */}
+      {/* PUBLIC ROUTES */}
+      <Route path="/" element={<Home />} />
 
-      <Route
-        path="/"
-        element={
-          <ProtectedRoute>
-            <Home />
-          </ProtectedRoute>
-        }
-      />
-
-      <Route
-        path="/products"
-        element={
-          <ProtectedRoute>
-            <Products />
-          </ProtectedRoute>
-        }
-      />
+      <Route path="/products" element={<Products />} />
 
       <Route
         path="/products/:id"
-        element={
-          <ProtectedRoute>
-            <ProductDetails />
-          </ProtectedRoute>
-        }
+        element={<ProductDetails />}
       />
 
       <Route
         path="/category/:category"
-        element={
-          <ProtectedRoute>
-            <CategoryProducts />
-          </ProtectedRoute>
-        }
+        element={<CategoryProducts />}
+      />
+
+      <Route path="/about" element={<AboutUs />} />
+
+      <Route path="/contact" element={<ContactUs />} />
+
+      {/* AUTH ROUTES */}
+      <Route path="/login" element={<Login />} />
+
+      <Route path="/register" element={<Register />} />
+
+      <Route
+        path="/forgot-password"
+        element={<ForgotPassword />}
       />
 
       <Route
+        path="/reset-password/:token"
+        element={<ResetPassword />}
+      />
+
+      {/* PROTECTED ROUTES */}
+      <Route
         path="/wishlist"
         element={
-          <ProtectedRoute>
+          user ? (
             <WishList />
-          </ProtectedRoute>
+          ) : (
+            <Navigate to="/login" replace />
+          )
         }
       />
 
       <Route
         path="/cart"
         element={
-          <ProtectedRoute>
+          user ? (
             <Cart />
-          </ProtectedRoute>
+          ) : (
+            <Navigate to="/login" replace />
+          )
         }
       />
 
@@ -122,19 +125,6 @@ const AppRoutes = () => {
         }
       />
 
-      {/* LOGIN */}
-      <Route
-        path="/login"
-        element={<Login />}
-      />
-
-      {/* REGISTER */}
-      <Route
-        path="/register"
-        element={<Register />}
-      />
-<Route path="/forgot-password" element={<ForgotPassword />} />
-<Route path="/reset-password/:token" element={<ResetPassword />} />
       <Route
         path="/profile"
         element={
@@ -153,24 +143,7 @@ const AppRoutes = () => {
         }
       />
 
-      <Route
-        path="/about"
-        element={
-          <ProtectedRoute>
-            <AboutUs />
-          </ProtectedRoute>
-        }
-      />
-
-      <Route
-        path="/contact"
-        element={
-          <ProtectedRoute>
-            <ContactUs />
-          </ProtectedRoute>
-        }
-      />
-
+      {/* PAYMENT */}
       <Route
         path="/payment-success"
         element={<PaymentSuccess />}
@@ -185,13 +158,13 @@ const AppRoutes = () => {
         }
       />
 
-      {/* Redirect */}
+      {/* REDIRECT */}
       <Route
         path="/edit/:id"
         element={<EditRedirect />}
       />
 
-      {/* VENDOR ROUTES */}
+      {/* VENDOR */}
       <Route
         path="/vendor/*"
         element={<VendorRoutes />}

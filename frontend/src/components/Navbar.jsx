@@ -188,87 +188,104 @@ export default function Navbar() {
         </div>
 
         <div className="hidden items-center gap-4 lg:flex">
-          {showSearchBar && <SearchBox />}
 
-          <div
-            className="relative flex h-10 w-10 cursor-pointer items-center justify-center rounded border border-slate-200 text-lg hover:border-red-200 hover:text-red-500"
-            onClick={() => navigate("/wishlist")}
-          >
-            <FaHeart />
-            {wishlistCount > 0 && (
-              <span className="absolute -right-2 -top-2 flex h-[18px] min-w-[18px] items-center justify-center rounded-full bg-red-500 text-[10px] font-bold text-white">
-                {wishlistCount}
-              </span>
-            )}
-          </div>
+  {showSearchBar && <SearchBox />}
 
-          <div
-            className="relative flex h-10 cursor-pointer items-center gap-2 rounded bg-[#0c831f] px-4 text-sm font-black text-white"
-            onClick={() => navigate("/cart")}
-          >
-            <FaShoppingCart />
-            <span>Cart</span>
-            {cartCount > 0 && (
-              <span className="absolute -right-2 -top-2 flex h-[18px] min-w-[18px] items-center justify-center rounded-full bg-red-500 text-[10px] font-bold text-white">
-                {cartCount}
-              </span>
-            )}
-          </div>
+  {/* SHOW ONLY IF USER LOGGED IN */}
+  {user && (
+    <>
+      {/* WISHLIST */}
+      <div
+        className="relative flex h-10 w-10 cursor-pointer items-center justify-center rounded border border-slate-200 text-lg hover:border-red-200 hover:text-red-500"
+        onClick={() => navigate("/wishlist")}
+      >
+        <FaHeart />
 
-          <div className="relative" ref={menuRef}>
-            <button
-              onClick={() => setUserMenu(!userMenu)}
-              className="flex h-10 w-10 items-center justify-center rounded border border-slate-200 hover:border-[#0c831f]"
+        {wishlistCount > 0 && (
+          <span className="absolute -right-2 -top-2 flex h-[18px] min-w-[18px] items-center justify-center rounded-full bg-red-500 text-[10px] font-bold text-white">
+            {wishlistCount}
+          </span>
+        )}
+      </div>
+
+      {/* CART */}
+      <div
+        className="relative flex h-10 cursor-pointer items-center gap-2 rounded bg-[#0c831f] px-4 text-sm font-black text-white"
+        onClick={() => navigate("/cart")}
+      >
+        <FaShoppingCart />
+        <span>Cart</span>
+
+        {cartCount > 0 && (
+          <span className="absolute -right-2 -top-2 flex h-[18px] min-w-[18px] items-center justify-center rounded-full bg-red-500 text-[10px] font-bold text-white">
+            {cartCount}
+          </span>
+        )}
+      </div>
+    </>
+  )}
+
+  {/* USER MENU */}
+  <div className="relative" ref={menuRef}>
+    <button
+      onClick={() => setUserMenu(!userMenu)}
+      className="flex h-10 w-10 items-center justify-center rounded border border-slate-200 hover:border-[#0c831f]"
+    >
+      <FaUser />
+    </button>
+
+    {userMenu && (
+      <div className="absolute right-0 z-50 mt-3 w-48 overflow-hidden rounded-[8px] border border-slate-100 bg-white text-black shadow-lg">
+
+        {user ? (
+          <>
+            <div className="border-b bg-slate-50 px-4 py-3 font-bold">
+              Hi, {user.name}
+            </div>
+
+            <div
+              onClick={() => navigate("/profile")}
+              className="cursor-pointer px-4 py-3 hover:bg-slate-50"
             >
-              <FaUser />
-            </button>
+              Profile
+            </div>
 
-            {userMenu && (
-              <div className="absolute right-0 z-50 mt-3 w-48 overflow-hidden rounded-[8px] border border-slate-100 bg-white text-black shadow-lg">
-                {user ? (
-                  <>
-                    <div className="border-b bg-slate-50 px-4 py-3 font-bold">
-                      Hi, {user.name}
-                    </div>
-                    <div
-                      onClick={() => navigate("/profile")}
-                      className="cursor-pointer px-4 py-3 hover:bg-slate-50"
-                    >
-                      Profile
-                    </div>
-                    <div
-                      onClick={() => navigate("/orders")}
-                      className="cursor-pointer px-4 py-3 hover:bg-slate-50"
-                    >
-                      Orders
-                    </div>
-                    <div
-                      onClick={handleLogout}
-                      className="cursor-pointer px-4 py-3 text-red-500 hover:bg-slate-50"
-                    >
-                      Logout
-                    </div>
-                  </>
-                ) : (
-                  <>
-                    <div
-                      onClick={() => navigate("/login")}
-                      className="cursor-pointer px-4 py-3 hover:bg-slate-50"
-                    >
-                      Login
-                    </div>
-                    <div
-                      onClick={() => navigate("/register")}
-                      className="cursor-pointer px-4 py-3 hover:bg-slate-50"
-                    >
-                      Register
-                    </div>
-                  </>
-                )}
-              </div>
-            )}
-          </div>
-        </div>
+            <div
+              onClick={() => navigate("/orders")}
+              className="cursor-pointer px-4 py-3 hover:bg-slate-50"
+            >
+              Orders
+            </div>
+
+            <div
+              onClick={handleLogout}
+              className="cursor-pointer px-4 py-3 text-red-500 hover:bg-slate-50"
+            >
+              Logout
+            </div>
+          </>
+        ) : (
+          <>
+            <div
+              onClick={() => navigate("/login")}
+              className="cursor-pointer px-4 py-3 hover:bg-slate-50"
+            >
+              Login
+            </div>
+
+            <div
+              onClick={() => navigate("/register")}
+              className="cursor-pointer px-4 py-3 hover:bg-slate-50"
+            >
+              Register
+            </div>
+          </>
+        )}
+
+      </div>
+    )}
+  </div>
+</div>
 
         <div className="flex items-center gap-3 lg:hidden">
           {showSearchBar && (
@@ -308,24 +325,30 @@ export default function Navbar() {
               {item.label}
             </span>
           ))}
-          <span
-            onClick={() => {
-              navigate("/wishlist");
-              setOpen(false);
-            }}
-            className="cursor-pointer"
-          >
-            Wishlist ({wishlistCount})
-          </span>
-          <span
-            onClick={() => {
-              navigate("/cart");
-              setOpen(false);
-            }}
-            className="cursor-pointer"
-          >
-            Cart ({cartCount})
-          </span>
+         
+        {user && (
+  <>
+    <span
+      onClick={() => {
+        navigate("/wishlist");
+        setOpen(false);
+      }}
+      className="cursor-pointer"
+    >
+      Wishlist ({wishlistCount})
+    </span>
+
+    <span
+      onClick={() => {
+        navigate("/cart");
+        setOpen(false);
+      }}
+      className="cursor-pointer"
+    >
+      Cart ({cartCount})
+    </span>
+  </>
+)}
 
           {user ? (
             <>

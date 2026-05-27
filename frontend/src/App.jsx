@@ -34,7 +34,7 @@ function App() {
     <>
 
       {/* NAVBAR */}
-      {!hideLayout && <Navbar />}
+      {/* {!hideLayout && <Navbar />} */}
 
       {/* ROUTES */}
       <AppRoutes />
