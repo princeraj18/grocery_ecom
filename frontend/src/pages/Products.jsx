@@ -91,12 +91,18 @@ filtered = filtered.filter(
 );    }
 
     if (sortPrice === "low-high") {
-      filtered.sort((a, b) => a.offerPrice - b.offerPrice);
-    }
+filtered.sort(
+  (a, b) =>
+    (a.variants?.[0]?.offerPrice || 0) -
+    (b.variants?.[0]?.offerPrice || 0)
+);    }
 
     if (sortPrice === "high-low") {
-      filtered.sort((a, b) => b.offerPrice - a.offerPrice);
-    }
+filtered.sort(
+  (a, b) =>
+    (b.variants?.[0]?.offerPrice || 0) -
+    (a.variants?.[0]?.offerPrice || 0)
+);    }
 
     return filtered;
   }, [search, category, sortPrice, products]);
@@ -216,12 +222,18 @@ if (loadingProducts) {
 
             <div className="grid grid-cols-2 gap-3 md:grid-cols-3 xl:grid-cols-4">
               {filteredProducts.map((item) => {
-             const discount =
-  item.price > 0
+            const actualPrice =
+  item.variants?.[0]?.price || 0;
+
+const offerPrice =
+  item.variants?.[0]?.offerPrice || 0;
+
+const discount =
+  actualPrice > 0
     ? Math.round(
-        ((item.price -
-          item.offerPrice) /
-          item.price) *
+        ((actualPrice -
+          offerPrice) /
+          actualPrice) *
           100
       )
     : 0;
@@ -283,12 +295,13 @@ if (loadingProducts) {
 
                       <div className="mt-3 flex items-end justify-between gap-2">
                         <div>
-                          <p className="text-base font-black">
-                            Rs. {item.offerPrice}
-                          </p>
-                          <p className="text-xs text-slate-400 line-through">
-                            Rs. {item.price}
-                          </p>
+                         <p className="text-base font-black">
+  Rs. {offerPrice}
+</p>
+
+<p className="text-xs text-slate-400 line-through">
+  Rs. {actualPrice}
+</p>
                         </div>
 
                         <button
