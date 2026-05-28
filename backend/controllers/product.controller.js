@@ -255,6 +255,9 @@ export const getProducts = async (
 // ==========================================
 // GET VENDOR PRODUCTS
 // ==========================================
+// ==========================================
+// GET VENDOR PRODUCTS
+// ==========================================
 export const getVendorProducts =
   async (req, res) => {
 
@@ -263,9 +266,17 @@ export const getVendorProducts =
       const products =
         await Product.find({
           vendor: req.vendor._id,
-        }).sort({
-          createdAt: -1,
-        });
+        })
+
+          // POPULATE CATEGORY
+          .populate(
+            "category",
+            "text image bgColor"
+          )
+
+          .sort({
+            createdAt: -1,
+          });
 
       res.status(200).json({
         success: true,

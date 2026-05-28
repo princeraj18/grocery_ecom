@@ -71,12 +71,25 @@ const CategoryProducts = () => {
 
   const currentCategory = categories.find((cat) => {
     const key = getCatKey(cat).toString().toLowerCase();
-    return key === paramKey;
+    // also allow matching by category _id
+    const id = (cat._id || "").toString().toLowerCase();
+    return key === paramKey || id === paramKey;
   });
 
   const filteredProducts = products.filter((product) => {
     const prodKey = getCatKey(product.category).toString().toLowerCase();
-    return prodKey === paramKey;
+    const prodId = (product.category && typeof product.category === "object")
+      ? (product.category._id || "").toString().toLowerCase()
+      : (product.category || "").toString().toLowerCase();
+
+    const currId = (currentCategory?._id || "").toString().toLowerCase();
+
+    // match by product's category path/text/id OR by id matching the resolved current category
+    return (
+      prodKey === paramKey ||
+      prodId === paramKey ||
+      (currId && prodId === currId)
+    );
   });
 
   if (loading) {
@@ -130,13 +143,20 @@ const CategoryProducts = () => {
 
             {filteredProducts.map(
               (item) => {
-                const discount =
-                  Math.round(
-                    ((item.price -
-                      item.offerPrice) /
-                      item.price) *
-                      100
-                  );
+                const actualPrice =
+  item.variants?.[0]?.price || 0;
+
+const offerPrice =
+  item.variants?.[0]?.offerPrice || 0;
+
+const discount =
+  actualPrice > 0
+    ? Math.round(
+        ((actualPrice - offerPrice) /
+          actualPrice) *
+          100
+      )
+    : 0;
 
                 return (
                   <Link
@@ -175,16 +195,11 @@ const CategoryProducts = () => {
                         <div>
                           <p className="font-bold">
                             ₹
-                            {
-                              item.offerPrice
-                            }
+                           ₹{offerPrice}
                           </p>
 
                           <p className="text-xs text-gray-400 line-through">
-                            ₹
-                            {
-                              item.price
-                            }
+                           ₹{actualPrice}
                           </p>
                         </div>
 

@@ -217,18 +217,19 @@ const ProductDetails = () => {
   // =====================================
   // ADD TO CART
   // =====================================
-  const handleAddToCart =
-    () => {
-      addToCart({
-        ...product,
-        offerPrice:
-          selectedVariant?.offerPrice,
-        price:
-          selectedVariant?.price,
-        selectedSize:
-          selectedVariant?.size,
-      });
-    };
+ const handleAddToCart = () => {
+
+  addToCart({
+    ...product,
+
+    selectedVariant: {
+      size: selectedVariant?.size,
+      price: selectedVariant?.price,
+      offerPrice:
+        selectedVariant?.offerPrice,
+    },
+  });
+};
 
   if (!product) {
     return (

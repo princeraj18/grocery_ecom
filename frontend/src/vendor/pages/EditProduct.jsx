@@ -22,19 +22,46 @@ export default function EditProduct() {
   const [loading, setLoading] =
     useState(true);
 
+  const [categories, setCategories] =
+    useState([]);
+
+  const [images, setImages] =
+    useState([]);
+
   const [productData, setProductData] =
     useState({
       name: "",
       description: "",
       category: "",
-      price: "",
-      offerPrice: "",
-      stockQuantity: "",
+      variants: [],
       inStock: true,
     });
 
-  const [images, setImages] =
-    useState([]);
+  // ===================================
+  // FETCH CATEGORIES
+  // ===================================
+  const fetchCategories =
+    async () => {
+
+      try {
+
+        const res =
+          await axios.get(
+            "http://localhost:5000/api/categories"
+          );
+
+        setCategories(
+          res.data.categories || []
+        );
+
+      } catch (error) {
+
+        console.log(
+          "CATEGORY ERROR:",
+          error
+        );
+      }
+    };
 
   // ===================================
   // FETCH PRODUCT
@@ -63,18 +90,15 @@ export default function EditProduct() {
           data.product;
 
         setProductData({
-          name: product.name,
+          name: product.name || "",
           description:
-            product.description?.[0] || "",
+            product.description || "",
           category:
-            product.category,
-          price: product.price,
-          offerPrice:
-            product.offerPrice,
-          stockQuantity:
-            product.stockQuantity,
+            product.category?._id || "",
+          variants:
+            product.variants || [],
           inStock:
-            product.inStock,
+            product.inStock ?? true,
         });
 
       } catch (error) {
@@ -94,7 +118,7 @@ export default function EditProduct() {
     };
 
   // ===================================
-  // HANDLE CHANGE
+  // HANDLE INPUT CHANGE
   // ===================================
   const handleChange = (e) => {
 
@@ -105,12 +129,78 @@ export default function EditProduct() {
       checked,
     } = e.target;
 
-    setProductData({
-      ...productData,
+    setProductData((prev) => ({
+      ...prev,
       [name]:
         type === "checkbox"
           ? checked
           : value,
+    }));
+  };
+
+  // ===================================
+  // HANDLE VARIANT CHANGE
+  // ===================================
+  const handleVariantChange = (
+    index,
+    field,
+    value
+  ) => {
+
+    const updated = [
+      ...productData.variants,
+    ];
+
+    updated[index][field] =
+      field === "price" ||
+      field === "offerPrice" ||
+      field === "stockQuantity"
+        ? Number(value)
+        : value;
+
+    setProductData({
+      ...productData,
+      variants: updated,
+    });
+  };
+
+  // ===================================
+  // ADD VARIANT
+  // ===================================
+  const addVariant = () => {
+
+    setProductData({
+      ...productData,
+      variants: [
+        ...productData.variants,
+        {
+          size: "",
+          price: "",
+          offerPrice: "",
+          stockQuantity: "",
+        },
+      ],
+    });
+  };
+
+  // ===================================
+  // REMOVE VARIANT
+  // ===================================
+  const removeVariant = (
+    index
+  ) => {
+
+    if (
+      productData.variants.length === 1
+    )
+      return;
+
+    setProductData({
+      ...productData,
+      variants:
+        productData.variants.filter(
+          (_, i) => i !== index
+        ),
     });
   };
 
@@ -148,18 +238,10 @@ export default function EditProduct() {
         );
 
         formData.append(
-          "price",
-          productData.price
-        );
-
-        formData.append(
-          "offerPrice",
-          productData.offerPrice
-        );
-
-        formData.append(
-          "stockQuantity",
-          productData.stockQuantity
+          "variants",
+          JSON.stringify(
+            productData.variants
+          )
         );
 
         formData.append(
@@ -196,7 +278,9 @@ export default function EditProduct() {
           "Product updated successfully"
         );
 
-        navigate("/vendor/products");
+        navigate(
+          "/vendor/products"
+        );
 
       } catch (error) {
 
@@ -211,6 +295,8 @@ export default function EditProduct() {
     };
 
   useEffect(() => {
+
+    fetchCategories();
 
     fetchProduct();
 
@@ -237,7 +323,7 @@ export default function EditProduct() {
 
         <div className="p-6">
 
-          <div className="bg-white p-8 rounded-xl shadow max-w-3xl">
+          <div className="bg-white p-8 rounded-xl shadow max-w-5xl">
 
             <h1 className="text-3xl font-bold mb-6">
               Edit Product
@@ -310,107 +396,124 @@ export default function EditProduct() {
                 >
 
                   <option value="">
-                    Select
+                    Select Category
                   </option>
 
-                  <option value="Vegetables">
-                    Vegetables
-                  </option>
+                  {categories.map(
+                    (cat) => (
 
-                  <option value="Fruits">
-                    Fruits
-                  </option>
-
-                  <option value="Drinks">
-                    Drinks
-                  </option>
-
-                  <option value="Instant">
-                    Instant
-                  </option>
-
-                  <option value="Dairy">
-                    Dairy
-                  </option>
-                  <option value="Snacks">
-                    Snacks
-                  </option>
-
-                  <option value="Bakery">
-                    Bakery
-                  </option>
-
-                  <option value="Grains">
-                    Grains
-                  </option>
+                      <option
+                        key={cat._id}
+                        value={cat._id}
+                      >
+                        {cat.text}
+                      </option>
+                    )
+                  )}
 
                 </select>
 
               </div>
 
-              {/* PRICE */}
-              <div className="grid grid-cols-2 gap-5">
-
-                <div>
-
-                  <label className="block mb-2 font-semibold">
-                    Price
-                  </label>
-
-                  <input
-                    type="number"
-                    name="price"
-                    value={
-                      productData.price
-                    }
-                    onChange={
-                      handleChange
-                    }
-                    className="w-full border p-3 rounded-lg"
-                  />
-
-                </div>
-
-                <div>
-
-                  <label className="block mb-2 font-semibold">
-                    Offer Price
-                  </label>
-
-                  <input
-                    type="number"
-                    name="offerPrice"
-                    value={
-                      productData.offerPrice
-                    }
-                    onChange={
-                      handleChange
-                    }
-                    className="w-full border p-3 rounded-lg"
-                  />
-
-                </div>
-
-              </div>
-
-              {/* STOCK */}
+              {/* VARIANTS */}
               <div>
 
-                <label className="block mb-2 font-semibold">
-                  Stock Quantity
+                <label className="block mb-3 font-semibold">
+                  Product Variants
                 </label>
 
-                <input
-                  type="number"
-                  name="stockQuantity"
-                  value={
-                    productData.stockQuantity
-                  }
-                  onChange={
-                    handleChange
-                  }
-                  className="w-full border p-3 rounded-lg"
-                />
+                {productData.variants.map(
+                  (
+                    variant,
+                    index
+                  ) => (
+
+                    <div
+                      key={index}
+                      className="grid md:grid-cols-5 gap-3 mb-3 border rounded-lg p-4"
+                    >
+
+                      <input
+                        type="text"
+                        placeholder="Size"
+                        value={variant.size}
+                        onChange={(e) =>
+                          handleVariantChange(
+                            index,
+                            "size",
+                            e.target.value
+                          )
+                        }
+                        className="border p-3 rounded"
+                      />
+
+                      <input
+                        type="number"
+                        placeholder="Price"
+                        value={variant.price}
+                        onChange={(e) =>
+                          handleVariantChange(
+                            index,
+                            "price",
+                            e.target.value
+                          )
+                        }
+                        className="border p-3 rounded"
+                      />
+
+                      <input
+                        type="number"
+                        placeholder="Offer Price"
+                        value={
+                          variant.offerPrice
+                        }
+                        onChange={(e) =>
+                          handleVariantChange(
+                            index,
+                            "offerPrice",
+                            e.target.value
+                          )
+                        }
+                        className="border p-3 rounded"
+                      />
+
+                      <input
+                        type="number"
+                        placeholder="Stock"
+                        value={
+                          variant.stockQuantity
+                        }
+                        onChange={(e) =>
+                          handleVariantChange(
+                            index,
+                            "stockQuantity",
+                            e.target.value
+                          )
+                        }
+                        className="border p-3 rounded"
+                      />
+
+                      <button
+                        type="button"
+                        onClick={() =>
+                          removeVariant(index)
+                        }
+                        className="bg-red-500 text-white rounded px-4"
+                      >
+                        Remove
+                      </button>
+
+                    </div>
+                  )
+                )}
+
+                <button
+                  type="button"
+                  onClick={addVariant}
+                  className="bg-blue-600 text-white px-4 py-2 rounded"
+                >
+                  + Add Variant
+                </button>
 
               </div>
 

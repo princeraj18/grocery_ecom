@@ -1,62 +1,98 @@
-import React, { useState, useEffect } from "react";
+import React, {
+  useState,
+  useEffect,
+} from "react";
+
 import axios from "axios";
 
 import Sidebar from "../components/Sidebar";
 import Navbar from "../components/Navbar";
 
 export default function AddProduct() {
-  const [formData, setFormData] = useState({
-    name: "",
-    description: "",
-    category: "",
-    stockQuantity: "",
-  });
 
-  const [images, setImages] = useState([]);
-  const [categories, setCategories] = useState([]);
-  const [loadingCategories, setLoadingCategories] =
-    useState(true);
+  // =========================
+  // FORM DATA
+  // =========================
+  const [formData, setFormData] =
+    useState({
+      name: "",
+      description: "",
+      category: "",
+    });
 
-  const [variants, setVariants] = useState([
-    {
-      size: "",
-      price: "",
-      offerPrice: "",
-    },
-  ]);
+  // =========================
+  // IMAGES
+  // =========================
+  const [images, setImages] =
+    useState([]);
+
+  // =========================
+  // CATEGORIES
+  // =========================
+  const [categories, setCategories] =
+    useState([]);
+
+  const [
+    loadingCategories,
+    setLoadingCategories,
+  ] = useState(true);
+
+  // =========================
+  // VARIANTS
+  // =========================
+  const [variants, setVariants] =
+    useState([
+      {
+        size: "",
+        price: "",
+        offerPrice: "",
+        stockQuantity: "",
+      },
+    ]);
 
   // =========================
   // FETCH CATEGORIES
   // =========================
   useEffect(() => {
-    const fetchCategories = async () => {
-      try {
-        setLoadingCategories(true);
 
-        const res = await axios.get(
-          "http://localhost:5000/api/categories"
-        );
+    const fetchCategories =
+      async () => {
 
-        setCategories(
-          res.data.categories || []
-        );
-      } catch (error) {
-        console.log(
-          "CATEGORY FETCH ERROR:",
-          error
-        );
-      } finally {
-        setLoadingCategories(false);
-      }
-    };
+        try {
+
+          setLoadingCategories(true);
+
+          const res =
+            await axios.get(
+              "http://localhost:5000/api/categories"
+            );
+
+          setCategories(
+            res.data.categories || []
+          );
+
+        } catch (error) {
+
+          console.log(
+            "CATEGORY FETCH ERROR:",
+            error
+          );
+
+        } finally {
+
+          setLoadingCategories(false);
+        }
+      };
 
     fetchCategories();
+
   }, []);
 
   // =========================
-  // INPUT CHANGE
+  // HANDLE INPUT CHANGE
   // =========================
   const handleChange = (e) => {
+
     setFormData((prev) => ({
       ...prev,
       [e.target.name]:
@@ -65,44 +101,59 @@ export default function AddProduct() {
   };
 
   // =========================
-  // IMAGE CHANGE
+  // HANDLE IMAGE CHANGE
   // =========================
   const handleImages = (e) => {
+
     setImages(
       Array.from(e.target.files)
     );
   };
 
   // =========================
-  // VARIANT CHANGE
+  // HANDLE VARIANT CHANGE
   // =========================
   const handleVariantChange = (
     index,
     field,
     value
   ) => {
+
     const updated = [...variants];
 
     updated[index][field] =
-      value;
+      field === "price" ||
+      field === "offerPrice" ||
+      field === "stockQuantity"
+        ? Number(value)
+        : value;
 
     setVariants(updated);
   };
 
+  // =========================
+  // ADD VARIANT
+  // =========================
   const addVariant = () => {
+
     setVariants([
       ...variants,
       {
         size: "",
         price: "",
         offerPrice: "",
+        stockQuantity: "",
       },
     ]);
   };
 
+  // =========================
+  // REMOVE VARIANT
+  // =========================
   const removeVariant = (
     index
   ) => {
+
     if (variants.length === 1)
       return;
 
@@ -114,14 +165,16 @@ export default function AddProduct() {
   };
 
   // =========================
-  // SUBMIT
+  // SUBMIT PRODUCT
   // =========================
   const handleSubmit = async (
     e
   ) => {
+
     e.preventDefault();
 
     try {
+
       const token =
         localStorage.getItem(
           "vendorToken"
@@ -130,6 +183,7 @@ export default function AddProduct() {
       const data =
         new FormData();
 
+      // BASIC INFO
       data.append(
         "name",
         formData.name
@@ -145,23 +199,22 @@ export default function AddProduct() {
         formData.category
       );
 
-      data.append(
-        "stockQuantity",
-        formData.stockQuantity
-      );
-
+      // VARIANTS
       data.append(
         "variants",
         JSON.stringify(variants)
       );
 
+      // IMAGES
       images.forEach((image) => {
+
         data.append(
           "images",
           image
         );
       });
-console.log("SELECTED CATEGORY:", formData.category);
+
+      // API CALL
       const res =
         await axios.post(
           "http://localhost:5000/api/products",
@@ -175,17 +228,20 @@ console.log("SELECTED CATEGORY:", formData.category);
           }
         );
 
+      console.log(
+        "PRODUCT ADDED:",
+        res.data
+      );
+
       alert(
         "Product Added Successfully"
       );
 
-      console.log(res.data);
-
+      // RESET FORM
       setFormData({
         name: "",
         description: "",
         category: "",
-        stockQuantity: "",
       });
 
       setVariants([
@@ -193,6 +249,7 @@ console.log("SELECTED CATEGORY:", formData.category);
           size: "",
           price: "",
           offerPrice: "",
+          stockQuantity: "",
         },
       ]);
 
@@ -201,8 +258,13 @@ console.log("SELECTED CATEGORY:", formData.category);
       document.getElementById(
         "product-images"
       ).value = "";
+
     } catch (error) {
-      console.log(error);
+
+      console.log(
+        "ADD PRODUCT ERROR:",
+        error
+      );
 
       alert(
         error.response?.data
@@ -213,26 +275,33 @@ console.log("SELECTED CATEGORY:", formData.category);
   };
 
   return (
+
     <div className="flex min-h-screen bg-gray-100">
+
+      {/* SIDEBAR */}
       <Sidebar />
 
+      {/* MAIN */}
       <div className="flex-1">
+
         <Navbar />
 
         <div className="p-6">
+
           <div className="bg-white rounded-2xl shadow-lg p-8 max-w-5xl mx-auto">
+
             <h1 className="text-3xl font-bold mb-8 text-gray-800">
               Add Product
             </h1>
 
             <form
-              onSubmit={
-                handleSubmit
-              }
+              onSubmit={handleSubmit}
               className="space-y-6"
             >
+
               {/* PRODUCT NAME */}
               <div>
+
                 <label className="block mb-2 font-semibold">
                   Product Name
                 </label>
@@ -240,20 +309,18 @@ console.log("SELECTED CATEGORY:", formData.category);
                 <input
                   type="text"
                   name="name"
-                  value={
-                    formData.name
-                  }
-                  onChange={
-                    handleChange
-                  }
+                  value={formData.name}
+                  onChange={handleChange}
                   placeholder="Enter Product Name"
                   className="border p-3 rounded-lg w-full"
                   required
                 />
+
               </div>
 
               {/* DESCRIPTION */}
               <div>
+
                 <label className="block mb-2 font-semibold">
                   Description
                 </label>
@@ -263,18 +330,18 @@ console.log("SELECTED CATEGORY:", formData.category);
                   value={
                     formData.description
                   }
-                  onChange={
-                    handleChange
-                  }
+                  onChange={handleChange}
                   rows="4"
                   placeholder="Enter Product Description"
                   className="border p-3 rounded-lg w-full"
                   required
                 />
+
               </div>
 
               {/* CATEGORY */}
               <div>
+
                 <label className="block mb-2 font-semibold">
                   Category
                 </label>
@@ -284,12 +351,11 @@ console.log("SELECTED CATEGORY:", formData.category);
                   value={
                     formData.category
                   }
-                  onChange={
-                    handleChange
-                  }
+                  onChange={handleChange}
                   className="border p-3 rounded-lg w-full"
                   required
                 >
+
                   <option value="">
                     {loadingCategories
                       ? "Loading Categories..."
@@ -298,19 +364,23 @@ console.log("SELECTED CATEGORY:", formData.category);
 
                   {categories.map(
                     (cat) => (
-                   <option
-  key={cat._id}
-  value={cat._id}
->
-  {cat.text}
-</option>
+
+                      <option
+                        key={cat._id}
+                        value={cat._id}
+                      >
+                        {cat.text}
+                      </option>
                     )
                   )}
+
                 </select>
+
               </div>
 
               {/* VARIANTS */}
               <div>
+
                 <label className="block mb-3 font-semibold">
                   Product Variants
                 </label>
@@ -320,31 +390,40 @@ console.log("SELECTED CATEGORY:", formData.category);
                     variant,
                     index
                   ) => (
+
                     <div
-                      key={
-                        index
-                      }
-                      className="grid md:grid-cols-4 gap-3 mb-3 border rounded-lg p-4"
+                      key={index}
+                      className="grid md:grid-cols-5 gap-3 mb-4 border rounded-lg p-4"
                     >
+
+                      {/* SIZE */}
                       <select
-                        value={
-                          variant.size
-                        }
-                        onChange={(
-                          e
-                        ) =>
+                        value={variant.size}
+                        onChange={(e) =>
                           handleVariantChange(
                             index,
                             "size",
-                            e.target
-                              .value
+                            e.target.value
                           )
                         }
                         className="border p-3 rounded"
                         required
                       >
+
                         <option value="">
                           Select Size
+                        </option>
+
+                        <option value="1pc">
+                          1 pc
+                        </option>
+
+                        <option value="2pc">
+                          2 pcs
+                        </option>
+
+                        <option value="3pc">
+                          3 pcs
                         </option>
 
                         <option value="100ml">
@@ -386,96 +465,90 @@ console.log("SELECTED CATEGORY:", formData.category);
                         <option value="5kg">
                           5 Kg
                         </option>
+
                       </select>
 
+                      {/* PRICE */}
                       <input
                         type="number"
                         placeholder="Price"
-                        value={
-                          variant.price
-                        }
-                        onChange={(
-                          e
-                        ) =>
+                        value={variant.price}
+                        onChange={(e) =>
                           handleVariantChange(
                             index,
                             "price",
-                            e.target
-                              .value
+                            e.target.value
                           )
                         }
                         className="border p-3 rounded"
                         required
                       />
 
+                      {/* OFFER PRICE */}
                       <input
                         type="number"
                         placeholder="Offer Price"
                         value={
                           variant.offerPrice
                         }
-                        onChange={(
-                          e
-                        ) =>
+                        onChange={(e) =>
                           handleVariantChange(
                             index,
                             "offerPrice",
-                            e.target
-                              .value
+                            e.target.value
                           )
                         }
                         className="border p-3 rounded"
                         required
                       />
 
+                      {/* STOCK */}
+                      <input
+                        type="number"
+                        placeholder="Stock"
+                        value={
+                          variant.stockQuantity
+                        }
+                        onChange={(e) =>
+                          handleVariantChange(
+                            index,
+                            "stockQuantity",
+                            e.target.value
+                          )
+                        }
+                        className="border p-3 rounded"
+                        required
+                      />
+
+                      {/* REMOVE */}
                       <button
                         type="button"
                         onClick={() =>
-                          removeVariant(
-                            index
-                          )
+                          removeVariant(index)
                         }
                         className="bg-red-500 text-white rounded px-4"
                       >
                         Remove
                       </button>
+
                     </div>
                   )
                 )}
 
+                {/* ADD VARIANT */}
                 <button
                   type="button"
-                  onClick={
-                    addVariant
-                  }
+                  onClick={addVariant}
                   className="bg-blue-600 text-white px-4 py-2 rounded"
                 >
                   + Add Variant
                 </button>
-              </div>
 
-              {/* STOCK */}
-              <div>
-                <label className="block mb-2 font-semibold">
-                  Stock Quantity
-                </label>
-
-                <input
-                  type="number"
-                  name="stockQuantity"
-                  value={
-                    formData.stockQuantity
-                  }
-                  onChange={
-                    handleChange
-                  }
-                  className="border p-3 rounded-lg w-full"
-                  required
-                />
               </div>
 
               {/* IMAGES */}
               <div>
+
                 <label className="block mb-2 font-semibold">
                   Upload Images
                 </label>
@@ -485,48 +558,52 @@ console.log("SELECTED CATEGORY:", formData.category);
                   type="file"
                   multiple
                   accept="image/*"
-                  onChange={
-                    handleImages
-                  }
+                  onChange={handleImages}
                   className="border p-3 rounded-lg w-full"
                   required
                 />
+
               </div>
 
               {/* IMAGE PREVIEW */}
-              {images.length >
-                0 && (
+              {images.length > 0 && (
+
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+
                   {images.map(
                     (
                       img,
                       index
                     ) => (
+
                       <img
-                        key={
-                          index
-                        }
-                        src={URL.createObjectURL(
-                          img
-                        )}
+                        key={index}
+                        src={URL.createObjectURL(img)}
                         alt="preview"
                         className="h-24 w-full object-cover rounded border"
                       />
                     )
                   )}
+
                 </div>
               )}
 
+              {/* SUBMIT */}
               <button
                 type="submit"
                 className="bg-green-600 hover:bg-green-700 text-white px-8 py-3 rounded-lg font-semibold"
               >
                 Add Product
               </button>
+
             </form>
+
           </div>
+
         </div>
+
       </div>
+
     </div>
   );
 }

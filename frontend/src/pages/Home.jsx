@@ -196,53 +196,74 @@ if (loadingProducts) {
           </div>
 
           <div className="grid grid-cols-2 gap-3 md:grid-cols-3 lg:grid-cols-5">
-            {bestDeals.map((product) => (
-              <Link
-                key={product._id}
-                to={`/products/${product._id}`}
-                className="group rounded-[8px] border border-slate-200 bg-white p-3 transition hover:shadow-md"
-              >
-                <div className="relative flex aspect-square items-center justify-center rounded-[8px] bg-[#f7f8f3]">
-                  <span className="absolute left-2 top-2 rounded bg-[#0c831f] px-2 py-1 text-[11px] font-black text-white">
-                   {product.price > 0
-  ? Math.round(
-      ((product.price -
-        product.offerPrice) /
-        product.price) *
-        100
-    )
-  : 0}
-                    % OFF
-                  </span>
-                  <img
-                    src={
-  Array.isArray(product.image)
-    ? product.image[0]
-    : product.image
-}
-                    alt={product.name}
-                    className="h-32 w-32 object-contain transition group-hover:scale-105"
-                  />
-                </div>
-                <p className="text-xs font-semibold text-slate-500">
-  {product.category?.text}
-</p>
-                <h3 className="mt-1 min-h-[40px] text-sm font-black leading-snug line-clamp-2">
-                  {product.name}
-                </h3>
-                <div className="mt-2 flex items-end justify-between gap-2">
-                  <div>
-                    <p className="text-base font-black">Rs. {product.offerPrice}</p>
-                    <p className="text-xs text-slate-400 line-through">
-                      Rs. {product.price}
-                    </p>
-                  </div>
-                  <span className="rounded border border-[#0c831f] px-3 py-1 text-xs font-black text-[#0c831f]">
-                    ADD
-                  </span>
-                </div>
-              </Link>
-            ))}
+          {bestDeals.map((product) => {
+
+  const actualPrice =
+    product.variants?.[0]?.price || 0;
+
+  const offerPrice =
+    product.variants?.[0]?.offerPrice || 0;
+
+  const discount =
+    actualPrice > 0
+      ? Math.round(
+          ((actualPrice - offerPrice) /
+            actualPrice) *
+            100
+        )
+      : 0;
+
+  return (
+    <Link
+      key={product._id}
+      to={`/products/${product._id}`}
+      className="group rounded-[8px] border border-slate-200 bg-white p-3 transition hover:shadow-md"
+    >
+      <div className="relative flex aspect-square items-center justify-center rounded-[8px] bg-[#f7f8f3]">
+
+        <span className="absolute left-2 top-2 rounded bg-[#0c831f] px-2 py-1 text-[11px] font-black text-white">
+          {discount}% OFF
+        </span>
+
+        <img
+          src={
+            Array.isArray(product.image)
+              ? product.image[0]
+              : product.image
+          }
+          alt={product.name}
+          className="h-32 w-32 object-contain transition group-hover:scale-105"
+        />
+      </div>
+
+      <p className="text-xs font-semibold text-slate-500">
+        {product.category?.text}
+      </p>
+
+      <h3 className="mt-1 min-h-[40px] text-sm font-black leading-snug line-clamp-2">
+        {product.name}
+      </h3>
+
+      <div className="mt-2 flex items-end justify-between gap-2">
+
+        <div>
+          <p className="text-base font-black">
+            Rs. {offerPrice}
+          </p>
+
+          <p className="text-xs text-slate-400 line-through">
+            Rs. {actualPrice}
+          </p>
+        </div>
+
+        <span className="rounded border border-[#0c831f] px-3 py-1 text-xs font-black text-[#0c831f]">
+          ADD
+        </span>
+
+      </div>
+    </Link>
+  );
+})}
           </div>
         </div>
       </section>

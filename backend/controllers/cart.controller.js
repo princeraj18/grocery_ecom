@@ -53,12 +53,15 @@ export const addToCart = async (
       });
     }
 
+    // CHECK BOTH PRODUCT + VARIANT
     const existingItem =
-  cart.items.find(
-    (item) =>
-      item.productId.toString() ===
-      product.productId.toString()
-  );
+      cart.items.find(
+        (item) =>
+          item.productId.toString() ===
+            product.productId.toString() &&
+          item.variantSize ===
+            product.variantSize
+      );
 
     if (existingItem) {
       existingItem.quantity +=
@@ -73,7 +76,9 @@ export const addToCart = async (
       success: true,
       cart,
     });
+
   } catch (error) {
+
     console.log(error);
 
     res.status(500).json({
@@ -89,9 +94,11 @@ export const updateCart = async (
   res
 ) => {
   try {
+
     const {
       userId,
       productId,
+      variantSize,
       quantity,
     } = req.body;
 
@@ -106,11 +113,13 @@ export const updateCart = async (
       });
     }
 
-   const item = cart.items.find(
-  (it) =>
-    it.productId.toString() ===
-    productId.toString()
-);
+    const item = cart.items.find(
+      (it) =>
+        it.productId.toString() ===
+          productId.toString() &&
+        it.variantSize ===
+          variantSize
+    );
 
     if (!item) {
       return res.status(404).json({
@@ -127,7 +136,9 @@ export const updateCart = async (
       success: true,
       cart,
     });
+
   } catch (error) {
+
     console.log(error);
 
     res.status(500).json({
@@ -140,9 +151,14 @@ export const updateCart = async (
 // ================= REMOVE FROM CART =================
 export const removeFromCart =
   async (req, res) => {
+
     try {
-      const { userId, productId } =
-        req.body;
+
+      const {
+        userId,
+        productId,
+        variantSize,
+      } = req.body;
 
       const cart =
         await Cart.findOne({
@@ -150,20 +166,22 @@ export const removeFromCart =
         });
 
       if (!cart) {
-        return res
-          .status(404)
-          .json({
-            success: false,
-            message:
-              "Cart not found",
-          });
+        return res.status(404).json({
+          success: false,
+          message: "Cart not found",
+        });
       }
 
-     cart.items = cart.items.filter(
-  (item) =>
-    item.productId.toString() !==
-    productId.toString()
-);
+      cart.items =
+        cart.items.filter(
+          (item) =>
+            !(
+              item.productId.toString() ===
+                productId.toString() &&
+              item.variantSize ===
+                variantSize
+            )
+        );
 
       await cart.save();
 
@@ -171,7 +189,9 @@ export const removeFromCart =
         success: true,
         cart,
       });
+
     } catch (error) {
+
       console.log(error);
 
       res.status(500).json({

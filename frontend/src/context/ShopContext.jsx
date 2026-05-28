@@ -1,3 +1,4 @@
+
 import {
   createContext,
   useEffect,
@@ -24,8 +25,10 @@ const ShopContextProvider = ({
   // =========================
   const [products, setProducts] =
     useState([]);
-const [categories, setCategories] =
-  useState([]);
+
+  const [categories, setCategories] =
+    useState([]);
+
   const [cartItems, setCartItems] =
     useState([]);
 
@@ -52,6 +55,7 @@ const [categories, setCategories] =
   const fetchProducts =
     async () => {
       try {
+
         setLoadingProducts(
           true
         );
@@ -60,11 +64,6 @@ const [categories, setCategories] =
           await api.get(
             "/products"
           );
-
-        console.log(
-          "PRODUCTS:",
-          data.products
-        );
 
         setProducts(
           data.products || []
@@ -85,33 +84,30 @@ const [categories, setCategories] =
       }
     };
 
-    // =========================
-// FETCH CATEGORIES
-// =========================
-const fetchCategories =
-  async () => {
-    try {
+  // =========================
+  // FETCH CATEGORIES
+  // =========================
+  const fetchCategories =
+    async () => {
+      try {
 
-      const { data } =
-        await api.get(
-          "/categories"
-        );
-
-      if (data.success) {
+        const { data } =
+          await api.get(
+            "/categories"
+          );
 
         setCategories(
           data.categories || []
         );
+
+      } catch (error) {
+
+        console.log(
+          "FETCH CATEGORY ERROR:",
+          error
+        );
       }
-
-    } catch (error) {
-
-      console.log(
-        "FETCH CATEGORY ERROR:",
-        error
-      );
-    }
-  };
+    };
 
   // =========================
   // FETCH CART
@@ -130,11 +126,6 @@ const fetchCategories =
           await api.get(
             `/cart/${user._id}`
           );
-
-        console.log(
-          "CART DATA:",
-          data
-        );
 
         setCartItems(
           data?.cart?.items || []
@@ -161,9 +152,7 @@ const fetchCategories =
 
         if (!user?._id) {
 
-          setWishlistItems(
-            []
-          );
+          setWishlistItems([]);
 
           return;
         }
@@ -172,11 +161,6 @@ const fetchCategories =
           await api.get(
             `/wishlist/${user._id}`
           );
-
-        console.log(
-          "WISHLIST DATA:",
-          data
-        );
 
         setWishlistItems(
           Array.isArray(
@@ -193,9 +177,7 @@ const fetchCategories =
           error
         );
 
-        setWishlistItems(
-          []
-        );
+        setWishlistItems([]);
       }
     };
 
@@ -204,11 +186,11 @@ const fetchCategories =
   // =========================
   useEffect(() => {
 
-  fetchProducts();
+    fetchProducts();
 
-  fetchCategories();
+    fetchCategories();
 
-}, []);
+  }, []);
 
   // =========================
   // LOAD USER DATA
@@ -258,18 +240,25 @@ const fetchCategories =
           productId:
             product._id,
 
+          variantSize:
+            product.selectedVariant?.size,
+
           name:
             product.name,
 
           image:
-            product.image?.[0] ||
-            "",
+            product.image?.[0] || "",
 
           category:
             product.category,
 
           price:
-            product.offerPrice,
+            product.selectedVariant
+              ?.offerPrice,
+
+          originalPrice:
+            product.selectedVariant
+              ?.price,
 
           quantity: 1,
         };
@@ -307,7 +296,10 @@ const fetchCategories =
   // INCREASE QUANTITY
   // =========================
   const increaseQuantity =
-    async (productId) => {
+    async (
+      productId,
+      variantSize
+    ) => {
 
       try {
 
@@ -315,7 +307,9 @@ const fetchCategories =
           cartItems.find(
             (item) =>
               item.productId ===
-              productId
+                productId &&
+              item.variantSize ===
+                variantSize
           );
 
         if (!item) return;
@@ -329,9 +323,10 @@ const fetchCategories =
 
               productId,
 
+              variantSize,
+
               quantity:
-                item.quantity +
-                1,
+                item.quantity + 1,
             }
           );
 
@@ -352,7 +347,10 @@ const fetchCategories =
   // DECREASE QUANTITY
   // =========================
   const decreaseQuantity =
-    async (productId) => {
+    async (
+      productId,
+      variantSize
+    ) => {
 
       try {
 
@@ -360,7 +358,9 @@ const fetchCategories =
           cartItems.find(
             (item) =>
               item.productId ===
-              productId
+                productId &&
+              item.variantSize ===
+                variantSize
           );
 
         if (!item) return;
@@ -370,7 +370,8 @@ const fetchCategories =
         ) {
 
           await removeFromCart(
-            productId
+            productId,
+            variantSize
           );
 
           return;
@@ -385,9 +386,10 @@ const fetchCategories =
 
               productId,
 
+              variantSize,
+
               quantity:
-                item.quantity -
-                1,
+                item.quantity - 1,
             }
           );
 
@@ -408,7 +410,10 @@ const fetchCategories =
   // REMOVE FROM CART
   // =========================
   const removeFromCart =
-    async (productId) => {
+    async (
+      productId,
+      variantSize
+    ) => {
 
       try {
 
@@ -421,6 +426,8 @@ const fetchCategories =
                   user._id,
 
                 productId,
+
+                variantSize,
               },
             }
           );
@@ -587,28 +594,29 @@ const fetchCategories =
   // PROVIDER VALUE
   // =========================
   const value = {
-  products,
-  categories,
-  loadingProducts,
 
-  cartItems,
-  addToCart,
-  increaseQuantity,
-  decreaseQuantity,
-  removeFromCart,
-  clearCart,
+    products,
+    categories,
+    loadingProducts,
 
-  wishlistItems,
-  addToWishlist,
-  removeFromWishlist,
+    cartItems,
+    addToCart,
+    increaseQuantity,
+    decreaseQuantity,
+    removeFromCart,
+    clearCart,
 
-  user,
-  loginUser,
-  logoutUser,
+    wishlistItems,
+    addToWishlist,
+    removeFromWishlist,
 
-  fetchCart,
-  fetchWishlist,
-};
+    user,
+    loginUser,
+    logoutUser,
+
+    fetchCart,
+    fetchWishlist,
+  };
 
   return (
 
@@ -624,3 +632,4 @@ const fetchCategories =
 
 export default
   ShopContextProvider;
+

@@ -2,11 +2,12 @@ import React, {
   useEffect,
   useState,
 } from "react";
+
 import { useNavigate } from "react-router-dom";
+
 import axios from "axios";
 
 import Sidebar from "../components/Sidebar";
-
 import Navbar from "../components/Navbar";
 
 export default function Products() {
@@ -16,7 +17,9 @@ export default function Products() {
 
   const [loading, setLoading] =
     useState(true);
-const navigate = useNavigate();
+
+  const navigate = useNavigate();
+
   // =========================
   // FETCH VENDOR PRODUCTS
   // =========================
@@ -24,6 +27,8 @@ const navigate = useNavigate();
     async () => {
 
       try {
+
+        setLoading(true);
 
         const token =
           localStorage.getItem(
@@ -40,13 +45,21 @@ const navigate = useNavigate();
             }
           );
 
-        setProducts(
+        console.log(
+          "VENDOR PRODUCTS:",
           data.products
+        );
+
+        setProducts(
+          data.products || []
         );
 
       } catch (error) {
 
-        console.log(error);
+        console.log(
+          "FETCH PRODUCT ERROR:",
+          error
+        );
 
         alert(
           error.response?.data
@@ -98,7 +111,10 @@ const navigate = useNavigate();
 
       } catch (error) {
 
-        console.log(error);
+        console.log(
+          "DELETE ERROR:",
+          error
+        );
 
         alert(
           error.response?.data
@@ -135,12 +151,24 @@ const navigate = useNavigate();
               My Products
             </h1>
 
+            {/* ADD PRODUCT */}
+            <button
+              onClick={() =>
+                navigate(
+                  "/vendor/products/create"
+                )
+              }
+              className="bg-green-600 hover:bg-green-700 text-white px-5 py-3 rounded-lg font-semibold shadow"
+            >
+              + Add Product
+            </button>
+
           </div>
 
           {/* LOADING */}
           {loading ? (
 
-            <div className="text-center text-xl font-semibold">
+            <div className="text-center text-xl font-semibold py-20">
               Loading...
             </div>
 
@@ -156,6 +184,7 @@ const navigate = useNavigate();
 
               <table className="w-full">
 
+                {/* TABLE HEADER */}
                 <thead className="bg-black text-white">
 
                   <tr>
@@ -185,6 +214,10 @@ const navigate = useNavigate();
                     </th>
 
                     <th className="p-4 text-left">
+                      Variants
+                    </th>
+
+                    <th className="p-4 text-left">
                       Actions
                     </th>
 
@@ -192,101 +225,163 @@ const navigate = useNavigate();
 
                 </thead>
 
+                {/* TABLE BODY */}
                 <tbody>
 
                   {products.map(
-                    (product) => (
+                    (product) => {
 
-                      <tr
-                        key={product._id}
-                        className="border-b hover:bg-gray-50"
-                      >
+                      // =========================
+                      // CATEGORY FIX
+                      // =========================
+                      const categoryName =
+                        typeof product.category ===
+                        "object"
+                          ? product.category?.text
+                          : product.category;
 
-                        {/* IMAGE */}
-                        <td className="p-4">
+                      // =========================
+                      // PRICE FIX
+                      // =========================
+                      const firstVariant =
+                        product.variants?.[0];
 
-                          <img
-                            src={
-                              product.image?.[0]
-                            }
-                            alt={
-                              product.name
-                            }
-                            className="w-16 h-16 object-cover rounded-lg"
-                          />
+                      // =========================
+                      // STOCK FIX
+                      // =========================
+                    const totalStock =
+  product.variants?.reduce(
+    (total, variant) => {
 
-                        </td>
+      return (
+        total +
+        (parseInt(
+          variant.stockQuantity
+        ) || 0)
+      );
+    },
+    0
+  ) || 0;
 
-                        {/* NAME */}
-                        <td className="p-4 font-semibold">
-                          {product.name}
-                        </td>
+                      return (
 
-                        {/* CATEGORY */}
-                        <td className="p-4">
-                          {
-                            product.category
-                          }
-                        </td>
-
-                        {/* PRICE */}
-                        <td className="p-4">
-                          ₹
-                          {
-                            product.price
-                          }
-                        </td>
-
-                        {/* OFFER PRICE */}
-                        <td className="p-4 text-green-600 font-bold">
-                          ₹
-                          {
-                            product.offerPrice
-                          }
-                        </td>
-
-                        {/* STOCK */}
-                        <td className="p-4">
-
-                          {
-                            product.stockQuantity
-                          }
-
-                        </td>
-
-                        {/* ACTIONS */}
-                        <td className="p-4">
-
-                          <div className="flex gap-3">
-
-                            {/* EDIT */}
-                        <button
-                          onClick={() =>
-                            navigate(`/vendor/products/edit/${product._id}`)
-                          }
-                          className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg"
+                        <tr
+                          key={product._id}
+                          className="border-b hover:bg-gray-50"
                         >
-                          Edit
-                        </button>
 
-                            {/* DELETE */}
-                            <button
-                              onClick={() =>
-                                deleteProduct(
-                                  product._id
-                                )
+                          {/* IMAGE */}
+                          <td className="p-4">
+
+                            <img
+                              src={
+                                product.image?.[0]
                               }
-                              className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg"
-                            >
-                              Delete
-                            </button>
+                              alt={
+                                product.name
+                              }
+                              className="w-16 h-16 object-cover rounded-lg border"
+                            />
 
-                          </div>
+                          </td>
 
-                        </td>
+                          {/* NAME */}
+                          <td className="p-4 font-semibold">
+                            {product.name}
+                          </td>
 
-                      </tr>
-                    )
+                          {/* CATEGORY */}
+                          <td className="p-4">
+
+                            {categoryName ||
+                              "No Category"}
+
+                          </td>
+
+                          {/* PRICE */}
+                          <td className="p-4">
+
+                            ₹
+                            {firstVariant?.price || 0}
+
+                          </td>
+
+                          {/* OFFER PRICE */}
+                          <td className="p-4 text-green-600 font-bold">
+
+                            ₹
+                            {firstVariant?.offerPrice || 0}
+
+                          </td>
+
+                          {/* STOCK */}
+                          <td className="p-4 font-semibold">
+
+                            {totalStock}
+
+                          </td>
+
+                          {/* VARIANTS */}
+                          <td className="p-4">
+
+                            <div className="flex flex-wrap gap-2">
+
+                              {product.variants?.map(
+                                (
+                                  variant,
+                                  index
+                                ) => (
+
+                                  <span
+                                    key={index}
+                                    className="bg-gray-200 px-3 py-1 rounded-full text-sm"
+                                  >
+                                    {variant.size}
+                                  </span>
+
+                                )
+                              )}
+
+                            </div>
+
+                          </td>
+
+                          {/* ACTIONS */}
+                          <td className="p-4">
+
+                            <div className="flex gap-3">
+
+                              {/* EDIT */}
+                              <button
+                                onClick={() =>
+                                  navigate(
+                                    `/vendor/products/edit/${product._id}`
+                                  )
+                                }
+                                className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg"
+                              >
+                                Edit
+                              </button>
+
+                              {/* DELETE */}
+                              <button
+                                onClick={() =>
+                                  deleteProduct(
+                                    product._id
+                                  )
+                                }
+                                className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg"
+                              >
+                                Delete
+                              </button>
+
+                            </div>
+
+                          </td>
+
+                        </tr>
+                      );
+                    }
                   )}
 
                 </tbody>
