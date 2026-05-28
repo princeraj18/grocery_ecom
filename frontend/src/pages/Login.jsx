@@ -155,13 +155,7 @@ const Login = () => {
 
         <div className="w-full max-w-md bg-white p-8 rounded-2xl shadow-lg relative">
 
-          {/* VENDOR LOGIN BUTTON */}
-          <Link
-            to="/vendor/login"
-            className="absolute top-5 right-5 bg-orange-500 hover:bg-orange-600 text-white text-sm px-4 py-2 rounded-lg transition"
-          >
-            Vendor Login
-          </Link>
+        
 
           {/* HEADING */}
           <h2 className="text-3xl font-bold text-center text-gray-800">
@@ -281,8 +275,15 @@ const Login = () => {
 
           </p>
 
+  
         </div>
-
+{/* VENDOR LOGIN BUTTON */}
+          <Link
+            to="/vendor/login"
+            className="absolute  top-5 sm:right-10 bg-orange-500 hover:bg-orange-600 text-white text-sm px-4 py-2 rounded-lg transition"
+          >
+            Vendor Login
+          </Link>
       </div>
 
     </div>

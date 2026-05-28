@@ -5,6 +5,7 @@ import React, {
   useRef,
   useEffect,
   useMemo,
+  memo,
 } from "react";
 
 import {
@@ -23,6 +24,67 @@ import {
 } from "react-router-dom";
 
 import { ShopContext } from "../context/ShopContext";
+
+// =========================
+// SEARCH BOX COMPONENT (MEMOIZED)
+// =========================
+const SearchBox = memo(({
+  search,
+  setSearch,
+  suggestions,
+  handleSelectProduct,
+  mobile = false,
+}) => (
+  <div className="relative w-full">
+    <input
+      type="text"
+      placeholder="Search groceries..."
+      value={search}
+      onChange={(e) => {
+        setSearch(e.target.value);
+        localStorage.setItem("productSearch", e.target.value);
+      }}
+      className={`w-full rounded border border-slate-200 bg-[#f6f7f1] px-4 py-3 text-sm outline-none focus:border-[#0c831f] focus:bg-white ${
+        mobile ? "" : "lg:w-80"
+      }`}
+    />
+
+    {search && suggestions.length > 0 && (
+      <div className="absolute left-0 top-14 z-50 w-full overflow-hidden rounded-[8px] border border-slate-100 bg-white shadow-xl">
+        {suggestions.map((product) => {
+          const image = Array.isArray(product.image)
+            ? product.image[0]
+            : product.image;
+
+          const offerPrice =
+            product.variants?.[0]?.offerPrice || 0;
+
+          return (
+            <div
+              key={product._id}
+              onClick={() => handleSelectProduct(product)}
+              className="flex cursor-pointer items-center gap-3 border-b px-4 py-3 hover:bg-slate-50"
+            >
+              <img
+                src={image || "https://via.placeholder.com/150"}
+                alt={product.name}
+                className="h-12 w-12 rounded bg-[#f6f7f1] object-contain"
+              />
+
+              <div>
+                <p className="font-bold">{product.name}</p>
+
+                <p className="text-sm font-bold text-[#0c831f]">
+                  Rs. {offerPrice}
+                </p>
+              </div>
+            </div>
+          );
+        })}
+      </div>
+    )}
+  </div>
+));
 
 export default function Navbar() {
   const [open, setOpen] =
@@ -279,6 +341,12 @@ export default function Navbar() {
   // MENU ITEMS
   // =========================
 
+ 
+
+  // =========================
+  // MENU ITEMS
+  // =========================
+
   const menuItems = [
     {
       label: "Home",
@@ -297,96 +365,6 @@ export default function Navbar() {
       path: "/contact",
     },
   ];
-
-  // =========================
-  // SEARCH BOX
-  // =========================
-
-  const SearchBox = ({
-    mobile = false,
-  }) => (
-    <div className="relative w-full">
-        <input
-              type="text"
-              placeholder="Search groceries..."
-              value={search}
-              onChange={(e) => {
-                setSearch(e.target.value);
-                localStorage.setItem("productSearch", e.target.value);
-              }}
-              className={`w-full rounded border border-slate-200 bg-[#f6f7f1] px-4 py-3 text-sm outline-none focus:border-[#0c831f] focus:bg-white ${
-          mobile
-            ? ""
-            : "lg:w-80"
-        }`}
-    />
-
-      {search &&
-        suggestions.length >
-          0 && (
-          <div className="absolute left-0 top-14 z-50 w-full overflow-hidden rounded-[8px] border border-slate-100 bg-white shadow-xl">
-
-            {suggestions.map(
-              (product) => {
-                const image =
-                  Array.isArray(
-                    product.image
-                  )
-                    ? product
-                        .image[0]
-                    : product.image;
-
-                const offerPrice =
-                  product
-                    .variants?.[0]
-                    ?.offerPrice ||
-                  0;
-
-                return (
-                  <div
-                    key={
-                      product._id
-                    }
-                    onClick={() =>
-                      handleSelectProduct(
-                        product
-                      )
-                    }
-                    className="flex cursor-pointer items-center gap-3 border-b px-4 py-3 hover:bg-slate-50"
-                  >
-                    <img
-                      src={
-                        image ||
-                        "https://via.placeholder.com/150"
-                      }
-                      alt={
-                        product.name
-                      }
-                      className="h-12 w-12 rounded bg-[#f6f7f1] object-contain"
-                    />
-
-                    <div>
-                      <p className="font-bold">
-                        {
-                          product.name
-                        }
-                      </p>
-
-                      <p className="text-sm font-bold text-[#0c831f]">
-                        Rs.{" "}
-                        {
-                          offerPrice
-                        }
-                      </p>
-                    </div>
-                  </div>
-                );
-              }
-            )}
-          </div>
-        )}
-    </div>
-  );
 
   return (
     <nav className="sticky top-0 z-50 border-b border-slate-200 bg-white shadow-sm">
@@ -423,7 +401,13 @@ export default function Navbar() {
 
         <div className="hidden lg:block">
           {showSearchBar && (
-            <SearchBox />
+            <SearchBox
+              search={search}
+              setSearch={setSearch}
+              suggestions={suggestions}
+              handleSelectProduct={handleSelectProduct}
+              mobile={false}
+            />
           )}
         </div>
 
@@ -625,12 +609,17 @@ export default function Navbar() {
 
       {/* MOBILE SEARCH */}
 
-      {showSearch &&
-        showSearchBar && (
-          <div className="px-4 pb-3 lg:hidden">
-            <SearchBox mobile />
-          </div>
-        )}
+      {showSearch && showSearchBar && (
+        <div className="px-4 pb-3 lg:hidden">
+          <SearchBox
+            search={search}
+            setSearch={setSearch}
+            suggestions={suggestions}
+            handleSelectProduct={handleSelectProduct}
+            mobile={true}
+          />
+        </div>
+      )}
 
       {/* MOBILE SIDEBAR */}
 
