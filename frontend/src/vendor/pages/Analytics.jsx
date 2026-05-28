@@ -8,6 +8,11 @@ import api from "../api/api";
 import Sidebar from "../components/Sidebar";
 import Navbar from "../components/Navbar";
 
+import {
+  Menu,
+  X,
+} from "lucide-react";
+
 export default function Analytics() {
 
   const [analytics, setAnalytics] =
@@ -25,75 +30,78 @@ export default function Analytics() {
   const [loading, setLoading] =
     useState(true);
 
+  // MOBILE SIDEBAR
+  const [sidebarOpen, setSidebarOpen] =
+    useState(false);
+
   // ======================================
   // FETCH ANALYTICS
   // ======================================
   useEffect(() => {
 
-  const fetchAnalytics =
-    async () => {
+    const fetchAnalytics =
+      async () => {
 
-      try {
+        try {
 
-        // GET TOKEN
-        const token =
-          localStorage.getItem(
-            "vendorToken"
+          const token =
+            localStorage.getItem(
+              "vendorToken"
+            );
+
+          const { data } =
+            await api.get(
+              "/vendor/analytics",
+              {
+                headers: {
+                  Authorization: `Bearer ${token}`,
+                },
+              }
+            );
+
+          setAnalytics({
+            totalRevenue:
+              data.analytics
+                ?.totalRevenue || 0,
+
+            totalOrders:
+              data.analytics
+                ?.totalOrders || 0,
+
+            totalProducts:
+              data.analytics
+                ?.totalProducts || 0,
+
+            totalCustomers:
+              data.analytics
+                ?.totalCustomers || 0,
+
+            orders:
+              data.orders || [],
+
+            products:
+              data.products || [],
+
+            users:
+              data.users || [],
+          });
+
+        } catch (error) {
+
+          console.log(
+            "ANALYTICS ERROR:",
+            error
           );
 
-        const { data } =
-          await api.get(
-            "/vendor/analytics",
-            {
-              headers: {
-                Authorization: `Bearer ${token}`,
-              },
-            }
-          );
+        } finally {
 
-        setAnalytics({
-          totalRevenue:
-            data.analytics
-              ?.totalRevenue || 0,
+          setLoading(false);
+        }
+      };
 
-          totalOrders:
-            data.analytics
-              ?.totalOrders || 0,
+    fetchAnalytics();
 
-          totalProducts:
-            data.analytics
-              ?.totalProducts || 0,
-
-          totalCustomers:
-            data.analytics
-              ?.totalCustomers || 0,
-
-          orders:
-            data.orders || [],
-
-          products:
-            data.products || [],
-
-          users:
-            data.users || [],
-        });
-
-      } catch (error) {
-
-        console.log(
-          "ANALYTICS ERROR:",
-          error
-        );
-
-      } finally {
-
-        setLoading(false);
-      }
-    };
-
-  fetchAnalytics();
-
-}, []);
+  }, []);
 
   // ======================================
   // STATS
@@ -133,26 +141,83 @@ export default function Analytics() {
 
   return (
 
-    <div className="flex bg-gray-100 min-h-screen">
+    <div className="flex min-h-screen bg-gray-100 overflow-hidden">
 
-      {/* SIDEBAR */}
-      <Sidebar />
+      {/* ======================================
+          MOBILE OVERLAY
+      ====================================== */}
+      {
+        sidebarOpen && (
+          <div
+            className="fixed inset-0 bg-black/50 z-40 lg:hidden"
+            onClick={() =>
+              setSidebarOpen(false)
+            }
+          />
+        )
+      }
 
-      {/* MAIN */}
-      <div className="flex-1">
+      {/* ======================================
+          SIDEBAR
+      ====================================== */}
+      <div
+        className={`
+          fixed lg:static top-0 left-0 z-50
+          h-screen transition-transform duration-300
+          ${sidebarOpen
+            ? "translate-x-0"
+            : "-translate-x-full lg:translate-x-0"
+          }
+        `}
+      >
+        <Sidebar />
+      </div>
 
-        <Navbar />
+      {/* ======================================
+          MAIN CONTENT
+      ====================================== */}
+      <div className="flex-1 flex flex-col min-w-0">
 
-        <div className="p-6">
+        {/* MOBILE TOPBAR */}
+     <div className="sticky top-0 z-30 bg-white shadow-sm">
+     
+               <div className="flex items-center">
+     
+                 {/* MOBILE MENU */}
+                 <button
+                   onClick={() =>
+                     setSidebarOpen(
+                       !sidebarOpen
+                     )
+                   }
+                   className="lg:hidden p-4"
+                 >
+                   {sidebarOpen ? (
+                     <X size={28} />
+                   ) : (
+                     <Menu size={28} />
+                   )}
+                 </button>
+     
+                 <div className="flex-1">
+                   <Navbar />
+                 </div>
+     
+               </div>
+     
+             </div>
+
+        {/* CONTENT */}
+        <div className="p-4 sm:p-6 overflow-x-hidden">
 
           {/* HEADER */}
           <div className="mb-8">
 
-            <h1 className="text-3xl font-bold text-gray-800">
+            <h1 className="text-2xl sm:text-3xl font-bold text-gray-800">
               Vendor Analytics
             </h1>
 
-            <p className="text-gray-500 mt-2">
+            <p className="text-gray-500 mt-2 text-sm sm:text-base">
               Revenue, products,
               customers & orders overview
             </p>
@@ -165,7 +230,7 @@ export default function Analytics() {
 
               <div className="flex justify-center items-center h-[60vh]">
 
-                <div className="text-2xl font-bold text-gray-700 animate-pulse">
+                <div className="text-xl sm:text-2xl font-bold text-gray-700 animate-pulse text-center">
                   Loading Analytics...
                 </div>
 
@@ -175,8 +240,10 @@ export default function Analytics() {
 
               <>
 
-                {/* STATS */}
-                <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6 mb-10">
+                {/* ======================================
+                    STATS
+                ====================================== */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-5 mb-10">
 
                   {
                     stats.map(
@@ -187,16 +254,16 @@ export default function Analytics() {
 
                         <div
                           key={index}
-                          className={`bg-gradient-to-r ${item.color} text-white rounded-3xl p-6 shadow-lg hover:scale-105 transition duration-300`}
+                          className={`bg-gradient-to-r ${item.color} text-white rounded-3xl p-5 sm:p-6 shadow-lg hover:scale-[1.02] transition`}
                         >
 
-                          <p className="text-lg opacity-90">
+                          <p className="text-base sm:text-lg opacity-90">
                             {
                               item.title
                             }
                           </p>
 
-                          <h2 className="text-4xl font-bold mt-4">
+                          <h2 className="text-3xl sm:text-4xl font-bold mt-4 break-words">
                             {
                               item.value
                             }
@@ -209,16 +276,18 @@ export default function Analytics() {
 
                 </div>
 
-                {/* RECENT ORDERS */}
-                <div className="bg-white rounded-3xl shadow-md p-6 mb-8">
+                {/* ======================================
+                    RECENT ORDERS
+                ====================================== */}
+                <div className="bg-white rounded-3xl shadow-md p-4 sm:p-6 mb-8 overflow-hidden">
 
-                  <div className="flex items-center justify-between mb-6">
+                  <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
 
-                    <h2 className="text-2xl font-bold text-gray-800">
+                    <h2 className="text-xl sm:text-2xl font-bold text-gray-800">
                       Recent Orders
                     </h2>
 
-                    <span className="bg-gray-100 px-4 py-2 rounded-full text-sm text-gray-600">
+                    <span className="bg-gray-100 px-4 py-2 rounded-full text-sm text-gray-600 w-fit">
                       {
                         analytics.orders.length
                       } Orders
@@ -226,9 +295,94 @@ export default function Analytics() {
 
                   </div>
 
-                  <div className="overflow-x-auto">
+                  {/* MOBILE CARDS */}
+                  <div className="block lg:hidden space-y-4">
 
-                    <table className="w-full">
+                    {
+                      analytics.orders
+                        ?.slice(0, 6)
+                        ?.map((order) => (
+
+                          <div
+                            key={order._id}
+                            className="border rounded-2xl p-4"
+                          >
+
+                            <div className="flex items-center justify-between mb-3">
+
+                              <h3 className="font-bold">
+                                #
+                                {
+                                  order._id?.slice(
+                                    -6
+                                  )
+                                }
+                              </h3>
+
+                              <span
+                                className={`px-3 py-1 rounded-full text-xs font-semibold
+                                  ${
+                                    order.orderStatus ===
+                                    "Delivered"
+                                      ? "bg-green-100 text-green-700"
+
+                                      : order.orderStatus ===
+                                        "Cancelled"
+                                      ? "bg-red-100 text-red-700"
+
+                                      : "bg-yellow-100 text-yellow-700"
+                                  }`}
+                              >
+                                {
+                                  order.orderStatus
+                                }
+                              </span>
+
+                            </div>
+
+                            <p className="text-sm text-gray-600">
+                              Customer:
+                              <span className="font-semibold ml-1">
+                                {
+                                  order
+                                    ?.shippingAddress
+                                    ?.firstName
+                                }{" "}
+
+                                {
+                                  order
+                                    ?.shippingAddress
+                                    ?.lastName
+                                }
+                              </span>
+                            </p>
+
+                            <p className="text-sm text-gray-600 mt-1">
+                              Payment:
+                              <span className="font-semibold ml-1">
+                                {
+                                  order.paymentMethod
+                                }
+                              </span>
+                            </p>
+
+                            <p className="text-green-600 font-bold mt-2">
+                              ₹
+                              {
+                                order.totalAmount
+                              }
+                            </p>
+
+                          </div>
+                        ))
+                    }
+
+                  </div>
+
+                  {/* DESKTOP TABLE */}
+                  <div className="hidden lg:block overflow-x-auto">
+
+                    <table className="w-full min-w-[800px]">
 
                       <thead>
 
@@ -312,17 +466,17 @@ export default function Analytics() {
 
                                   <span
                                     className={`px-4 py-1 rounded-full text-sm font-semibold
-                                    ${
-                                      order.orderStatus ===
-                                      "Delivered"
-                                        ? "bg-green-100 text-green-700"
+                                      ${
+                                        order.orderStatus ===
+                                        "Delivered"
+                                          ? "bg-green-100 text-green-700"
 
-                                        : order.orderStatus ===
-                                          "Cancelled"
-                                        ? "bg-red-100 text-red-700"
+                                          : order.orderStatus ===
+                                            "Cancelled"
+                                          ? "bg-red-100 text-red-700"
 
-                                        : "bg-yellow-100 text-yellow-700"
-                                    }`}
+                                          : "bg-yellow-100 text-yellow-700"
+                                      }`}
                                   >
                                     {
                                       order.orderStatus
@@ -343,15 +497,17 @@ export default function Analytics() {
 
                 </div>
 
-                {/* PRODUCTS + CUSTOMERS */}
+                {/* ======================================
+                    PRODUCTS + CUSTOMERS
+                ====================================== */}
                 <div className="grid grid-cols-1 xl:grid-cols-2 gap-8">
 
                   {/* PRODUCTS */}
-                  <div className="bg-white rounded-3xl shadow-md p-6">
+                  <div className="bg-white rounded-3xl shadow-md p-4 sm:p-6">
 
                     <div className="flex items-center justify-between mb-6">
 
-                      <h2 className="text-2xl font-bold text-gray-800">
+                      <h2 className="text-xl sm:text-2xl font-bold text-gray-800">
                         Products
                       </h2>
 
@@ -372,7 +528,7 @@ export default function Analytics() {
 
                             <div
                               key={product._id}
-                              className="flex items-center gap-4 border border-gray-200 p-4 rounded-2xl hover:shadow-md transition"
+                              className="flex flex-col sm:flex-row gap-4 border border-gray-200 p-4 rounded-2xl hover:shadow-md transition"
                             >
 
                               <img
@@ -387,7 +543,7 @@ export default function Analytics() {
                                 alt={
                                   product.name
                                 }
-                                className="w-20 h-20 rounded-2xl object-cover border"
+                                className="w-full sm:w-20 h-48 sm:h-20 rounded-2xl object-cover border"
                               />
 
                               <div className="flex-1">
@@ -404,7 +560,7 @@ export default function Analytics() {
                                   }
                                 </p>
 
-                                <div className="flex items-center gap-3 mt-2">
+                                <div className="flex items-center gap-3 mt-2 flex-wrap">
 
                                   <span className="text-green-600 font-bold">
                                     ₹
@@ -433,11 +589,11 @@ export default function Analytics() {
                   </div>
 
                   {/* CUSTOMERS */}
-                  <div className="bg-white rounded-3xl shadow-md p-6">
+                  <div className="bg-white rounded-3xl shadow-md p-4 sm:p-6">
 
                     <div className="flex items-center justify-between mb-6">
 
-                      <h2 className="text-2xl font-bold text-gray-800">
+                      <h2 className="text-xl sm:text-2xl font-bold text-gray-800">
                         Customers
                       </h2>
 
@@ -458,7 +614,7 @@ export default function Analytics() {
 
                             <div
                               key={order._id}
-                              className="flex items-center justify-between border border-gray-200 rounded-2xl p-4 hover:shadow-md transition"
+                              className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 border border-gray-200 rounded-2xl p-4 hover:shadow-md transition"
                             >
 
                               <div className="flex items-center gap-4">
@@ -493,7 +649,7 @@ export default function Analytics() {
 
                                   </h3>
 
-                                  <p className="text-gray-500 text-sm">
+                                  <p className="text-gray-500 text-sm break-all">
 
                                     {
                                       order
@@ -507,7 +663,7 @@ export default function Analytics() {
 
                               </div>
 
-                              <span className="text-sm bg-gray-100 px-3 py-1 rounded-full text-gray-600">
+                              <span className="text-sm bg-gray-100 px-3 py-1 rounded-full text-gray-600 w-fit">
                                 Customer
                               </span>
 

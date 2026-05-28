@@ -217,7 +217,19 @@ const ProductDetails = () => {
   // =====================================
   // ADD TO CART
   // =====================================
- const handleAddToCart = () => {
+// =====================================
+// ADD TO CART
+// =====================================
+const handleAddToCart = () => {
+
+  // CHECK STOCK
+  if (
+    !selectedVariant ||
+    selectedVariant.stockQuantity <= 0
+  ) {
+    alert("Product is out of stock");
+    return;
+  }
 
   addToCart({
     ...product,
@@ -227,10 +239,13 @@ const ProductDetails = () => {
       price: selectedVariant?.price,
       offerPrice:
         selectedVariant?.offerPrice,
+      stockQuantity:
+        selectedVariant?.stockQuantity,
     },
   });
-};
 
+  alert("Product added to cart");
+};
   if (!product) {
     return (
       <div className="text-center py-20">
@@ -385,18 +400,46 @@ const ProductDetails = () => {
             </div>
           </div>
 
-          {/* STOCK */}
-          <p
-            className={`mt-5 font-medium ${
-              product.inStock
-                ? "text-green-600"
-                : "text-red-500"
-            }`}
-          >
-            {product.inStock
-              ? "In Stock"
-              : "Out of Stock"}
-          </p>
+         {/* STOCK */}
+<div className="mt-5">
+
+  {selectedVariant?.stockQuantity > 0 ? (
+
+    <div className="space-y-1">
+
+      <p className="text-green-600 font-semibold">
+        In Stock
+      </p>
+
+      <p className="text-gray-700">
+        Available Quantity:
+        <span className="font-bold ml-2">
+          {selectedVariant?.stockQuantity}
+        </span>
+      </p>
+
+    </div>
+
+  ) : (
+
+    <div className="space-y-1">
+
+      <p className="text-red-500 font-semibold">
+        Out of Stock
+      </p>
+
+      <p className="text-gray-500">
+        Available Quantity:
+        <span className="font-bold ml-2">
+          0
+        </span>
+      </p>
+
+    </div>
+
+  )}
+
+</div>
 
           {/* DESCRIPTION */}
           <div className="mt-6">
@@ -433,13 +476,20 @@ const ProductDetails = () => {
           {/* BUTTONS */}
           <div className="flex gap-4 mt-10">
             <button
-              onClick={
-                handleAddToCart
-              }
-              className="bg-green-600 hover:bg-green-700 text-white px-8 py-3 rounded-lg"
-            >
-              Add To Cart
-            </button>
+  onClick={handleAddToCart}
+  disabled={
+    selectedVariant?.stockQuantity <= 0
+  }
+  className={`px-8 py-3 rounded-lg text-white ${
+    selectedVariant?.stockQuantity > 0
+      ? "bg-green-600 hover:bg-green-700"
+      : "bg-gray-400 cursor-not-allowed"
+  }`}
+>
+  {selectedVariant?.stockQuantity > 0
+    ? "Add To Cart"
+    : "Out Of Stock"}
+</button>
 
             <button
               onClick={() =>

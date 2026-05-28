@@ -9,13 +9,10 @@ import axios from "axios";
 import {
   useNavigate,
 } from "react-router-dom";
+
 import {
   ShopContext,
 } from "../context/ShopContext";
-
-// import Navbar from "../components/Navbar";
-
-// import Sidebar from "../components/Sidebar";
 
 const WishList = () => {
 
@@ -126,11 +123,7 @@ const WishList = () => {
 
       <div className="flex">
 
-        {/* <Sidebar /> */}
-
         <div className="flex-1">
-
-          {/* <Navbar /> */}
 
           <div className="p-10 text-2xl font-bold">
             Loading Wishlist...
@@ -146,13 +139,8 @@ const WishList = () => {
 
     <div className="flex bg-gray-100 min-h-screen">
 
-      {/* SIDEBAR */}
-      {/* <Sidebar /> */}
-
       {/* MAIN */}
       <div className="flex-1">
-
-        {/* <Navbar /> */}
 
         <div className="p-6">
 
@@ -196,7 +184,8 @@ const WishList = () => {
 
             ) : (
 
-<div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
+              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
+
                 {
                   wishlist.map(
                     (item) => {
@@ -204,86 +193,158 @@ const WishList = () => {
                       const product =
                         item.product;
 
+                      // ======================================
+                      // GET FIRST VARIANT
+                      // ======================================
+                      const firstVariant =
+                        product?.variants?.[0];
+
+                      // ======================================
+                      // TOTAL STOCK
+                      // ======================================
+                      const totalStock =
+                        product?.variants?.reduce(
+                          (
+                            total,
+                            variant
+                          ) =>
+                            total +
+                            Number(
+                              variant.stockQuantity || 0
+                            ),
+                          0
+                        ) || 0;
+
                       return (
 
                         <div
-  key={item._id}
-  className="bg-white rounded-2xl shadow-sm hover:shadow-lg transition overflow-hidden border"
->
-  {/* IMAGE */}
-  <div className="relative">
-    <img
-      src={
-        Array.isArray(product?.image)
-          ? product?.image[0]
-          : product?.image
-      }
-      alt={product?.name}
-      className="w-full h-40 object-cover"
-    />
+                          key={item._id}
+                          className="bg-white rounded-2xl shadow-sm hover:shadow-lg transition overflow-hidden border"
+                        >
 
-    <span
-      className={`absolute top-2 right-2 text-xs px-2 py-1 rounded-full font-medium ${
-        product?.inStock
-          ? "bg-green-100 text-green-700"
-          : "bg-red-100 text-red-600"
-      }`}
-    >
-      {product?.inStock
-        ? "In Stock"
-        : "Out of Stock"}
-    </span>
-  </div>
+                          {/* IMAGE */}
+                          <div className="relative">
 
-  {/* CONTENT */}
-  <div className="p-3">
+                            <img
+                              src={
+                                Array.isArray(product?.image)
+                                  ? product?.image[0]
+                                  : product?.image
+                              }
+                              alt={product?.name}
+                              className="w-full h-40 object-cover"
+                            />
 
-    <p className="text-xs text-gray-500 mb-1">
-      {product?.category}
-    </p>
+                            <span
+                              className={`absolute top-2 right-2 text-xs px-2 py-1 rounded-full font-medium ${
+                                totalStock > 0
+                                  ? "bg-green-100 text-green-700"
+                                  : "bg-red-100 text-red-600"
+                              }`}
+                            >
+                              {totalStock > 0
+                                ? "In Stock"
+                                : "Out of Stock"}
+                            </span>
 
-    <h2 className="font-semibold text-sm text-gray-800 line-clamp-2 min-h-[40px]">
-      {product?.name}
-    </h2>
+                          </div>
 
-    {/* PRICE */}
-    <div className="flex items-center gap-2 mt-2">
-      <span className="text-lg font-bold text-green-600">
-        ₹{product?.offerPrice}
-      </span>
+                          {/* CONTENT */}
+                          <div className="p-3">
 
-      <span className="text-xs text-gray-400 line-through">
-        ₹{product?.price}
-      </span>
-    </div>
+                            
 
-    {/* BUTTONS */}
-    <div className="flex gap-2 mt-3">
-      <button
-        onClick={() =>
-          navigate(
-            `/products/${product?._id}`
-          )
-        }
-        className="flex-1 bg-black text-white text-xs py-2 rounded-lg hover:bg-gray-800"
-      >
-        View
-      </button>
+                            {/* NAME */}
+                            <h2 className="font-semibold text-sm text-gray-800 line-clamp-2 min-h-[40px]">
 
-      <button
-        onClick={() =>
-          removeItem(
-            product?._id
-          )
-        }
-        className="flex-1 bg-red-500 text-white text-xs py-2 rounded-lg hover:bg-red-600"
-      >
-        Remove
-      </button>
-    </div>
+                              {product?.name}
 
-  </div>
-</div>
+                            </h2>
+
+                            {/* PRICE */}
+                            <div className="flex items-center gap-2 mt-2">
+
+                              <span className="text-lg font-bold text-green-600">
+
+                                ₹
+                                {
+                                  firstVariant?.offerPrice || 0
+                                }
+
+                              </span>
+
+                              <span className="text-xs text-gray-400 line-through">
+
+                                ₹
+                                {
+                                  firstVariant?.price || 0
+                                }
+
+                              </span>
+
+                            </div>
+
+                            {/* STOCK */}
+                            <p className="text-xs text-gray-500 mt-1">
+
+                              Stock:
+                              <span className="font-semibold ml-1">
+                                {totalStock}
+                              </span>
+
+                            </p>
+
+                            {/* SIZE */}
+                            <div className="flex flex-wrap gap-1 mt-2">
+
+                              {product?.variants?.map(
+                                (
+                                  variant,
+                                  index
+                                ) => (
+
+                                  <span
+                                    key={index}
+                                    className="bg-gray-100 text-xs px-2 py-1 rounded-full"
+                                  >
+                                    {variant.size}
+                                  </span>
+
+                                )
+                              )}
+
+                            </div>
+
+                            {/* BUTTONS */}
+                            <div className="flex gap-2 mt-3">
+
+                              <button
+                                onClick={() =>
+                                  navigate(
+                                    `/products/${product?._id}`
+                                  )
+                                }
+                                className="flex-1 bg-black text-white text-xs py-2 rounded-lg hover:bg-gray-800"
+                              >
+                                View
+                              </button>
+
+                              <button
+                                onClick={() =>
+                                  removeItem(
+                                    product?._id
+                                  )
+                                }
+                                className="flex-1 bg-red-500 text-white text-xs py-2 rounded-lg hover:bg-red-600"
+                              >
+                                Remove
+                              </button>
+
+                            </div>
+
+                          </div>
+
+                        </div>
                       );
                     }
                   )

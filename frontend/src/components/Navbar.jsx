@@ -269,7 +269,7 @@ export default function Navbar() {
       "user"
     );
 
-    navigate("/login");
+    navigate("/");
 
     setUserMenu(false);
     setOpen(false);

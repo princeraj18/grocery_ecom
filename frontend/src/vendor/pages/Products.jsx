@@ -3,12 +3,20 @@ import React, {
   useState,
 } from "react";
 
-import { useNavigate } from "react-router-dom";
+import {
+  useNavigate,
+} from "react-router-dom";
 
 import axios from "axios";
 
+import {
+  FaBars,
+  FaTimes,
+} from "react-icons/fa";
+
 import Sidebar from "../components/Sidebar";
 import Navbar from "../components/Navbar";
+import { Menu, X } from "lucide-react";
 
 export default function Products() {
 
@@ -18,10 +26,14 @@ export default function Products() {
   const [loading, setLoading] =
     useState(true);
 
-  const navigate = useNavigate();
+  const [sidebarOpen, setSidebarOpen] =
+    useState(false);
+
+  const navigate =
+    useNavigate();
 
   // =========================
-  // FETCH VENDOR PRODUCTS
+  // FETCH PRODUCTS
   // =========================
   const fetchProducts =
     async () => {
@@ -44,11 +56,6 @@ export default function Products() {
               },
             }
           );
-
-        console.log(
-          "VENDOR PRODUCTS:",
-          data.products
-        );
 
         setProducts(
           data.products || []
@@ -132,33 +139,94 @@ export default function Products() {
 
   return (
 
-    <div className="flex min-h-screen bg-gray-100">
+    <div className="flex min-h-screen bg-gray-100 overflow-hidden">
 
+      {/* ========================= */}
+      {/* MOBILE SIDEBAR OVERLAY */}
+      {/* ========================= */}
+      {sidebarOpen && (
+
+        <div
+          className="fixed inset-0 bg-black/50 z-40 lg:hidden"
+          onClick={() =>
+            setSidebarOpen(false)
+          }
+        />
+
+      )}
+
+      {/* ========================= */}
       {/* SIDEBAR */}
-      <Sidebar />
+      {/* ========================= */}
+      <div
+        className={`
+          fixed lg:static top-0 left-0 z-50
+          h-full transition-transform duration-300
+          ${
+            sidebarOpen
+              ? "translate-x-0"
+              : "-translate-x-full lg:translate-x-0"
+          }
+        `}
+      >
+        <Sidebar />
+      </div>
 
-      {/* MAIN */}
-      <div className="flex-1">
+      {/* ========================= */}
+      {/* MAIN CONTENT */}
+      {/* ========================= */}
+      <div className="flex-1 flex flex-col min-w-0">
 
-        <Navbar />
+        {/* ========================= */}
+        {/* TOPBAR */}
+        {/* ========================= */}
+        <div className="sticky top-0 z-30 bg-white shadow-sm">
 
-        <div className="p-6">
+          <div className="flex items-center">
+
+            {/* MOBILE MENU */}
+            <button
+              onClick={() =>
+                setSidebarOpen(
+                  !sidebarOpen
+                )
+              }
+              className="lg:hidden p-4"
+            >
+              {sidebarOpen ? (
+                <X size={28} />
+              ) : (
+                <Menu size={28} />
+              )}
+            </button>
+
+            <div className="flex-1">
+              <Navbar />
+            </div>
+
+          </div>
+
+        </div>
+
+        {/* ========================= */}
+        {/* PAGE CONTENT */}
+        {/* ========================= */}
+        <div className="p-4 md:p-6 overflow-x-hidden">
 
           {/* HEADER */}
-          <div className="flex items-center justify-between mb-6">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
 
-            <h1 className="text-3xl font-bold">
+            <h1 className="text-2xl md:text-3xl font-bold">
               My Products
             </h1>
 
-            {/* ADD PRODUCT */}
             <button
               onClick={() =>
                 navigate(
                   "/vendor/products/create"
                 )
               }
-              className="bg-green-600 hover:bg-green-700 text-white px-5 py-3 rounded-lg font-semibold shadow"
+              className="bg-green-600 hover:bg-green-700 text-white px-5 py-3 rounded-lg font-semibold shadow w-full sm:w-auto"
             >
               + Add Product
             </button>
@@ -180,215 +248,357 @@ export default function Products() {
 
           ) : (
 
-            <div className="overflow-x-auto bg-white rounded-xl shadow">
+            <>
+              {/* ========================= */}
+              {/* DESKTOP TABLE */}
+              {/* ========================= */}
+              <div className="hidden xl:block overflow-x-auto bg-white rounded-2xl shadow">
 
-              <table className="w-full">
+                <table className="w-full min-w-[1100px]">
 
-                {/* TABLE HEADER */}
-                <thead className="bg-black text-white">
+                  <thead className="bg-black text-white">
 
-                  <tr>
+                    <tr>
 
-                    <th className="p-4 text-left">
-                      Image
-                    </th>
+                      <th className="p-4 text-left">
+                        Image
+                      </th>
 
-                    <th className="p-4 text-left">
-                      Product
-                    </th>
+                      <th className="p-4 text-left">
+                        Product
+                      </th>
 
-                    <th className="p-4 text-left">
-                      Category
-                    </th>
+                      <th className="p-4 text-left">
+                        Category
+                      </th>
 
-                    <th className="p-4 text-left">
-                      Price
-                    </th>
+                      <th className="p-4 text-left">
+                        Price
+                      </th>
 
-                    <th className="p-4 text-left">
-                      Offer Price
-                    </th>
+                      <th className="p-4 text-left">
+                        Offer Price
+                      </th>
 
-                    <th className="p-4 text-left">
-                      Stock
-                    </th>
+                      <th className="p-4 text-left">
+                        Stock
+                      </th>
 
-                    <th className="p-4 text-left">
-                      Variants
-                    </th>
+                      <th className="p-4 text-left">
+                        Variants
+                      </th>
 
-                    <th className="p-4 text-left">
-                      Actions
-                    </th>
+                      <th className="p-4 text-left">
+                        Actions
+                      </th>
 
-                  </tr>
+                    </tr>
 
-                </thead>
+                  </thead>
 
-                {/* TABLE BODY */}
-                <tbody>
+                  <tbody>
 
-                  {products.map(
-                    (product) => {
+                    {products.map(
+                      (product) => {
 
-                      // =========================
-                      // CATEGORY FIX
-                      // =========================
-                      const categoryName =
-                        typeof product.category ===
-                        "object"
-                          ? product.category?.text
-                          : product.category;
+                        const categoryName =
+                          product.category?.text ||
+                          product.category?.name ||
+                          product.category ||
+                          "No Category";
 
-                      // =========================
-                      // PRICE FIX
-                      // =========================
-                      const firstVariant =
-                        product.variants?.[0];
+                        const firstVariant =
+                          product.variants?.[0];
 
-                      // =========================
-                      // STOCK FIX
-                      // =========================
-                    const totalStock =
-  product.variants?.reduce(
-    (total, variant) => {
+                        const totalStock =
+                          product.variants?.reduce(
+                            (
+                              total,
+                              variant
+                            ) => {
 
-      return (
-        total +
-        (parseInt(
-          variant.stockQuantity
-        ) || 0)
-      );
-    },
-    0
-  ) || 0;
-
-                      return (
-
-                        <tr
-                          key={product._id}
-                          className="border-b hover:bg-gray-50"
-                        >
-
-                          {/* IMAGE */}
-                          <td className="p-4">
-
-                            <img
-                              src={
-                                product.image?.[0]
-                              }
-                              alt={
-                                product.name
-                              }
-                              className="w-16 h-16 object-cover rounded-lg border"
-                            />
-
-                          </td>
-
-                          {/* NAME */}
-                          <td className="p-4 font-semibold">
-                            {product.name}
-                          </td>
-
-                          {/* CATEGORY */}
-                          <td className="p-4">
-
-                            {categoryName ||
-                              "No Category"}
-
-                          </td>
-
-                          {/* PRICE */}
-                          <td className="p-4">
-
-                            ₹
-                            {firstVariant?.price || 0}
-
-                          </td>
-
-                          {/* OFFER PRICE */}
-                          <td className="p-4 text-green-600 font-bold">
-
-                            ₹
-                            {firstVariant?.offerPrice || 0}
-
-                          </td>
-
-                          {/* STOCK */}
-                          <td className="p-4 font-semibold">
-
-                            {totalStock}
-
-                          </td>
-
-                          {/* VARIANTS */}
-                          <td className="p-4">
-
-                            <div className="flex flex-wrap gap-2">
-
-                              {product.variants?.map(
+                              return (
+                                total +
                                 (
-                                  variant,
-                                  index
-                                ) => (
-
-                                  <span
-                                    key={index}
-                                    className="bg-gray-200 px-3 py-1 rounded-full text-sm"
-                                  >
-                                    {variant.size}
-                                  </span>
-
+                                  parseInt(
+                                    variant.stockQuantity
+                                  ) || 0
                                 )
-                              )}
+                              );
+                            },
+                            0
+                          ) || 0;
+
+                        return (
+
+                          <tr
+                            key={product._id}
+                            className="border-b hover:bg-gray-50"
+                          >
+
+                            {/* IMAGE */}
+                            <td className="p-4">
+
+                              <img
+                                src={
+                                  product.image?.[0]
+                                }
+                                alt={
+                                  product.name
+                                }
+                                className="w-16 h-16 object-cover rounded-lg border"
+                              />
+
+                            </td>
+
+                            {/* NAME */}
+                            <td className="p-4 font-semibold">
+                              {product.name}
+                            </td>
+
+                            {/* CATEGORY */}
+                            <td className="p-4">
+                              {categoryName}
+                            </td>
+
+                            {/* PRICE */}
+                            <td className="p-4">
+                              ₹
+                              {firstVariant?.price || 0}
+                            </td>
+
+                            {/* OFFER PRICE */}
+                            <td className="p-4 text-green-600 font-bold">
+                              ₹
+                              {firstVariant?.offerPrice || 0}
+                            </td>
+
+                            {/* STOCK */}
+                            <td className="p-4 font-semibold">
+                              {totalStock}
+                            </td>
+
+                            {/* VARIANTS */}
+                            <td className="p-4">
+
+                              <div className="flex flex-wrap gap-2">
+
+                                {product.variants?.map(
+                                  (
+                                    variant,
+                                    index
+                                  ) => (
+
+                                    <span
+                                      key={index}
+                                      className="bg-gray-200 px-3 py-1 rounded-full text-sm"
+                                    >
+                                      {
+                                        variant.size
+                                      }
+                                    </span>
+
+                                  )
+                                )}
+
+                              </div>
+
+                            </td>
+
+                            {/* ACTIONS */}
+                            <td className="p-4">
+
+                              <div className="flex gap-3">
+
+                                <button
+                                  onClick={() =>
+                                    navigate(
+                                      `/vendor/products/edit/${product._id}`
+                                    )
+                                  }
+                                  className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg"
+                                >
+                                  Edit
+                                </button>
+
+                                <button
+                                  onClick={() =>
+                                    deleteProduct(
+                                      product._id
+                                    )
+                                  }
+                                  className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg"
+                                >
+                                  Delete
+                                </button>
+
+                              </div>
+
+                            </td>
+
+                          </tr>
+                        );
+                      }
+                    )}
+
+                  </tbody>
+
+                </table>
+
+              </div>
+
+              {/* ========================= */}
+              {/* MOBILE + TABLET CARDS */}
+              {/* ========================= */}
+              <div className="grid grid-cols-1 md:grid-cols-2 xl:hidden gap-5">
+
+                {products.map(
+                  (product) => {
+
+                    const categoryName =
+                      product.category?.text ||
+                      product.category?.name ||
+                      product.category ||
+                      "No Category";
+
+                    const firstVariant =
+                      product.variants?.[0];
+
+                    const totalStock =
+                      product.variants?.reduce(
+                        (
+                          total,
+                          variant
+                        ) => {
+
+                          return (
+                            total +
+                            (
+                              parseInt(
+                                variant.stockQuantity
+                              ) || 0
+                            )
+                          );
+                        },
+                        0
+                      ) || 0;
+
+                    return (
+
+                      <div
+                        key={product._id}
+                        className="bg-white rounded-2xl shadow-md p-4 hover:shadow-lg transition"
+                      >
+
+                        {/* PRODUCT TOP */}
+                        <div className="flex gap-4">
+
+                          <img
+                            src={
+                              product.image?.[0]
+                            }
+                            alt={
+                              product.name
+                            }
+                            className="w-24 h-24 md:w-28 md:h-28 object-cover rounded-xl border"
+                          />
+
+                          <div className="flex-1 min-w-0">
+
+                            <h2 className="font-bold text-lg truncate">
+                              {product.name}
+                            </h2>
+
+                            <p className="text-gray-500 text-sm mt-1">
+                              {categoryName}
+                            </p>
+
+                            <div className="mt-3 space-y-1">
+
+                              <p className="text-sm">
+                                Price:
+                                <span className="font-semibold ml-1">
+                                  ₹
+                                  {firstVariant?.price || 0}
+                                </span>
+                              </p>
+
+                              <p className="text-sm text-green-600 font-bold">
+                                Offer:
+                                <span className="ml-1">
+                                  ₹
+                                  {firstVariant?.offerPrice || 0}
+                                </span>
+                              </p>
+
+                              <p className="text-sm">
+                                Stock:
+                                <span className="font-semibold ml-1">
+                                  {totalStock}
+                                </span>
+                              </p>
 
                             </div>
 
-                          </td>
+                          </div>
 
-                          {/* ACTIONS */}
-                          <td className="p-4">
+                        </div>
 
-                            <div className="flex gap-3">
+                        {/* VARIANTS */}
+                        <div className="flex flex-wrap gap-2 mt-4">
 
-                              {/* EDIT */}
-                              <button
-                                onClick={() =>
-                                  navigate(
-                                    `/vendor/products/edit/${product._id}`
-                                  )
-                                }
-                                className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg"
+                          {product.variants?.map(
+                            (
+                              variant,
+                              index
+                            ) => (
+
+                              <span
+                                key={index}
+                                className="bg-gray-200 px-3 py-1 rounded-full text-xs"
                               >
-                                Edit
-                              </button>
+                                {variant.size}
+                              </span>
 
-                              {/* DELETE */}
-                              <button
-                                onClick={() =>
-                                  deleteProduct(
-                                    product._id
-                                  )
-                                }
-                                className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg"
-                              >
-                                Delete
-                              </button>
+                            )
+                          )}
 
-                            </div>
+                        </div>
 
-                          </td>
+                        {/* BUTTONS */}
+                        <div className="flex flex-col sm:flex-row gap-3 mt-5">
 
-                        </tr>
-                      );
-                    }
-                  )}
+                          <button
+                            onClick={() =>
+                              navigate(
+                                `/vendor/products/edit/${product._id}`
+                              )
+                            }
+                            className="flex-1 bg-blue-500 hover:bg-blue-600 text-white py-2 rounded-lg"
+                          >
+                            Edit
+                          </button>
 
-                </tbody>
+                          <button
+                            onClick={() =>
+                              deleteProduct(
+                                product._id
+                              )
+                            }
+                            className="flex-1 bg-red-500 hover:bg-red-600 text-white py-2 rounded-lg"
+                          >
+                            Delete
+                          </button>
 
-              </table>
+                        </div>
 
-            </div>
+                      </div>
+                    );
+                  }
+                )}
+
+              </div>
+            </>
           )}
 
         </div>

@@ -6,8 +6,12 @@ import React, {
 import axios from "axios";
 
 import Sidebar from "../components/Sidebar";
-
 import Navbar from "../components/Navbar";
+
+import {
+  Menu,
+  X,
+} from "lucide-react";
 
 export default function Profile() {
 
@@ -25,6 +29,10 @@ export default function Profile() {
 
   const [logo, setLogo] =
     useState(null);
+
+  // MOBILE SIDEBAR
+  const [sidebarOpen, setSidebarOpen] =
+    useState(false);
 
   const [formData, setFormData] =
     useState({
@@ -228,19 +236,37 @@ export default function Profile() {
 
     return (
 
-      <div className="flex">
+      <div className="flex bg-gray-100 min-h-screen">
 
-        <Sidebar />
+       
 
-        <div className="flex-1 bg-gray-100 min-h-screen">
-
-          <Navbar />
-
-          <div className="p-10 text-xl font-semibold">
-            Loading...
-          </div>
-
-        </div>
+       <div className="sticky top-0 z-30 bg-white shadow-sm">
+       
+                 <div className="flex items-center">
+       
+                   {/* MOBILE MENU */}
+                   <button
+                     onClick={() =>
+                       setSidebarOpen(
+                         !sidebarOpen
+                       )
+                     }
+                     className="lg:hidden p-4"
+                   >
+                     {sidebarOpen ? (
+                       <X size={28} />
+                     ) : (
+                       <Menu size={28} />
+                     )}
+                   </button>
+       
+                   <div className="flex-1">
+                     <Navbar />
+                   </div>
+       
+                 </div>
+       
+               </div>
 
       </div>
     );
@@ -248,130 +274,213 @@ export default function Profile() {
 
   return (
 
-    <div className="flex">
+    <div className="flex bg-gray-100 min-h-screen overflow-hidden">
 
-      {/* SIDEBAR */}
-      <Sidebar />
+      {/* ===================================== */}
+      {/* DESKTOP SIDEBAR */}
+      {/* ===================================== */}
+      <div className="hidden lg:block">
 
+        <Sidebar />
+
+      </div>
+
+      {/* ===================================== */}
+      {/* MOBILE SIDEBAR */}
+      {/* ===================================== */}
+      {sidebarOpen && (
+
+        <>
+
+          {/* OVERLAY */}
+          <div
+            className="fixed inset-0 bg-black/50 z-40 lg:hidden"
+            onClick={() =>
+              setSidebarOpen(false)
+            }
+          />
+
+          {/* SIDEBAR */}
+          <div className="fixed top-0 left-0 z-50 h-full lg:hidden">
+
+            <Sidebar />
+
+          </div>
+
+        </>
+      )}
+
+      {/* ===================================== */}
       {/* MAIN */}
-      <div className="flex-1 bg-gray-100 min-h-screen">
+      {/* ===================================== */}
+      <div className="flex-1 flex flex-col overflow-hidden">
 
-        <Navbar />
+        <div className="sticky top-0 z-30 bg-white shadow-sm">
+        
+                  <div className="flex items-center">
+        
+                    {/* MOBILE MENU */}
+                    <button
+                      onClick={() =>
+                        setSidebarOpen(
+                          !sidebarOpen
+                        )
+                      }
+                      className="lg:hidden p-4"
+                    >
+                      {sidebarOpen ? (
+                        <X size={28} />
+                      ) : (
+                        <Menu size={28} />
+                      )}
+                    </button>
+        
+                    <div className="flex-1">
+                      <Navbar />
+                    </div>
+        
+                  </div>
+        
+                </div>
 
-        <div className="p-6">
+        {/* CONTENT */}
+        <div className="flex-1 overflow-y-auto p-4 sm:p-6">
 
           {/* HEADING */}
-          <h1 className="text-3xl font-bold mb-6">
-            Vendor Profile
-          </h1>
+          <div className="mb-6">
+
+            <h1 className="hidden lg:block text-3xl font-bold">
+              Vendor Profile
+            </h1>
+
+            <p className="text-gray-500 mt-2">
+              Manage your vendor details
+            </p>
+
+          </div>
 
           {/* CARD */}
-          <div className="bg-white rounded-2xl shadow p-8 max-w-4xl">
+          <div className="bg-white rounded-3xl shadow-lg p-5 sm:p-8 max-w-5xl mx-auto">
 
             <form
               onSubmit={handleSubmit}
-              className="space-y-6"
+              className="space-y-8"
             >
 
-              {/* LOGO */}
+              {/* PROFILE IMAGE */}
               <div className="flex flex-col items-center">
 
-                <img
-                  src={
-                    logoPreview ||
-                    "https://via.placeholder.com/150"
-                  }
-                  alt="Vendor Logo"
-                  className="w-32 h-32 rounded-full object-cover border-4 border-gray-200"
-                />
+                <div className="relative">
 
-                <input
-                  type="file"
-                  accept="image/*"
-                  onChange={handleLogo}
-                  className="mt-4"
-                />
+                  <img
+                    src={
+                      logoPreview ||
+                      "https://via.placeholder.com/150"
+                    }
+                    alt="Vendor Logo"
+                    className="w-32 h-32 sm:w-40 sm:h-40 rounded-full object-cover border-4 border-gray-200 shadow"
+                  />
+
+                </div>
+
+                <label className="mt-5 cursor-pointer bg-black text-white px-5 py-2 rounded-xl hover:bg-gray-800 transition">
+
+                  Change Logo
+
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={handleLogo}
+                    className="hidden"
+                  />
+
+                </label>
 
               </div>
 
-              {/* SHOP NAME */}
-              <div>
+              {/* FORM GRID */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
 
-                <label className="block font-semibold mb-2">
-                  Shop Name
-                </label>
+                {/* SHOP NAME */}
+                <div>
 
-                <input
-                  type="text"
-                  name="shopName"
-                  value={
-                    formData.shopName
-                  }
-                  onChange={
-                    handleChange
-                  }
-                  className="w-full border p-3 rounded-lg"
-                />
+                  <label className="block font-semibold mb-2">
+                    Shop Name
+                  </label>
 
-              </div>
+                  <input
+                    type="text"
+                    name="shopName"
+                    value={
+                      formData.shopName
+                    }
+                    onChange={
+                      handleChange
+                    }
+                    className="w-full border border-gray-300 p-3 rounded-xl focus:outline-none focus:ring-2 focus:ring-black"
+                  />
 
-              {/* OWNER NAME */}
-              <div>
+                </div>
 
-                <label className="block font-semibold mb-2">
-                  Owner Name
-                </label>
+                {/* OWNER NAME */}
+                <div>
 
-                <input
-                  type="text"
-                  name="ownerName"
-                  value={
-                    formData.ownerName
-                  }
-                  onChange={
-                    handleChange
-                  }
-                  className="w-full border p-3 rounded-lg"
-                />
+                  <label className="block font-semibold mb-2">
+                    Owner Name
+                  </label>
 
-              </div>
+                  <input
+                    type="text"
+                    name="ownerName"
+                    value={
+                      formData.ownerName
+                    }
+                    onChange={
+                      handleChange
+                    }
+                    className="w-full border border-gray-300 p-3 rounded-xl focus:outline-none focus:ring-2 focus:ring-black"
+                  />
 
-              {/* EMAIL */}
-              <div>
+                </div>
 
-                <label className="block font-semibold mb-2">
-                  Email
-                </label>
+                {/* EMAIL */}
+                <div>
 
-                <input
-                  type="email"
-                  value={
-                    formData.email
-                  }
-                  disabled
-                  className="w-full border p-3 rounded-lg bg-gray-100 cursor-not-allowed"
-                />
+                  <label className="block font-semibold mb-2">
+                    Email
+                  </label>
 
-              </div>
+                  <input
+                    type="email"
+                    value={
+                      formData.email
+                    }
+                    disabled
+                    className="w-full border border-gray-300 p-3 rounded-xl bg-gray-100 cursor-not-allowed"
+                  />
 
-              {/* PHONE */}
-              <div>
+                </div>
 
-                <label className="block font-semibold mb-2">
-                  Phone
-                </label>
+                {/* PHONE */}
+                <div>
 
-                <input
-                  type="text"
-                  name="phone"
-                  value={
-                    formData.phone
-                  }
-                  onChange={
-                    handleChange
-                  }
-                  className="w-full border p-3 rounded-lg"
-                />
+                  <label className="block font-semibold mb-2">
+                    Phone
+                  </label>
+
+                  <input
+                    type="text"
+                    name="phone"
+                    value={
+                      formData.phone
+                    }
+                    onChange={
+                      handleChange
+                    }
+                    className="w-full border border-gray-300 p-3 rounded-xl focus:outline-none focus:ring-2 focus:ring-black"
+                  />
+
+                </div>
 
               </div>
 
@@ -384,27 +493,27 @@ export default function Profile() {
 
                 <textarea
                   name="address"
-                  rows="4"
+                  rows="5"
                   value={
                     formData.address
                   }
                   onChange={
                     handleChange
                   }
-                  className="w-full border p-3 rounded-lg"
+                  className="w-full border border-gray-300 p-4 rounded-xl focus:outline-none focus:ring-2 focus:ring-black"
                 />
 
               </div>
 
-              {/* VERIFIED STATUS */}
+              {/* VERIFICATION */}
               <div>
 
-                <label className="block font-semibold mb-2">
+                <label className="block font-semibold mb-3">
                   Verification Status
                 </label>
 
                 <div
-                  className={`inline-block px-4 py-2 rounded-full text-white font-semibold ${
+                  className={`inline-flex items-center px-5 py-2 rounded-full text-white font-semibold ${
                     formData.isVerified
                       ? "bg-green-500"
                       : "bg-red-500"
@@ -418,15 +527,19 @@ export default function Profile() {
               </div>
 
               {/* BUTTON */}
-              <button
-                type="submit"
-                disabled={updating}
-                className="bg-black hover:bg-gray-800 text-white px-8 py-3 rounded-lg font-semibold"
-              >
-                {updating
-                  ? "Updating..."
-                  : "Update Profile"}
-              </button>
+              <div className="flex justify-center sm:justify-start">
+
+                <button
+                  type="submit"
+                  disabled={updating}
+                  className="w-full sm:w-auto bg-black hover:bg-gray-800 text-white px-10 py-3 rounded-xl font-semibold transition"
+                >
+                  {updating
+                    ? "Updating..."
+                    : "Update Profile"}
+                </button>
+
+              </div>
 
             </form>
 

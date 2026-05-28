@@ -6,8 +6,12 @@ import React, {
 import axios from "axios";
 
 import Sidebar from "../components/Sidebar";
-
 import Navbar from "../components/Navbar";
+
+import {
+  Menu,
+  X,
+} from "lucide-react";
 
 export default function Orders() {
 
@@ -16,6 +20,9 @@ export default function Orders() {
 
   const [loading, setLoading] =
     useState(true);
+
+  const [sidebarOpen, setSidebarOpen] =
+    useState(false);
 
   // ====================================
   // FETCH ORDERS
@@ -42,7 +49,7 @@ export default function Orders() {
           );
 
         setOrders(
-          data.orders
+          data.orders || []
         );
 
       } catch (error) {
@@ -104,94 +111,182 @@ export default function Orders() {
 
   return (
 
-    <div className="flex">
+    <div className="flex min-h-screen bg-gray-100 overflow-hidden">
 
-      {/* SIDEBAR */}
-      <Sidebar />
+      {/* ====================================
+          MOBILE SIDEBAR OVERLAY
+      ==================================== */}
+      {
+        sidebarOpen && (
+          <div
+            className="fixed inset-0 bg-black/50 z-40 lg:hidden"
+            onClick={() =>
+              setSidebarOpen(false)
+            }
+          />
+        )
+      }
 
-      {/* MAIN */}
-      <div className="flex-1 bg-gray-100 min-h-screen">
+      {/* ====================================
+          SIDEBAR
+      ==================================== */}
+      <div
+        className={`
+          fixed lg:static z-50
+          h-full
+          transition-transform duration-300
+          ${sidebarOpen
+            ? "translate-x-0"
+            : "-translate-x-full lg:translate-x-0"
+          }
+        `}
+      >
+        <Sidebar />
+      </div>
 
-        <Navbar />
+      {/* ====================================
+          MAIN CONTENT
+      ==================================== */}
+      <div className="flex-1 flex flex-col w-full overflow-hidden">
 
-        <div className="p-6">
+        {/* TOP NAV */}
+        <div className="sticky top-0 z-30 bg-white shadow-sm">
+
+          <div className="flex items-center">
+
+            {/* MOBILE MENU BUTTON */}
+            <button
+              onClick={() =>
+                setSidebarOpen(
+                  !sidebarOpen
+                )
+              }
+              className="lg:hidden p-4"
+            >
+              {sidebarOpen ? (
+                <X size={28} />
+              ) : (
+                <Menu size={28} />
+              )}
+            </button>
+
+            <div className="flex-1">
+              <Navbar />
+            </div>
+
+          </div>
+
+        </div>
+
+        {/* PAGE CONTENT */}
+        <div className="flex-1 overflow-y-auto p-3 sm:p-5 md:p-6">
 
           {/* HEADING */}
-          <h1 className="text-3xl font-bold mb-6">
-            Orders
-          </h1>
+          <div className="mb-6">
+
+            <h1 className="text-2xl md:text-3xl font-bold">
+              Orders
+            </h1>
+
+            <p className="text-gray-500 mt-1 text-sm md:text-base">
+              Manage and track all customer orders
+            </p>
+
+          </div>
 
           {/* LOADING */}
           {loading ? (
 
-            <div className="text-xl font-semibold">
-              Loading...
+            <div className="flex justify-center items-center h-[50vh]">
+
+              <div className="text-xl md:text-2xl font-semibold animate-pulse">
+                Loading Orders...
+              </div>
+
             </div>
 
           ) : orders.length === 0 ? (
 
-            <div className="bg-white p-10 rounded-xl shadow">
-              No Orders Found
+            <div className="bg-white rounded-2xl shadow p-10 text-center">
+
+              <h2 className="text-2xl font-bold mb-3">
+                No Orders Found
+              </h2>
+
+              <p className="text-gray-500">
+                No customer orders available yet.
+              </p>
+
             </div>
 
           ) : (
 
-            <div className="space-y-6">
+            <div className="space-y-5">
 
               {orders.map(
                 (order) => (
 
                   <div
                     key={order._id}
-                    className="bg-white rounded-xl shadow p-6"
+                    className="bg-white rounded-2xl shadow-md p-4 md:p-6"
                   >
 
-                    {/* TOP */}
-                    <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+                    {/* ====================================
+                        TOP SECTION
+                    ==================================== */}
+                    <div className="flex flex-col xl:flex-row xl:items-center xl:justify-between gap-5">
 
-                      <div>
+                      {/* LEFT */}
+                      <div className="space-y-2">
 
-                        <h2 className="text-xl font-bold">
-                          Order ID:
-                        </h2>
+                        <div>
 
-                        <p className="text-gray-500 break-all">
-                          {order._id}
-                        </p>
+                          <h2 className="text-lg md:text-xl font-bold">
+                            Order ID
+                          </h2>
 
-                        <p className="mt-2">
-                          <span className="font-semibold">
-                            Customer:
-                          </span>
-                          {" "}
-                          {
-                            order.user?.name
-                          }
-                        </p>
+                          <p className="text-gray-500 break-all text-sm">
+                            {order._id}
+                          </p>
 
-                        <p>
-                          <span className="font-semibold">
-                            Email:
-                          </span>
-                          {" "}
-                          {
-                            order.user?.email
-                          }
-                        </p>
+                        </div>
+
+                        <div className="space-y-1">
+
+                          <p className="text-sm md:text-base">
+                            <span className="font-semibold">
+                              Customer:
+                            </span>{" "}
+                            {
+                              order.user?.name
+                            }
+                          </p>
+
+                          <p className="text-sm md:text-base">
+                            <span className="font-semibold">
+                              Email:
+                            </span>{" "}
+                            {
+                              order.user?.email
+                            }
+                          </p>
+
+                        </div>
 
                       </div>
 
-                      <div>
+                      {/* RIGHT */}
+                      <div className="space-y-2">
 
-                        <p className="text-lg font-bold text-green-600">
+                        <p className="text-2xl font-bold text-green-600">
                           ₹
                           {
                             order.totalAmount
                           }
                         </p>
 
-                        <p className="text-sm text-gray-500">
-                          Payment:
+                        <p className="text-gray-500 text-sm">
+                          Payment Method:
                           {" "}
                           {
                             order.paymentMethod
@@ -199,7 +294,7 @@ export default function Orders() {
                         </p>
 
                         <p
-                          className={`font-semibold ${
+                          className={`font-semibold text-sm ${
                             order.paymentStatus ===
                             "Paid"
                               ? "text-green-600"
@@ -215,7 +310,9 @@ export default function Orders() {
 
                     </div>
 
-                    {/* PRODUCTS */}
+                    {/* ====================================
+                        PRODUCTS
+                    ==================================== */}
                     <div className="mt-6">
 
                       <h3 className="font-bold text-lg mb-4">
@@ -232,7 +329,7 @@ export default function Orders() {
 
                             <div
                               key={index}
-                              className="flex items-center gap-4 border rounded-lg p-3"
+                              className="flex flex-col sm:flex-row gap-4 border rounded-xl p-4"
                             >
 
                               {/* IMAGE */}
@@ -243,19 +340,19 @@ export default function Orders() {
                                 alt={
                                   item.name
                                 }
-                                className="w-20 h-20 object-cover rounded-lg"
+                                className="w-full sm:w-24 h-48 sm:h-24 object-cover rounded-xl border"
                               />
 
                               {/* DETAILS */}
-                              <div className="flex-1">
+                              <div className="flex-1 space-y-1">
 
-                                <h4 className="font-bold">
+                                <h4 className="font-bold text-lg">
                                   {
                                     item.name
                                   }
                                 </h4>
 
-                                <p className="text-gray-500">
+                                <p className="text-gray-500 text-sm">
                                   Quantity:
                                   {" "}
                                   {
@@ -263,7 +360,7 @@ export default function Orders() {
                                   }
                                 </p>
 
-                                <p className="text-gray-500">
+                                <p className="text-gray-500 text-sm">
                                   Price:
                                   {" "}
                                   ₹
@@ -282,87 +379,105 @@ export default function Orders() {
 
                     </div>
 
-                    {/* SHIPPING */}
+                    {/* ====================================
+                        SHIPPING
+                    ==================================== */}
                     <div className="mt-6">
 
-                      <h3 className="font-bold text-lg mb-2">
+                      <h3 className="font-bold text-lg mb-3">
                         Shipping Address
                       </h3>
 
-                      <p>
-                        {
-                          order
-                            .shippingAddress
-                            ?.firstName
-                        }
-                        {" "}
-                        {
-                          order
-                            .shippingAddress
-                            ?.lastName
-                        }
-                      </p>
+                      <div className="bg-gray-50 rounded-xl p-4 text-sm md:text-base space-y-1">
 
-                      <p>
-                        {
-                          order
-                            .shippingAddress
-                            ?.street
-                        }
-                        ,
-                        {" "}
-                        {
-                          order
-                            .shippingAddress
-                            ?.city
-                        }
-                        ,
-                        {" "}
-                        {
-                          order
-                            .shippingAddress
-                            ?.state
-                        }
-                      </p>
+                        <p>
+                          {
+                            order
+                              .shippingAddress
+                              ?.firstName
+                          }{" "}
+                          {
+                            order
+                              .shippingAddress
+                              ?.lastName
+                          }
+                        </p>
 
-                      <p>
-                        {
-                          order
-                            .shippingAddress
-                            ?.country
-                        }
-                        {" "}
-                        -
-                        {" "}
-                        {
-                          order
-                            .shippingAddress
-                            ?.zipcode
-                        }
-                      </p>
+                        <p>
+                          {
+                            order
+                              .shippingAddress
+                              ?.street
+                          }
+                          ,{" "}
+                          {
+                            order
+                              .shippingAddress
+                              ?.city
+                          }
+                          ,{" "}
+                          {
+                            order
+                              .shippingAddress
+                              ?.state
+                          }
+                        </p>
 
-                      <p>
-                        Phone:
-                        {" "}
-                        {
-                          order
-                            .shippingAddress
-                            ?.phone
-                        }
-                      </p>
+                        <p>
+                          {
+                            order
+                              .shippingAddress
+                              ?.country
+                          }
+                          {" "}
+                          -
+                          {" "}
+                          {
+                            order
+                              .shippingAddress
+                              ?.zipcode
+                          }
+                        </p>
+
+                        <p>
+                          Phone:
+                          {" "}
+                          {
+                            order
+                              .shippingAddress
+                              ?.phone
+                          }
+                        </p>
+
+                      </div>
 
                     </div>
 
-                    {/* STATUS */}
-                    <div className="mt-6 flex flex-col md:flex-row md:items-center gap-4">
+                    {/* ====================================
+                        STATUS
+                    ==================================== */}
+                    <div className="mt-6 flex flex-col lg:flex-row lg:items-center gap-4">
 
+                      {/* CURRENT STATUS */}
                       <div>
 
-                        <p className="font-semibold">
-                          Current Status:
+                        <p className="font-semibold text-sm md:text-base">
+                          Current Status
                         </p>
 
-                        <p className="text-blue-600 font-bold">
+                        <p
+                          className={`font-bold mt-1 ${
+                            order.orderStatus ===
+                            "Delivered"
+                              ? "text-green-600"
+
+                              : order.orderStatus ===
+                                "Cancelled"
+                              ? "text-red-500"
+
+                              : "text-blue-600"
+                          }`}
+                        >
                           {
                             order.orderStatus
                           }
@@ -381,7 +496,7 @@ export default function Orders() {
                             e.target.value
                           )
                         }
-                        className="border p-3 rounded-lg"
+                        className="border p-3 rounded-xl w-full lg:w-72 focus:outline-none focus:ring-2 focus:ring-black"
                       >
 
                         <option value="Order Placed">
