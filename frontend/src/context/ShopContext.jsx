@@ -243,6 +243,9 @@ const ShopContextProvider = ({
           variantSize:
             product.selectedVariant?.size,
 
+          variantId:
+            product.selectedVariant?._id,
+
           name:
             product.name,
 

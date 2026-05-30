@@ -235,6 +235,7 @@ const handleAddToCart = () => {
     ...product,
 
     selectedVariant: {
+      _id: selectedVariant?._id,
       size: selectedVariant?.size,
       price: selectedVariant?.price,
       offerPrice:

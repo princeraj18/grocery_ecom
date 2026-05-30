@@ -258,7 +258,16 @@ const Checkout = () => {
                       quantity:
                         item.quantity,
 
+                      variantId:
+                        item.variantId,
+
+                      variantSize:
+                        item.variantSize ||
+                        item.size ||
+                        "Default",
+
                       size:
+                        item.variantSize ||
                         item.size ||
                         "Default",
                     })
@@ -563,10 +572,12 @@ const Checkout = () => {
                           }
                         </p>
 
-                        {item.size && (
+                        {(item.variantSize ||
+                          item.size) && (
                           <p className="text-sm text-gray-500">
                             Size:{" "}
                             {
+                              item.variantSize ||
                               item.size
                             }
                           </p>

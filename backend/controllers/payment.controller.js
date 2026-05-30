@@ -6,6 +6,10 @@ import Order from "../models/Order.model.js";
 
 import mongoose from "mongoose";
 import { sendInvoiceEmail } from "../utils/emailService.js";
+import {
+  reduceOrderStock,
+  validateOrderStock,
+} from "../utils/stock.js";
 // ===================================
 // CREATE STRIPE CHECKOUT SESSION
 // ===================================
@@ -32,25 +36,38 @@ export const createCheckoutSession = async (
     // ===================================
     // CREATE ORDER
     // ===================================
+    const orderItems = cartItems.map((item) => {
+      const rawProd = item.productId || item._id;
+      const isObjectId = rawProd && mongoose.Types.ObjectId.isValid(rawProd);
+
+      const out = {
+        name: item.name,
+        image: Array.isArray(item.image) ? item.image[0] : item.image,
+        price: Number(item.price),
+        quantity: Number(item.quantity),
+        variant:
+          item.variantId ||
+          item.variant ||
+          undefined,
+        variantSize:
+          item.variantSize ||
+          item.size,
+      };
+
+      if (isObjectId) out.product = rawProd;
+      else if (rawProd) out.clientId = rawProd;
+
+      return out;
+    });
+
+    await validateOrderStock(
+      orderItems
+    );
+
     const order = await Order.create({
       user: userId,
 
-      items: cartItems.map((item) => {
-        const rawProd = item.productId || item._id;
-        const isObjectId = rawProd && mongoose.Types.ObjectId.isValid(rawProd);
-
-        const out = {
-          name: item.name,
-          image: Array.isArray(item.image) ? item.image[0] : item.image,
-          price: Number(item.price),
-          quantity: Number(item.quantity),
-        };
-
-        if (isObjectId) out.product = rawProd;
-        else if (rawProd) out.clientId = rawProd;
-
-        return out;
-      }),
+      items: orderItems,
 
       shippingAddress,
 
@@ -174,7 +191,7 @@ export const verifyPayment = async (req, res) => {
 
       // Update Order Target
       if (payment) {
-const updatedOrder =
+        const updatedOrder =
   await Order.findByIdAndUpdate(
     payment.order,
     {
@@ -186,6 +203,12 @@ const updatedOrder =
       new: true,
     }
   );
+
+        if (updatedOrder) {
+          await reduceOrderStock(
+            updatedOrder
+          );
+        }
 
         // =========================================================================
         // AUTOMATED HOOK RUNS IN background PROCESS (Prevents blocking Client response paths)

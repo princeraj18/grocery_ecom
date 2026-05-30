@@ -12,6 +12,10 @@ const cartItemSchema = new mongoose.Schema(
       required: true,
     },
 
+    variantId: {
+      type: String,
+    },
+
     name: {
       type: String,
       required: true,

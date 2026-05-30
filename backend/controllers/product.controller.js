@@ -1,5 +1,6 @@
 import Product from "../models/Product.model.js";
 import Category from "../models/Category.model.js";
+import Variant from "../models/Variant.model.js";
 import mongoose from "mongoose";
 import { cloudinary, isCloudAvailable } from "../config/cloudinary.js";
 import fs from "fs";
@@ -37,6 +38,7 @@ export const createProduct = async (
   name,
   description,
   category,
+   stockQuantity
 } = req.body;
 
 console.log("CATEGORY RECEIVED:", category);
@@ -61,13 +63,34 @@ if (!categoryExists) {
     message: "Category not found",
   });
 }
-const variants =
+
+// PARSE AND CREATE VARIANTS
+let variantIds = [];
+const parsedVariants =
   JSON.parse(
     req.body.variants || "[]"
   );
-  
 
-   
+if (parsedVariants.length > 0) {
+  try {
+    // Create variant documents from the submitted data
+    const createdVariants =
+      await Variant.insertMany(
+        parsedVariants
+      );
+    
+    // Extract variant IDs
+    variantIds = createdVariants.map(
+      (v) => v._id
+    );
+  } catch (variantError) {
+    return res.status(400).json({
+      success: false,
+      message: "Error creating variants: " +
+        variantError.message,
+    });
+  }
+}
 
     // IMAGE URLS - upload buffers to Cloudinary with a local fallback
     const uploadToCloudinary = (buffer, filename) =>
@@ -176,21 +199,30 @@ const variants =
     }
 
     // CREATE PRODUCT
-    const product = await Product.create({
+  // If variants were provided, compute total stock from variants
+  let computedStock = 0;
+  if (parsedVariants && parsedVariants.length > 0) {
+    computedStock = parsedVariants.reduce((sum, v) => {
+      return (
+        sum +
+        Number(
+          v?.stockQuantity ?? v?.stock ?? v?.quantity ?? 0
+        )
+      );
+    }, 0);
+  }
+
+  const product = await Product.create({
   vendor: req.vendor._id,
-
   name,
-
   description: [description],
-
   category,
-
-  variants,
-
+  stockQuantity:
+    computedStock || Number(stockQuantity) || 0,
+  variants: variantIds,
   image: imageUrls,
-
-  inStock: true,
-
+  inStock:
+    (computedStock > 0) || (Number(stockQuantity) > 0),
   bestseller: false,
 });
 
@@ -224,7 +256,7 @@ export const getProducts = async (
 ) => {
   try {
 
-  const products = await Product.find()
+ const products = await Product.find()
   .populate(
     "vendor",
     "shopName ownerName isVerified"
@@ -232,14 +264,35 @@ export const getProducts = async (
   .populate(
     "category",
     "text image bgColor"
-  ).populate("variants")
+  )
+  .populate(
+    "variants",
+    "size price offerPrice stockQuantity"
+  )
   .sort({
     createdAt: -1,
   });
 
+    // Compute stock totals from variants for each product before returning
+    const productsWithStock = products.map((p) => {
+      const obj = p.toObject ? p.toObject() : p;
+      const variantStockSum = (obj.variants || []).reduce((t, v) => {
+        return t + Number(v?.stockQuantity ?? v?.stock ?? v?.quantity ?? 0);
+      }, 0);
+
+      if (variantStockSum > 0) {
+        obj.stockQuantity = variantStockSum;
+        obj.inStock = true;
+      } else {
+        obj.inStock = Boolean(obj.stockQuantity > 0);
+      }
+
+      return obj;
+    });
+
     res.status(200).json({
       success: true,
-      products,
+      products: productsWithStock,
     });
 
   } catch (error) {
@@ -264,24 +317,41 @@ export const getVendorProducts =
 
     try {
 
-      const products =
-        await Product.find({
-          vendor: req.vendor._id,
-        })
+      const products = await Product.find({
+  vendor: req.vendor._id,
+})
+  .populate(
+    "category",
+    "text image bgColor"
+  )
+  .populate(
+    "variants",
+    "size price offerPrice stockQuantity"
+  )
+  .sort({
+    createdAt: -1,
+  });
 
-          // POPULATE CATEGORY
-          .populate(
-            "category",
-            "text image bgColor"
-          )
+      // Compute stock totals from variants for vendor products
+      const productsWithStock = products.map((p) => {
+        const obj = p.toObject ? p.toObject() : p;
+        const variantStockSum = (obj.variants || []).reduce((t, v) => {
+          return t + Number(v?.stockQuantity ?? v?.stock ?? v?.quantity ?? 0);
+        }, 0);
 
-          .sort({
-            createdAt: -1,
-          });
+        if (variantStockSum > 0) {
+          obj.stockQuantity = variantStockSum;
+          obj.inStock = true;
+        } else {
+          obj.inStock = Boolean(obj.stockQuantity > 0);
+        }
+
+        return obj;
+      });
 
       res.status(200).json({
         success: true,
-        products,
+        products: productsWithStock,
       });
 
     } catch (error) {
@@ -310,8 +380,7 @@ export const getSingleProduct =
           message: "Invalid product id",
         });
       }
-
- const product = await Product.findById(
+const product = await Product.findById(
   req.params.id
 )
   .populate(
@@ -321,9 +390,13 @@ export const getSingleProduct =
   .populate(
     "category",
     "text image bgColor"
+  )
+  .populate(
+    "variants",
+    "size price offerPrice stockQuantity"
   );
-      if (!product) {
 
+      if (!product) {
         return res.status(404).json({
           success: false,
           message:
@@ -331,9 +404,22 @@ export const getSingleProduct =
         });
       }
 
+      // Compute stock from variants for single product
+      const prodObj = product.toObject ? product.toObject() : product;
+      const variantStockSum = (prodObj.variants || []).reduce((t, v) => {
+        return t + Number(v?.stockQuantity ?? v?.stock ?? v?.quantity ?? 0);
+      }, 0);
+
+      if (variantStockSum > 0) {
+        prodObj.stockQuantity = variantStockSum;
+        prodObj.inStock = true;
+      } else {
+        prodObj.inStock = Boolean(prodObj.stockQuantity > 0);
+      }
+
       res.status(200).json({
         success: true,
-        product,
+        product: prodObj,
       });
 
     } catch (error) {
@@ -412,9 +498,67 @@ export const updateProduct =
 }
 
       if (req.body.variants) {
-  product.variants = JSON.parse(
+  const parsedVariants = JSON.parse(
     req.body.variants
   );
+
+  const variantIds = [];
+
+  for (const variant of parsedVariants) {
+    const variantData = {
+      size: variant.size,
+      price: Number(variant.price) || 0,
+      offerPrice:
+        Number(variant.offerPrice) || 0,
+      stockQuantity:
+        Number(variant.stockQuantity) || 0,
+    };
+
+    if (
+      variant._id &&
+      mongoose.Types.ObjectId.isValid(
+        variant._id
+      )
+    ) {
+      const updatedVariant =
+        await Variant.findByIdAndUpdate(
+          variant._id,
+          variantData,
+          {
+            new: true,
+            runValidators: true,
+          }
+        );
+
+      if (updatedVariant) {
+        variantIds.push(
+          updatedVariant._id
+        );
+      }
+    } else {
+      const createdVariant =
+        await Variant.create(
+          variantData
+        );
+
+      variantIds.push(
+        createdVariant._id
+      );
+    }
+  }
+
+  product.variants = variantIds;
+  product.stockQuantity =
+    parsedVariants.reduce(
+      (total, variant) =>
+        total +
+        Number(
+          variant.stockQuantity || 0
+        ),
+      0
+    );
+  product.inStock =
+    product.stockQuantity > 0;
 }
       product.inStock =
         req.body.inStock ??
@@ -464,14 +608,42 @@ export const updateProduct =
 
         product.image = newImageUrls;
       }
+if (
+  req.body.stockQuantity !==
+  undefined
+) {
+  product.stockQuantity =
+    Number(req.body.stockQuantity);
 
+  product.inStock =
+    product.stockQuantity > 0;
+}
       await product.save();
+
+      // Populate variants before returning
+      await product.populate(
+        "variants",
+        "size price offerPrice stockQuantity"
+      );
+
+      // Compute stock from populated variants
+      const prodObj = product.toObject ? product.toObject() : product;
+      const variantStockSum = (prodObj.variants || []).reduce((t, v) => {
+        return t + Number(v?.stockQuantity ?? v?.stock ?? v?.quantity ?? 0);
+      }, 0);
+
+      if (variantStockSum > 0) {
+        prodObj.stockQuantity = variantStockSum;
+        prodObj.inStock = true;
+      } else {
+        prodObj.inStock = Boolean(prodObj.stockQuantity > 0);
+      }
 
       res.status(200).json({
         success: true,
         message:
           "Product updated successfully",
-        product,
+        product: prodObj,
       });
 
     } catch (error) {
@@ -538,6 +710,198 @@ export const deleteProduct =
     } catch (error) {
 
       console.log(error);
+
+      res.status(500).json({
+        success: false,
+        message: error.message,
+      });
+    }
+  };
+
+
+  export const reduceProductStock =
+  async (
+    productId,
+    quantity
+  ) => {
+
+    const product =
+      await Product.findById(
+        productId
+      );
+
+    if (!product) {
+      throw new Error(
+        "Product not found"
+      );
+    }
+
+    if (
+      product.stockQuantity <
+      quantity
+    ) {
+      throw new Error(
+        "Insufficient stock"
+      );
+    }
+
+    product.stockQuantity -=
+      quantity;
+
+    product.inStock =
+      product.stockQuantity > 0;
+
+    await product.save();
+
+    return product;
+  };
+
+export const updateInventoryStock =
+  async (req, res) => {
+    try {
+      if (
+        !mongoose.Types.ObjectId.isValid(
+          req.params.id
+        )
+      ) {
+        return res.status(400).json({
+          success: false,
+          message: "Invalid product id",
+        });
+      }
+
+      const product =
+        await Product.findById(
+          req.params.id
+        );
+
+      if (!product) {
+        return res.status(404).json({
+          success: false,
+          message:
+            "Product not found",
+        });
+      }
+
+      if (
+        product.vendor.toString() !==
+        req.vendor._id.toString()
+      ) {
+        return res.status(403).json({
+          success: false,
+          message:
+            "You can update only your products",
+        });
+      }
+
+      const variants =
+        Array.isArray(
+          req.body.variants
+        )
+          ? req.body.variants
+          : [];
+
+      if (variants.length === 0) {
+        const stockQuantity =
+          Math.max(
+            0,
+            Number(
+              req.body.stockQuantity
+            ) || 0
+          );
+
+        product.stockQuantity =
+          stockQuantity;
+        product.inStock =
+          stockQuantity > 0;
+
+        await product.save();
+      } else {
+        for (const item of variants) {
+          if (
+            !item._id ||
+            !mongoose.Types.ObjectId.isValid(
+              item._id
+            )
+          ) {
+            continue;
+          }
+
+          const belongsToProduct =
+            product.variants.some(
+              (variantId) =>
+                variantId.toString() ===
+                item._id.toString()
+            );
+
+          if (!belongsToProduct) {
+            continue;
+          }
+
+          await Variant.findByIdAndUpdate(
+            item._id,
+            {
+              stockQuantity:
+                Math.max(
+                  0,
+                  Number(
+                    item.stockQuantity
+                  ) || 0
+                ),
+            },
+            {
+              runValidators: true,
+            }
+          );
+        }
+
+        const updatedVariants =
+          await Variant.find({
+            _id: {
+              $in: product.variants,
+            },
+          });
+
+        product.stockQuantity =
+          updatedVariants.reduce(
+            (total, variant) =>
+              total +
+              Number(
+                variant.stockQuantity ||
+                  0
+              ),
+            0
+          );
+        product.inStock =
+          product.stockQuantity > 0;
+
+        await product.save();
+      }
+
+      const updatedProduct =
+        await Product.findById(
+          product._id
+        )
+          .populate(
+            "category",
+            "text image bgColor"
+          )
+          .populate(
+            "variants",
+            "size price offerPrice stockQuantity"
+          );
+
+      res.status(200).json({
+        success: true,
+        message:
+          "Inventory updated successfully",
+        product: updatedProduct,
+      });
+    } catch (error) {
+      console.log(
+        "UPDATE INVENTORY ERROR:",
+        error
+      );
 
       res.status(500).json({
         success: false,

@@ -1,11 +1,17 @@
 import Order from "../models/Order.model.js";
 import Product from "../models/Product.model.js";
 import mongoose from "mongoose";
-
+import {
+  reduceOrderStock,
+  validateOrderStock,
+} from "../utils/stock.js";
 // ====================================
 // CREATE ORDER
 // ====================================
-const createOrder = async (req, res) => {
+const createOrder = async (
+  req,
+  res
+) => {
   try {
     const {
       userId,
@@ -18,7 +24,6 @@ const createOrder = async (req, res) => {
       paymentStatus,
     } = req.body;
 
-    // Accept either products or cartItems
     const productsSource =
       products || cartItems || [];
 
@@ -26,9 +31,6 @@ const createOrder = async (req, res) => {
       totalAmount ?? total ?? 0
     );
 
-    // ==========================
-    // VALIDATION
-    // ==========================
     if (!userId) {
       return res.status(400).json({
         success: false,
@@ -48,52 +50,86 @@ const createOrder = async (req, res) => {
       });
     }
 
-    // ==========================
-    // FORMAT PRODUCTS
-    // ==========================
-    const formattedProducts =
-      productsSource.map((item) => {
+    const formattedProducts = [];
 
-        const rawProd =
-          item.productId ||
-          item._id;
+    // =====================
+    // CHECK STOCK
+    // =====================
 
-        const isObjectId =
-          rawProd &&
-          mongoose.Types.ObjectId.isValid(
-            rawProd
-          );
+    for (const item of productsSource) {
+      const productId =
+        item.productId ||
+        item._id;
 
-        const out = {
-          name: item.name,
+      const quantity =
+        Number(item.quantity);
 
-          image: Array.isArray(
-            item.image
-          )
-            ? item.image[0]
-            : item.image,
+      if (
+        !mongoose.Types.ObjectId.isValid(
+          productId
+        )
+      ) {
+        continue;
+      }
 
-          price: Number(
-            item.price
-          ),
+      const product =
+        await Product.findById(
+          productId
+        );
 
-          quantity: Number(
-            item.quantity
-          ),
-        };
+      if (!product) {
+        return res.status(404).json({
+          success: false,
+          message:
+            "Product not found",
+        });
+      }
 
-        if (isObjectId) {
-          out.product = rawProd;
-        } else if (rawProd) {
-          out.clientId = rawProd;
-        }
+      if (
+        product.stockQuantity <
+        quantity
+      ) {
+        return res.status(400).json({
+          success: false,
+          message: `${product.name} has only ${product.stockQuantity} items left in stock`,
+        });
+      }
 
-        return out;
+      formattedProducts.push({
+        product:
+          product._id,
+
+        name:
+          product.name,
+
+        image:
+          product.image?.[0] ||
+          "",
+
+        price:
+          Number(item.price),
+
+        quantity,
+
+        variant:
+          item.variantId ||
+          item.variant ||
+          undefined,
+
+        variantSize:
+          item.variantSize ||
+          item.size,
       });
+    }
 
-    // ==========================
+    await validateOrderStock(
+      formattedProducts
+    );
+
+    // =====================
     // CREATE ORDER
-    // ==========================
+    // =====================
+
     const order =
       await Order.create({
         user: userId,
@@ -118,13 +154,17 @@ const createOrder = async (req, res) => {
           "Order Placed",
       });
 
+    // =====================
+    // REDUCE STOCK
+    // =====================
+
+    await reduceOrderStock(order);
+
     res.status(201).json({
       success: true,
       order,
     });
-
   } catch (error) {
-
     console.log(
       "CREATE ORDER ERROR:",
       error
@@ -132,7 +172,8 @@ const createOrder = async (req, res) => {
 
     res.status(500).json({
       success: false,
-      message: error.message,
+      message:
+        error.message,
     });
   }
 };
@@ -293,21 +334,20 @@ export const getVendorOrders =
         }).select("_id");
 
       // Product IDs array
-      const productIds =
-        vendorProducts.map(
-          (product) =>
-            product._id.toString()
-        );
+     const productIds =
+  vendorProducts.map(
+    (product) => product._id
+  );
 
       // ==========================
       // FIND ORDERS
       // ==========================
       const orders =
         await Order.find({
-          "items.product": {
-            $in: productIds,
-          },
-        })
+  "items.product": {
+    $in: productIds,
+  },
+})
           .populate(
             "user",
             "name email"
@@ -320,24 +360,24 @@ export const getVendorOrders =
       // FILTER ONLY
       // VENDOR PRODUCTS
       // ==========================
-      const filteredOrders =
-        orders.map((order) => {
+     const filteredOrders =
+  orders.map((order) => {
+    const vendorItems =
+      order.items.filter(
+        (item) =>
+          item.product &&
+          productIds.some(
+            (id) =>
+              id.toString() ===
+              item.product.toString()
+          )
+      );
 
-          const vendorItems =
-            order.items.filter(
-              (item) =>
-                item.product &&
-                productIds.includes(
-                  item.product.toString()
-                )
-            );
-
-          return {
-            ...order._doc,
-
-            items: vendorItems,
-          };
-        });
+    return {
+      ...order._doc,
+      items: vendorItems,
+    };
+  });
 
       res.status(200).json({
         success: true,

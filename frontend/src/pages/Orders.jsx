@@ -1,14 +1,10 @@
-import React, {
-  useEffect,
-  useState,
-} from "react";
-
+import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import api from "../api/Axios";
-
 const Orders = () => {
   const [orders, setOrders] =
     useState([]);
-
+const navigate = useNavigate();
   const [loading, setLoading] =
     useState(true);
 
@@ -68,7 +64,7 @@ const Orders = () => {
           </p>
         </div>
       ) : (
-        <div className="space-y-6">
+        <div className="bg-white rounded-3xl shadow-lg p-6 border border-gray-100">
 
           {orders.map((order) => (
             <div
@@ -96,9 +92,17 @@ const Orders = () => {
                     Order Status
                   </p>
 
-                  <span className="bg-green-100 text-green-700 px-3 py-1 rounded-full text-sm">
-                    {order.orderStatus || "Processing"}
-                  </span>
+                  <span
+  className={`px-3 py-1 rounded-full text-sm font-medium ${
+    order.orderStatus === "Delivered"
+      ? "bg-green-100 text-green-700"
+      : order.orderStatus === "Cancelled"
+      ? "bg-red-100 text-red-700"
+      : "bg-yellow-100 text-yellow-700"
+  }`}
+>
+  {order.orderStatus || "Processing"}
+</span>
                 </div>
 
                 {/* Payment */}
@@ -124,54 +128,97 @@ const Orders = () => {
                 </div>
               </div>
 
-              {/* Products */}
-              <div className="space-y-4">
+              
+{/* PRODUCTS */}
+<div className="border-t pt-5">
 
-                {order.products?.map(
-                  (item, index) => (
-                    <div
-                      key={index}
-                      className="flex items-center gap-4 border rounded-xl p-4"
-                    >
+  <h3 className="text-xl font-bold mb-4">
+    Ordered Products
+  </h3>
 
-                      {/* Product Image */}
-                      <img
-                        src={
-                          item.image ||
-                          "https://via.placeholder.com/100"
-                        }
-                        alt={item.name}
-                        className="w-24 h-24 object-cover rounded-lg border"
-                      />
+  <div className="space-y-4">
 
-                      {/* Product Info */}
-                      <div className="flex-1">
+    {order.items?.map((item, index) => (
 
-                        <h3 className="font-semibold text-lg">
-                          {item.name}
-                        </h3>
+      <div
+        key={index}
+        onClick={() =>
+          navigate(`/products/${item.product}`)
+        }
+        className="flex flex-col md:flex-row items-center gap-5 p-4 border rounded-2xl bg-gray-50 hover:bg-white hover:shadow-lg hover:border-green-500 transition-all duration-300 cursor-pointer"
+      >
 
-                        <p className="text-gray-600 mt-1">
-                          Quantity: {item.quantity}
-                        </p>
+        {/* PRODUCT IMAGE */}
+        <div className="flex-shrink-0">
 
-                        {item.size && (
-                          <p className="text-gray-600">
-                            Size: {item.size}
-                          </p>
-                        )}
+          <img
+            src={
+              item.image ||
+              "https://via.placeholder.com/120"
+            }
+            alt={item.name}
+            className="w-28 h-28 md:w-32 md:h-32 object-cover rounded-xl border"
+          />
 
-                        <p className="text-green-600 font-bold mt-2">
-                          ₹{item.price}
-                        </p>
+        </div>
 
-                      </div>
-                    </div>
-                  )
-                )}
+        {/* PRODUCT INFO */}
+        <div className="flex-1 text-center md:text-left">
 
-              </div>
+          <h4 className="text-lg md:text-xl font-semibold">
+            {item.name}
+          </h4>
 
+          {item.variantSize && (
+            <p className="text-gray-500 mt-1">
+              Size: {item.variantSize}
+            </p>
+          )}
+
+          <div className="flex flex-wrap justify-center md:justify-start gap-3 mt-3">
+
+            <span className="bg-blue-100 text-blue-700 px-3 py-1 rounded-full text-sm font-medium">
+              Qty: {item.quantity}
+            </span>
+
+            <span className="bg-green-100 text-green-700 px-3 py-1 rounded-full text-sm font-medium">
+              ₹{item.price}
+            </span>
+
+          </div>
+
+        </div>
+
+        {/* PRICE & ACTION */}
+        <div className="text-center md:text-right">
+
+          <p className="text-sm text-gray-500">
+            Subtotal
+          </p>
+
+          <p className="text-xl font-bold text-green-600">
+            ₹{item.price * item.quantity}
+          </p>
+
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              navigate(`/products/${item.product}`);
+            }}
+            className="mt-3 text-sm font-medium text-green-600 hover:text-green-700"
+          >
+            View Product →
+          </button>
+
+        </div>
+
+      </div>
+
+    ))}
+
+  </div>
+
+</div>
             </div>
           ))}
 

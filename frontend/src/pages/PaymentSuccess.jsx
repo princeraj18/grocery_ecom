@@ -41,6 +41,11 @@ const PaymentSuccess = () => {
               "lastOrderId"
             );
 
+          const paymentVerifiedKey =
+            sessionId
+              ? `paymentVerified:${sessionId}`
+              : "paymentVerified";
+
           console.log(
             "Session ID:",
             sessionId
@@ -57,7 +62,7 @@ const PaymentSuccess = () => {
           if (
             sessionId &&
             !localStorage.getItem(
-              "paymentVerified"
+              paymentVerifiedKey
             )
           ) {
 
@@ -109,7 +114,7 @@ const PaymentSuccess = () => {
               // PREVENT RE-RUN
               // =========================
               localStorage.setItem(
-                "paymentVerified",
+                paymentVerifiedKey,
                 "true"
               );
             }

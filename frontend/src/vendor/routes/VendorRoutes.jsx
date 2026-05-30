@@ -20,6 +20,7 @@ import VendorRegister from "../pages/VendorRegister";
 import VendorProtectedRoute from "./VendorProtectedRoute";
 import VendorForgotPassword from "../pages/VendorForgotPassword";
 import VendorResetPassword from "../pages/VendorResetPage";
+import Inventory from "../pages/Inventory";
 
 export default function VendorRoutes() {
 
@@ -118,6 +119,15 @@ export default function VendorRoutes() {
         element={
           <VendorProtectedRoute>
             <Reviews />
+          </VendorProtectedRoute>
+        }
+      />
+
+        <Route
+        path="inventory"
+        element={
+          <VendorProtectedRoute>
+            <Inventory />
           </VendorProtectedRoute>
         }
       />

@@ -15,6 +15,13 @@ const orderSchema = new mongoose.Schema(
           ref: "Product",
         },
 
+        variant: {
+          type: mongoose.Schema.Types.ObjectId,
+          ref: "Variant",
+        },
+
+        variantSize: String,
+
         clientId: String,
 
         name: String,
@@ -81,6 +88,11 @@ const orderSchema = new mongoose.Schema(
     },
 
     isPaid: {
+      type: Boolean,
+      default: false,
+    },
+
+    stockReduced: {
       type: Boolean,
       default: false,
     },

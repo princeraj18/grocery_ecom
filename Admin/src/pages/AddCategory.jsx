@@ -1,10 +1,14 @@
 import React, { useState } from "react";
+import { Menu, X } from "lucide-react";
+
 import api from "../services/api";
 
 import Sidebar from "../components/Sidebar";
 import Navbar from "../components/Navbar";
 
 const AddCategory = () => {
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+
   const [formData, setFormData] = useState({
     text: "",
     path: "",
@@ -78,18 +82,65 @@ const AddCategory = () => {
   };
 
   return (
-    <div className="flex min-h-screen bg-gray-100">
-      {/* Sidebar */}
-      <Sidebar />
+    <div className="flex min-h-screen bg-gray-100 overflow-hidden">
 
-      {/* Main Content */}
-      <div className="flex-1 flex flex-col">
-        {/* Navbar */}
-        <Navbar />
+      {/* MOBILE OVERLAY */}
+      {sidebarOpen && (
+        <div
+          className="fixed inset-0 bg-black/50 z-40 lg:hidden"
+          onClick={() => setSidebarOpen(false)}
+        />
+      )}
 
-        {/* Page Content */}
-        <div className="p-4 md:p-6">
-          <div className="max-w-3xl mx-auto bg-white rounded-2xl shadow-lg p-6 md:p-8">
+      {/* SIDEBAR */}
+      <div
+        className={`
+          fixed lg:static z-50 h-full
+          transition-transform duration-300
+          ${
+            sidebarOpen
+              ? "translate-x-0"
+              : "-translate-x-full lg:translate-x-0"
+          }
+        `}
+      >
+        <Sidebar />
+      </div>
+
+      {/* MAIN CONTENT */}
+      <div className="flex-1 flex flex-col overflow-hidden">
+
+        {/* NAVBAR */}
+        <div className="sticky top-0 z-30 bg-white shadow-sm">
+
+          <div className="flex items-center">
+
+            <button
+              onClick={() =>
+                setSidebarOpen(!sidebarOpen)
+              }
+              className="lg:hidden p-4"
+            >
+              {sidebarOpen ? (
+                <X size={28} />
+              ) : (
+                <Menu size={28} />
+              )}
+            </button>
+
+            <div className="flex-1">
+              <Navbar />
+            </div>
+
+          </div>
+
+        </div>
+
+        {/* PAGE CONTENT */}
+        <div className="flex-1 overflow-y-auto p-4 md:p-6">
+
+          <div className="max-w-3xl mx-auto bg-white rounded-2xl shadow-lg p-5 md:p-8">
+
             <h1 className="text-2xl md:text-3xl font-bold text-gray-800 mb-8">
               Add Category
             </h1>
@@ -98,8 +149,10 @@ const AddCategory = () => {
               onSubmit={handleSubmit}
               className="space-y-6"
             >
-              {/* Category Name */}
+
+              {/* CATEGORY NAME */}
               <div>
+
                 <label className="block mb-2 font-semibold text-gray-700">
                   Category Name
                 </label>
@@ -113,10 +166,12 @@ const AddCategory = () => {
                   className="w-full border border-gray-300 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-green-500"
                   required
                 />
+
               </div>
 
-              {/* Category Path */}
+              {/* CATEGORY PATH */}
               <div>
+
                 <label className="block mb-2 font-semibold text-gray-700">
                   Category Path
                 </label>
@@ -130,10 +185,12 @@ const AddCategory = () => {
                   className="w-full border border-gray-300 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-green-500"
                   required
                 />
+
               </div>
 
-              {/* Category Image */}
+              {/* IMAGE */}
               <div>
+
                 <label className="block mb-2 font-semibold text-gray-700">
                   Category Image
                 </label>
@@ -148,17 +205,21 @@ const AddCategory = () => {
 
                 {preview && (
                   <div className="mt-4">
+
                     <img
                       src={preview}
                       alt="Preview"
-                      className="h-40 w-40 object-cover rounded-lg border shadow"
+                      className="w-full max-w-[250px] h-48 object-cover rounded-lg border shadow"
                     />
+
                   </div>
                 )}
+
               </div>
 
-              {/* Background Color */}
+              {/* BACKGROUND COLOR */}
               <div>
+
                 <label className="block mb-2 font-semibold text-gray-700">
                   Background Color
                 </label>
@@ -170,10 +231,12 @@ const AddCategory = () => {
                   onChange={handleChange}
                   className="w-full h-12 border border-gray-300 rounded-lg cursor-pointer"
                 />
+
               </div>
 
-              {/* Preview Card */}
+              {/* PREVIEW CARD */}
               <div className="border rounded-xl p-4 bg-gray-50">
+
                 <h3 className="font-semibold mb-3 text-gray-700">
                   Category Preview
                 </h3>
@@ -181,18 +244,21 @@ const AddCategory = () => {
                 <div
                   className="rounded-xl p-4 flex items-center gap-4"
                   style={{
-                    backgroundColor: formData.bgColor,
+                    backgroundColor:
+                      formData.bgColor,
                   }}
                 >
+
                   {preview && (
                     <img
                       src={preview}
                       alt="Category"
-                      className="w-20 h-20 object-cover rounded-lg"
+                      className="w-16 h-16 md:w-20 md:h-20 object-cover rounded-lg"
                     />
                   )}
 
                   <div>
+
                     <h4 className="font-bold text-lg">
                       {formData.text ||
                         "Category Name"}
@@ -202,24 +268,32 @@ const AddCategory = () => {
                       {formData.path ||
                         "category-path"}
                     </p>
+
                   </div>
+
                 </div>
+
               </div>
 
-              {/* Submit Button */}
+              {/* SUBMIT BUTTON */}
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full md:w-auto bg-black hover:bg-gray-800 text-white px-8 py-3 rounded-lg font-semibold transition"
+                className="w-full md:w-auto bg-black hover:bg-gray-800 text-white px-8 py-3 rounded-lg font-semibold transition disabled:opacity-50"
               >
                 {loading
                   ? "Uploading..."
                   : "Add Category"}
               </button>
+
             </form>
+
           </div>
+
         </div>
+
       </div>
+
     </div>
   );
 };

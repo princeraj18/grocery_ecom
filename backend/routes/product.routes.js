@@ -6,46 +6,66 @@ import {
   getVendorProducts,
   getSingleProduct,
   updateProduct,
+  updateInventoryStock,
   deleteProduct,
 } from "../controllers/product.controller.js";
 
 import upload from "../middleware/upload.js";
-
 import vendorAuth from "../middleware/vendorAuth.js";
 
 const router = express.Router();
 
 // ==========================================
-// CREATE PRODUCT
+// MULTER ERROR HANDLER
 // ==========================================
-// Wrap multer upload so we can catch upload/storage errors and return clear responses
 const handleUpload = (req, res, next) => {
-  const middleware = upload.array("images", 5);
-  middleware(req, res, (err) => {
-    if (err) {
-      console.error("UPLOAD ERROR:", err);
+  const middleware = upload.array(
+    "images",
+    5
+  );
 
-      // Cloudinary timeouts and storage-specific errors
-      if (err && (err.name === "TimeoutError" || err.http_code === 499)) {
-        return res.status(504).json({
-          success: false,
-          message:
-            "Cloudinary upload timed out. Check CLOUDINARY credentials and network connectivity.",
-          details: err,
-        });
+  middleware(
+    req,
+    res,
+    (err) => {
+      if (err) {
+        console.error(
+          "UPLOAD ERROR:",
+          err
+        );
+
+        if (
+          err.name ===
+            "TimeoutError" ||
+          err.http_code === 499
+        ) {
+          return res
+            .status(504)
+            .json({
+              success: false,
+              message:
+                "Cloudinary upload timed out. Check configuration.",
+            });
+        }
+
+        return res
+          .status(500)
+          .json({
+            success: false,
+            message:
+              err.message ||
+              "Upload Error",
+          });
       }
 
-      // return other upload errors
-      return res.status(500).json({
-        success: false,
-        message: err.message || "Upload error",
-        details: err,
-      });
+      next();
     }
-    next();
-  });
+  );
 };
 
+// ==========================================
+// CREATE PRODUCT
+// ==========================================
 router.post(
   "/",
   vendorAuth,
@@ -64,17 +84,32 @@ router.get(
 // ==========================================
 // GET VENDOR PRODUCTS
 // ==========================================
+
+// Main Route
 router.get(
   "/vendor/my-products",
   vendorAuth,
   getVendorProducts
 );
 
-// Alias for vendor products for compatibility with frontend
+// Alias Route
 router.get(
   "/vendor",
   vendorAuth,
   getVendorProducts
+);
+
+// Inventory Route
+router.get(
+  "/vendor-products",
+  vendorAuth,
+  getVendorProducts
+);
+
+router.patch(
+  "/:id/inventory",
+  vendorAuth,
+  updateInventoryStock
 );
 
 // ==========================================
@@ -91,7 +126,10 @@ router.get(
 router.put(
   "/:id",
   vendorAuth,
-  upload.array("images", 5),
+  upload.array(
+    "images",
+    5
+  ),
   updateProduct
 );
 

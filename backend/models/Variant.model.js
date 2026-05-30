@@ -6,11 +6,27 @@ const variantSchema =
       size: {
         type: String,
         required: true,
-        unique:true,
         trim: true,
       },
 
-      
+      price: {
+        type: Number,
+        
+        min: 0,
+      },
+
+      offerPrice: {
+        type: Number,
+        
+        min: 0,
+      },
+
+      stockQuantity: {
+        type: Number,
+        
+        default: 0,
+        min: 0,
+      },
     },
     {
       timestamps: true,

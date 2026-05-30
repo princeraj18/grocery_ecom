@@ -21,6 +21,9 @@ export default function Sidebar() {
     {
       name: "Orders",
       path: "/vendor/orders",
+    }, {
+      name: "Inventory",
+      path: "/vendor/inventory",
     },
     {
       name: "Coupons",

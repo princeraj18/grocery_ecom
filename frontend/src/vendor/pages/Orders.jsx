@@ -2,7 +2,8 @@ import React, {
   useEffect,
   useState,
 } from "react";
-
+import jsPDF from "jspdf";
+import autoTable from "jspdf-autotable";
 import axios from "axios";
 
 import Sidebar from "../components/Sidebar";
@@ -23,7 +24,54 @@ export default function Orders() {
 
   const [sidebarOpen, setSidebarOpen] =
     useState(false);
+const downloadOrdersPDF = () => {
+  const doc = new jsPDF();
 
+  doc.setFontSize(18);
+  doc.text("Vendor Orders Report", 14, 20);
+
+  const tableData = [];
+
+  orders.forEach((order) => {
+    order.items.forEach((item) => {
+      tableData.push([
+        order._id.slice(-8),
+        item.name,
+        item.quantity,
+        `₹${item.price}`,
+        `₹${item.price * item.quantity}`,
+        order.orderStatus,
+        order.paymentStatus,
+        order.user?.name || "N/A",
+      ]);
+    });
+  });
+
+  autoTable(doc, {
+    startY: 30,
+    head: [
+      [
+        "Order ID",
+        "Product",
+        "Qty",
+        "Price",
+        "Subtotal",
+        "Status",
+        "Payment",
+        "Customer",
+      ],
+    ],
+    body: tableData,
+    styles: {
+      fontSize: 8,
+    },
+    headStyles: {
+      fillColor: [0, 0, 0],
+    },
+  });
+
+  doc.save("VendorOrders.pdf");
+};
   // ====================================
   // FETCH ORDERS
   // ====================================
@@ -182,17 +230,26 @@ export default function Orders() {
         <div className="flex-1 overflow-y-auto p-3 sm:p-5 md:p-6">
 
           {/* HEADING */}
-          <div className="mb-6">
+          <div className="mb-6 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
 
-            <h1 className="text-2xl md:text-3xl font-bold">
-              Orders
-            </h1>
+  <div>
+    <h1 className="text-2xl md:text-3xl font-bold">
+      Orders
+    </h1>
 
-            <p className="text-gray-500 mt-1 text-sm md:text-base">
-              Manage and track all customer orders
-            </p>
+    <p className="text-gray-500 mt-1 text-sm md:text-base">
+      Manage and track all customer orders
+    </p>
+  </div>
 
-          </div>
+  <button
+    onClick={downloadOrdersPDF}
+    className="bg-black text-white px-5 py-3 rounded-xl hover:bg-gray-800 transition font-medium"
+  >
+    Download Orders PDF
+  </button>
+
+</div>
 
           {/* LOADING */}
           {loading ? (
