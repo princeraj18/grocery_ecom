@@ -21,7 +21,8 @@ export default function AddProduct() {
   // =========================
   const [sidebarOpen, setSidebarOpen] =
     useState(false);
-
+const [variantOptions, setVariantOptions] =
+  useState([]);
   // =========================
   // FORM DATA
   // =========================
@@ -97,6 +98,30 @@ export default function AddProduct() {
       };
 
     fetchCategories();
+    const fetchVariants =
+  async () => {
+
+    try {
+
+      const res =
+        await axios.get(
+          "http://localhost:5000/api/variants"
+        );
+
+      setVariantOptions(
+        res.data.variants || []
+      );
+
+    } catch (error) {
+
+      console.log(
+        "VARIANT FETCH ERROR:",
+        error
+      );
+    }
+  };
+
+fetchVariants();
 
   }, []);
 
@@ -486,61 +511,23 @@ export default function AddProduct() {
                           required
                         >
 
-                          <option value="">
-                            Select Size
-                          </option>
+                         <option value="">
+  Select Variant
+</option>
 
-                          <option value="1pc">
-                            1 pc
-                          </option>
+{variantOptions.map(
+  (item) => (
 
-                          <option value="2pc">
-                            2 pcs
-                          </option>
-
-                          <option value="3pc">
-                            3 pcs
-                          </option>
-
-                          <option value="100ml">
-                            100 ml
-                          </option>
-
-                          <option value="250ml">
-                            250 ml
-                          </option>
-
-                          <option value="500ml">
-                            500 ml
-                          </option>
-
-                          <option value="1L">
-                            1 L
-                          </option>
-
-                          <option value="2L">
-                            2 L
-                          </option>
-
-                          <option value="250g">
-                            250 g
-                          </option>
-
-                          <option value="500g">
-                            500 g
-                          </option>
-
-                          <option value="1kg">
-                            1 Kg
-                          </option>
-
-                          <option value="2kg">
-                            2 Kg
-                          </option>
-
-                          <option value="5kg">
-                            5 Kg
-                          </option>
+    <option
+      key={item._id}
+      value={item.size}
+    >
+      {item.size}
+    </option>
+  )
+)}
+                        
+                          
 
                         </select>
 

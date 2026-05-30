@@ -1,77 +1,67 @@
 import mongoose from "mongoose";
 
-const variantSchema = new mongoose.Schema({
-  size: {
-    type: String,
-    required: true,
-  },
+const productSchema =
+  new mongoose.Schema(
+    {
+      vendor: {
+        type:
+          mongoose.Schema.Types.ObjectId,
+        ref: "Vendor",
+        required: true,
+      },
 
-  price: {
-    type: Number,
-    required: true,
-  },
+      name: {
+        type: String,
+        required: true,
+        trim: true,
+      },
 
-  offerPrice: {
-    type: Number,
-    required: true,
-  },
+      description: {
+        type: [String],
+        default: [],
+      },
 
-  stockQuantity: {
-    type: Number,
-    default: 0,
-  },
-});
+      category: {
+        type:
+          mongoose.Schema.Types.ObjectId,
+        ref: "Category",
+        required: true,
+      },
 
-const productSchema = new mongoose.Schema(
-  {
-    vendor: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "Vendor",
-      required: true,
+      // MULTIPLE VARIANTS
+      variants: [
+        {
+          type:
+            mongoose.Schema.Types.ObjectId,
+          ref: "Variant",
+        },
+      ],
+
+      image: {
+        type: [String],
+        required: true,
+      },
+
+      inStock: {
+        type: Boolean,
+        default: true,
+      },
+
+      bestseller: {
+        type: Boolean,
+        default: false,
+      },
     },
-
-    name: {
-      type: String,
-      required: true,
-      trim: true,
-    },
-
-    description: {
-      type: [String],
-      default: [],
-    },
-
-    // Category Reference
-    category: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "Category",
-      required: true,
-    },
-
-    variants: [variantSchema],
-
-    image: {
-      type: [String],
-      required: true,
-    },
-
-    inStock: {
-      type: Boolean,
-      default: true,
-    },
-
-    bestseller: {
-      type: Boolean,
-      default: false,
-    },
-  },
-  {
-    timestamps: true,
-  }
-);
+    {
+      timestamps: true,
+    }
+  );
 
 const Product =
   mongoose.models.Product ||
-  mongoose.model("Product", productSchema);
+  mongoose.model(
+    "Product",
+    productSchema
+  );
 
 export default Product;

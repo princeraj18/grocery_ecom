@@ -8,7 +8,7 @@ export const createReview = async (req, res) => {
     const { user, product, rating, comment } = req.body;
 
     const review = await Review.create({
-      user,
+      user:req.user,
       product,
       rating,
       comment,

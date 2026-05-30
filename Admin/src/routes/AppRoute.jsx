@@ -22,6 +22,7 @@ import AdminLayout from "../layout/AdminLayout";
 import AdminForgotPassword from "../pages/AdminForgotPassword";
 import AdminResetPassword from "../pages/AdminResetPassword";
 import AddCategory from "../pages/AddCategory";
+import AdminVariant from "../pages/AdminVariant";
 
 export default function AppRoutes() {
 
@@ -95,6 +96,16 @@ export default function AppRoutes() {
           </ProtectedRoute>
         }
       />
+   <Route
+  path="/admin/variants/create"
+  element={
+    <ProtectedRoute>
+      <AdminLayout>
+        <AdminVariant />
+      </AdminLayout>
+    </ProtectedRoute>
+  }
+/>
 
       
 

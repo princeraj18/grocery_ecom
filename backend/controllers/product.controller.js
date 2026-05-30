@@ -61,9 +61,10 @@ if (!categoryExists) {
     message: "Category not found",
   });
 }
-const variants = JSON.parse(
-  req.body.variants || "[]"
-);
+const variants =
+  JSON.parse(
+    req.body.variants || "[]"
+  );
   
 
    
@@ -231,7 +232,7 @@ export const getProducts = async (
   .populate(
     "category",
     "text image bgColor"
-  )
+  ).populate("variants")
   .sort({
     createdAt: -1,
   });

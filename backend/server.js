@@ -27,7 +27,7 @@ import reviewRoutes from "./routes/review.routes.js";
 import wishlistRoutes
 from "./routes/wishlist.routes.js";
 import categoryRoutes from "./routes/category.routes.js";
-
+import variantRoutes from "./routes/variant.routes.js";
 
 
 
@@ -101,6 +101,10 @@ app.use(
 app.use(
   "/api/dashboard",
   dashboardRoutes
+);
+app.use(
+  "/api/variants",
+  variantRoutes
 );
 app.use(
   "/api/analytics",

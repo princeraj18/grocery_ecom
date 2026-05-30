@@ -56,7 +56,18 @@ export default function Sidebar() {
         >
           Orders
         </NavLink>
-
+ <NavLink
+  to="/admin/variants/create"
+  className={({ isActive }) =>
+    `p-2 rounded ${
+      isActive
+        ? "bg-white text-black"
+        : ""
+    }`
+  }
+>
+  Add Variant
+</NavLink>
         <NavLink
   to="/admin/categories/create"
   className={({ isActive }) =>
