@@ -81,6 +81,20 @@ export default function Sidebar() {
   Add Category
 </NavLink>
 
+
+ <NavLink
+  to="/admin/support"
+  className={({ isActive }) =>
+    `p-2 rounded ${
+      isActive
+        ? "bg-white text-black"
+        : ""
+    }`
+  }
+>
+  Support
+</NavLink>
+
       </div>
     </div>
   )

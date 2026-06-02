@@ -25,6 +25,7 @@ import {
 } from "react-router-dom";
 
 import { ShopContext } from "../context/ShopContext";
+import Sidebar from "./Sidebar";
 
 // =========================
 // SEARCH BOX COMPONENT
@@ -576,6 +577,16 @@ return (
             >
               Wishlist
             </div>
+            
+            <div
+              onClick={() => {
+                navigate("/usersupport");
+                setUserMenu(false);
+              }}
+              className="cursor-pointer px-4 py-3 hover:bg-slate-50"
+            >
+              User Support
+            </div>
 
             <div
               onClick={handleLogout}
@@ -677,96 +688,22 @@ return (
       </div>
     )}
 
-    {/* MOBILE SIDEBAR */}
-
-    {open && (
-
-      <div className="flex flex-col gap-4 border-t bg-white px-4 py-4 lg:hidden">
-
-        <span
-          onClick={() =>
-            handleNavigation("/")
-          }
-          className="cursor-pointer font-semibold"
-        >
-          Home
-        </span>
-
-        <span
-          onClick={() =>
-            handleNavigation(
-              "/products"
-            )
-          }
-          className="cursor-pointer font-semibold"
-        >
-          Products
-        </span>
-
-        <span
-          onClick={() =>
-            handleNavigation(
-              "/about"
-            )
-          }
-          className="cursor-pointer font-semibold"
-        >
-          About Us
-        </span>
-
-        <span
-          onClick={() =>
-            handleNavigation(
-              "/coupons"
-            )
-          }
-          className="cursor-pointer font-semibold"
-        >
-          Coupons
-        </span>
-        <span
-          onClick={() =>
-            handleNavigation(
-              "/notification"
-            )
-          }
-          className="cursor-pointer font-semibold"
-        >
-          Notifications
-        </span>
-<span
-          onClick={() =>
-            handleNavigation(
-              "/wishlist"
-            )
-          }
-          className="cursor-pointer font-semibold"
-        >
-          Wishlist
-        </span>
-        <span
-          onClick={() =>
-            handleNavigation(
-              "/cart"
-            )
-          }
-          className="cursor-pointer font-semibold"
-        >
-          Cart
-        </span>
-        <span
-          onClick={() =>
-            handleNavigation(
-              "/contact"
-            )
-          }
-          className="cursor-pointer font-semibold"
-        >
-          Contact Us
-        </span>
-
-      </div>
-    )}
+    <Sidebar
+      open={open}
+      onClose={() =>
+        setOpen(false)
+      }
+      onNavigate={
+        handleNavigation
+      }
+      cartCount={cartCount}
+      wishlistCount={
+        wishlistCount
+      }
+      unreadNotificationCount={
+        unreadNotificationCount
+      }
+    />
     
 
   </nav>

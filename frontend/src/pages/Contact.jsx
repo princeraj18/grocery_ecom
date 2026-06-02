@@ -38,45 +38,60 @@ const Contact = () => {
   // =========================
   // HANDLE SUBMIT
   // =========================
-  const handleSubmit = async (
-    e
-  ) => {
-    e.preventDefault();
+ const handleSubmit = async (
+  e
+) => {
 
-    try {
-      setLoading(true);
+  e.preventDefault();
 
-      setSuccess("");
+  try {
 
-      setError("");
+    setLoading(true);
 
-      const res = await api.post(
-        "/contacts",
-        formData
-      );
+    setSuccess("");
 
-      setSuccess(
-        res.data.message
-      );
+    setError("");
 
-      setFormData({
-        name: "",
-        email: "",
-        subject: "",
-        message: "",
-      });
-    } catch (error) {
-      console.log(error);
+    const token =
+      localStorage.getItem("token");
 
-      setError(
-        error.response?.data
-          ?.message ||
-          "Something went wrong"
-      );
-    } finally {
-      setLoading(false);
-    }
-  };
+    const res = await api.post(
+      "/contact",
+      formData,
+      {
+        headers: {
+          Authorization:
+            `Bearer ${token}`,
+        },
+      }
+    );
+
+    setSuccess(
+      res.data.message
+    );
+
+    setFormData({
+      name: "",
+      email: "",
+      subject: "",
+      message: "",
+    });
+
+  } catch (error) {
+
+    console.log(error);
+
+    setError(
+      error.response?.data
+        ?.message ||
+        "Something went wrong"
+    );
+
+  } finally {
+
+    setLoading(false);
+  }
+};
 
   return (
     <div className="min-h-screen bg-gray-50 py-16 px-6">

@@ -76,7 +76,7 @@ app.use(
 );
 
 app.use(
-  "/api/contacts",
+  "/api/contact",
   contactRoutes
 );
 

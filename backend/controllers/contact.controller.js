@@ -7,7 +7,9 @@ import Contact from "../models/contact.model.js";
 // =====================================
 export const createContact =
   async (req, res) => {
+
     try {
+
       const {
         name,
         email,
@@ -15,7 +17,6 @@ export const createContact =
         message,
       } = req.body;
 
-      // Validation
       if (
         !name ||
         !email ||
@@ -29,9 +30,9 @@ export const createContact =
         });
       }
 
-      // Create Contact
       const contact =
         await Contact.create({
+          userId: req.user?._id,
           name,
           email,
           subject,
@@ -44,11 +45,10 @@ export const createContact =
           "Message sent successfully",
         contact,
       });
+
     } catch (error) {
-      console.log(
-        "CREATE CONTACT ERROR:",
-        error
-      );
+
+      console.log(error);
 
       res.status(500).json({
         success: false,
@@ -57,7 +57,6 @@ export const createContact =
       });
     }
   };
-
 // =====================================
 // GET ALL CONTACTS
 // =====================================
@@ -153,6 +152,211 @@ export const deleteContact =
         "DELETE CONTACT ERROR:",
         error
       );
+
+      res.status(500).json({
+        success: false,
+        message:
+          "Server Error",
+      });
+    }
+  };
+
+  
+// =====================================
+// REPLY TO CONTACT
+// =====================================
+
+import nodemailer from "nodemailer";
+
+export const replyContact =
+  async (req, res) => {
+
+    try {
+
+      const { reply } =
+        req.body;
+
+      const contact =
+        await Contact.findById(
+          req.params.id
+        );
+
+      if (!contact) {
+
+        return res.status(404).json({
+          success: false,
+          message:
+            "Contact not found",
+        });
+      }
+
+      // SAVE REPLY
+      contact.adminReply =
+        reply;
+
+      contact.status =
+        "Resolved";
+
+      await contact.save();
+
+      // SEND EMAIL
+
+      const transporter =
+        nodemailer.createTransport({
+          service: "gmail",
+
+          auth: {
+            user:
+              process.env.EMAIL_USER,
+
+            pass:
+              process.env.EMAIL_PASS,
+          },
+        });
+
+      await transporter.sendMail({
+        from:
+          process.env.EMAIL_USER,
+
+        to:
+          contact.email,
+
+        subject:
+          `Reply: ${contact.subject}`,
+
+        html: `
+          <div style="font-family:sans-serif;">
+            <h2>Hello ${contact.name},</h2>
+
+            <p>Thank you for contacting support.</p>
+
+            <h3>Your Query:</h3>
+
+            <p>${contact.message}</p>
+
+            <hr/>
+
+            <h3>Admin Reply:</h3>
+
+            <p>${reply}</p>
+
+            <br/>
+
+            <p>Regards,</p>
+
+            <h4>Support Team</h4>
+          </div>
+        `,
+      });
+
+      res.status(200).json({
+        success: true,
+        message:
+          "Reply sent successfully",
+      });
+
+    } catch (error) {
+
+      console.log(error);
+
+      res.status(500).json({
+        success: false,
+        message:
+          "Server Error",
+      });
+    }
+  };
+
+
+
+
+  // =====================================
+// GET USER SUPPORT MESSAGES
+// =====================================
+export const getUserContacts =
+  async (req, res) => {
+
+    try {
+
+      if (!req.user) {
+
+        return res.status(401).json({
+          success: false,
+          message:
+            "Unauthorized",
+        });
+      }
+
+      const contacts =
+        await Contact.find({
+          userId:
+            req.user._id,
+        }).sort({
+          createdAt: -1,
+        });
+
+      res.status(200).json({
+        success: true,
+        contacts,
+      });
+
+    } catch (error) {
+
+      console.log(
+        "GET USER CONTACTS ERROR:",
+        error
+      );
+
+      res.status(500).json({
+        success: false,
+        message:
+          error.message,
+      });
+    }
+  };
+
+  // =====================================
+// ADMIN REPLY TO CONTACT
+// =====================================
+export const replyToContact =
+  async (req, res) => {
+
+    try {
+
+      const { reply } =
+        req.body;
+
+      const contact =
+        await Contact.findById(
+          req.params.id
+        );
+
+      if (!contact) {
+
+        return res.status(404).json({
+          success: false,
+          message:
+            "Contact not found",
+        });
+      }
+
+      contact.adminReply =
+        reply;
+
+      contact.status =
+        "Resolved";
+
+      await contact.save();
+
+      res.status(200).json({
+        success: true,
+        message:
+          "Reply sent successfully",
+      });
+
+    } catch (error) {
+
+      console.log(error);
 
       res.status(500).json({
         success: false,

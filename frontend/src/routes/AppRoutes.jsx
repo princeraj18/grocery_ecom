@@ -29,6 +29,7 @@ import VendorRoutes from "../vendor/routes/VendorRoutes";
 import ForgotPassword from "../pages/ForgotPassword";
 import ResetPassword from "../pages/ResetPassword";
 import Notification from "../pages/Notification";
+import UserSupport from "../pages/UserSupport";
 
 const AppRoutes = () => {
 
@@ -135,6 +136,15 @@ const user = JSON.parse(
         element={
           <ProtectedRoute>
             <Orders />
+          </ProtectedRoute>
+        }
+      />
+      
+      <Route
+        path="/usersupport"
+        element={
+          <ProtectedRoute>
+            <UserSupport />
           </ProtectedRoute>
         }
       />

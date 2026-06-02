@@ -1,5 +1,3 @@
-// routes/contact.routes.js
-
 import express from "express";
 
 import {
@@ -7,32 +5,58 @@ import {
   getAllContacts,
   getSingleContact,
   deleteContact,
+  replyContact,
+  getUserContacts,
 } from "../controllers/contact.controller.js";
+
+import { protect } from "../middleware/auth.middlewar.js";
 
 const router = express.Router();
 
-// Create Contact
+// =====================================
+// USER ROUTES
+// =====================================
+
+// CREATE CONTACT
 router.post(
   "/",
+  protect,
   createContact
 );
 
-// Get All Contacts
+// GET USER SUPPORTS
+router.get(
+  "/my-supports",
+  protect,
+  getUserContacts
+);
+
+// =====================================
+// ADMIN ROUTES
+// =====================================
+
+// GET ALL CONTACTS
 router.get(
   "/",
   getAllContacts
 );
 
-// Get Single Contact
+// GET SINGLE CONTACT
 router.get(
   "/:id",
   getSingleContact
 );
 
-// Delete Contact
+// DELETE CONTACT
 router.delete(
   "/:id",
   deleteContact
+);
+
+// ADMIN REPLY
+router.put(
+  "/reply/:id",
+  replyContact
 );
 
 export default router;

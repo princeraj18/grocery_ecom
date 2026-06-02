@@ -3,7 +3,7 @@ import Vendor from "../models/Vendor.model.js";
 import bcrypt from "bcryptjs";
 
 import jwt from "jsonwebtoken";
-import { cloudinary } from "../config/cloudinary.js";
+import { cloudinary, isCloudAvailable } from "../config/cloudinary.js";
 import fs from "fs";
 import path from "path";
 import crypto from "crypto";
@@ -223,6 +223,7 @@ export const getSingleVendor =
     }
   };
 
+
 // ==============================
 // UPDATE VENDOR
 // ==============================
@@ -245,6 +246,10 @@ export const updateVendor =
         });
       }
 
+      // =========================
+      // UPDATE FIELDS
+      // =========================
+
       vendor.shopName =
         req.body.shopName ||
         vendor.shopName;
@@ -261,38 +266,56 @@ export const updateVendor =
         req.body.address ||
         vendor.address;
 
-      // LOGO
+      // =========================
+      // HANDLE LOGO UPLOAD
+      // =========================
+
       if (req.file) {
-        try {
-          const uploadResult = await new Promise((resolve, reject) => {
-            const stream = cloudinary.uploader.upload_stream(
-              { resource_type: "auto", folder: "vendors/logos", public_id: `${Date.now()}-${req.file.originalname}` },
-              (error, result) => {
-                if (error) return reject(error);
-                resolve(result);
-              }
-            );
 
-            stream.end(req.file.buffer);
-          });
+        // If Cloudinary is configured and reachable, try upload
+        if (isCloudAvailable()) {
+          try {
+            const uploadResult =
+              await cloudinary.uploader.upload(
+                req.file.path,
+                {
+                  folder: "vendors/logos",
+                }
+              );
 
-          vendor.logo = uploadResult.secure_url || uploadResult.url || "";
-        } catch (err) {
-          // fallback to local uploads
-          const uploadsDir = path.join(process.cwd(), "uploads");
-          if (!fs.existsSync(uploadsDir)) fs.mkdirSync(uploadsDir, { recursive: true });
+            vendor.logo = uploadResult.secure_url;
 
-          const safeName = `${Date.now()}-${(req.file.originalname || "logo").replace(/\s+/g, "-")}`;
-          const filePath = path.join(uploadsDir, safeName);
-          fs.writeFileSync(filePath, req.file.buffer);
+            // Delete local file after successful upload
+            if (fs.existsSync(req.file.path)) {
+              fs.unlinkSync(req.file.path);
+            }
 
-          vendor.logo = `${process.env.BASE_URL || `http://localhost:${process.env.PORT || 5000}`}/uploads/${safeName}`;
+          } catch (uploadError) {
+            console.log("Cloudinary Upload Error:", uploadError);
 
-          console.warn("Vendor logo upload failed, saved locally:", err.message || err);
+            // Fallback: serve the uploaded local file via /uploads (absolute URL)
+            const filename = path.basename(req.file.path);
+            vendor.logo = `${req.protocol}://${req.get("host")}/uploads/${filename}`;
+
+            // Do not delete the file so it remains accessible
+          }
+
+        } else {
+          // Cloudinary not available — use local upload as fallback
+          const filename = path.basename(req.file.path);
+          vendor.logo = `${req.protocol}://${req.get("host")}/uploads/${filename}`;
         }
       }
 
+      // =========================
+      // SAVE VENDOR
+      // =========================
+
       await vendor.save();
+
+      // =========================
+      // RESPONSE
+      // =========================
 
       res.status(200).json({
         success: true,
@@ -312,6 +335,7 @@ export const updateVendor =
       });
     }
   };
+
 
 // ==============================
 // DELETE VENDOR

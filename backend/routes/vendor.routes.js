@@ -70,14 +70,12 @@ router.delete(
 // VERIFY VENDOR
 router.put(
   "/verify/:id",
-
   verifyVendor
 );
 
 // UNVERIFY VENDOR
 router.put(
   "/unverify/:id",
-  
   unverifyVendor
 );
 router.post("/forgot-password", forgotVendorPassword); // NEW
