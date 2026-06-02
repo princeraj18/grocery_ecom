@@ -313,3 +313,103 @@ export const toggleCouponStatus =
       });
     }
   };
+
+// =======================================
+// GET PUBLIC ACTIVE COUPONS
+// =======================================
+export const getPublicCoupons =
+  async (req, res) => {
+
+    try {
+
+      const now = new Date();
+
+      const coupons =
+        await Coupon.find({
+          isActive: true,
+          expiryDate: {
+            $gte: now,
+          },
+        })
+          .populate(
+            "vendor",
+            "shopName ownerName isVerified"
+          )
+          .sort({
+            createdAt: -1,
+          });
+
+      const vendorIds =
+        coupons.map((coupon) =>
+          coupon.vendor?._id ||
+          coupon.vendor
+        );
+
+      const products =
+        await Product.find({
+          vendor: {
+            $in: vendorIds,
+          },
+        })
+          .populate(
+            "category",
+            "text image bgColor"
+          )
+          .populate(
+            "variants",
+            "size price offerPrice stockQuantity"
+          )
+          .limit(60)
+          .sort({
+            createdAt: -1,
+          });
+
+      const productsByVendor =
+        products.reduce(
+          (grouped, product) => {
+            const vendorId =
+              product.vendor?.toString();
+
+            grouped[vendorId] =
+              grouped[vendorId] || [];
+
+            grouped[vendorId].push(
+              product
+            );
+
+            return grouped;
+          },
+          {}
+        );
+
+      res.status(200).json({
+        success: true,
+        coupons:
+          coupons.map((coupon) => {
+            const couponObj =
+              coupon.toObject();
+
+            const vendorId =
+              couponObj.vendor?._id?.toString() ||
+              couponObj.vendor?.toString();
+
+            return {
+              ...couponObj,
+              products:
+                productsByVendor[
+                  vendorId
+                ] || [],
+            };
+          }),
+      });
+
+    } catch (error) {
+
+      console.log(error);
+
+      res.status(500).json({
+        success: false,
+        message: error.message,
+      });
+    }
+  };

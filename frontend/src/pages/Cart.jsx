@@ -10,7 +10,9 @@ import { ShopContext } from "../context/ShopContext";
 
 const Cart = () => {
   const navigate = useNavigate();
-
+const user = JSON.parse(
+  localStorage.getItem("user")
+);
   const {
     cartItems,
     increaseQuantity,
@@ -277,17 +279,35 @@ const Cart = () => {
               </div>
             </div>
 
-            {/* CHECKOUT */}
             <button
               onClick={() =>
                 navigate(
-                  "/checkout"
+                  "/coupons"
                 )
               }
-              className="w-full mt-6 bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-3 rounded-lg shadow-sm transition-colors tracking-wide text-center"
+              className="mt-5 w-full rounded-lg border border-[#0c831f] py-3 text-center font-bold text-[#0c831f] hover:bg-[#e9f6eb]"
             >
-              Proceed To Checkout
+              View Available Coupons
             </button>
+
+          {/* CHECKOUT */}
+<button
+  onClick={() => {
+
+    if (!user) {
+
+      alert("please login to proceed to checkout");
+      navigate("/login");
+
+      return;
+    }
+
+    navigate("/checkout");
+  }}
+  className="w-full mt-6 bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-3 rounded-lg shadow-sm transition-colors tracking-wide text-center"
+>
+  Proceed To Checkout
+</button>
           </div>
         </div>
       )}

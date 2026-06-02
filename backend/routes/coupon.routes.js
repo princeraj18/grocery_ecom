@@ -4,13 +4,23 @@ import vendorAuth from "../middleware/vendorAuth.js";
 
 import {
   createCoupon,
+  getPublicCoupons,
   getVendorCoupons,
   deleteCoupon,
-  toggleCouponStatus,  validateCoupon,
+  toggleCouponStatus,
+  validateCoupon,
 
 } from "../controllers/coupon.controller.js";
 
 const router = express.Router();
+
+// =======================================
+// GET PUBLIC COUPONS
+// =======================================
+router.get(
+  "/public",
+  getPublicCoupons
+);
 
 // =======================================
 // CREATE COUPON

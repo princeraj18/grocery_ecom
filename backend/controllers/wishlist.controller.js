@@ -115,7 +115,13 @@ export const getWishlist =
       const wishlist =
         await Wishlist.find({
           user: req.params.userId,
-        }).populate("product");
+        }).populate({
+          path: "product",
+          populate: [
+            { path: "variants", model: "Variant" },
+            { path: "category", model: "Category" },
+          ],
+        });
 
       res.status(200).json({
         success: true,

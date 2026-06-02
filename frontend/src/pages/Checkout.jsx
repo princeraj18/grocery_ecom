@@ -2,6 +2,7 @@
 
 import React, {
   useContext,
+  useEffect,
   useState,
 } from "react";
 
@@ -49,6 +50,23 @@ const Checkout = () => {
     useState("");
 
   const SHIPPING_CHARGE = 20;
+
+  useEffect(() => {
+    const selectedCouponCode =
+      sessionStorage.getItem(
+        "selectedCouponCode"
+      );
+
+    if (selectedCouponCode) {
+      setCouponCode(
+        selectedCouponCode
+      );
+
+      sessionStorage.removeItem(
+        "selectedCouponCode"
+      );
+    }
+  }, []);
 
   // =========================
   // PRICE CALCULATIONS

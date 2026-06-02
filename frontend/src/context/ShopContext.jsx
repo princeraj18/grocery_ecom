@@ -1,4 +1,3 @@
-
 import {
   createContext,
   useEffect,
@@ -12,6 +11,39 @@ import api from "../api/Axios";
 // =========================
 export const ShopContext =
   createContext();
+
+// =========================
+// NORMALIZE WISHLIST
+// =========================
+const normalizeWishlist = (
+  wishlist
+) => {
+
+  if (
+    Array.isArray(
+      wishlist?.items
+    )
+  ) {
+    return wishlist.items;
+  }
+
+  if (
+    Array.isArray(
+      wishlist
+    )
+  ) {
+    return wishlist;
+  }
+
+  if (
+    wishlist &&
+    wishlist.product
+  ) {
+    return [wishlist];
+  }
+
+  return [];
+};
 
 // =========================
 // PROVIDER
@@ -30,10 +62,34 @@ const ShopContextProvider = ({
     useState([]);
 
   const [cartItems, setCartItems] =
-    useState([]);
+    useState(
+      JSON.parse(
+        localStorage.getItem(
+          "guestCart"
+        )
+      ) || []
+    );
 
-  const [wishlistItems, setWishlistItems] =
-    useState([]);
+  const [
+    wishlistItems,
+    setWishlistItems,
+  ] = useState(
+    JSON.parse(
+      localStorage.getItem(
+        "guestWishlist"
+      )
+    ) || []
+  );
+
+  const [
+    notifications,
+    setNotifications,
+  ] = useState([]);
+
+  const [
+    unreadNotificationCount,
+    setUnreadNotificationCount,
+  ] = useState(0);
 
   const [
     loadingProducts,
@@ -50,10 +106,39 @@ const ShopContextProvider = ({
     );
 
   // =========================
+  // SAVE GUEST DATA
+  // =========================
+  useEffect(() => {
+
+    if (!user) {
+
+      localStorage.setItem(
+        "guestCart",
+        JSON.stringify(
+          cartItems
+        )
+      );
+
+      localStorage.setItem(
+        "guestWishlist",
+        JSON.stringify(
+          wishlistItems
+        )
+      );
+    }
+
+  }, [
+    cartItems,
+    wishlistItems,
+    user,
+  ]);
+
+  // =========================
   // FETCH PRODUCTS
   // =========================
   const fetchProducts =
     async () => {
+
       try {
 
         setLoadingProducts(
@@ -89,6 +174,7 @@ const ShopContextProvider = ({
   // =========================
   const fetchCategories =
     async () => {
+
       try {
 
         const { data } =
@@ -117,10 +203,8 @@ const ShopContextProvider = ({
 
       try {
 
-        if (!user?._id) {
-          setCartItems([]);
+        if (!user?._id)
           return;
-        }
 
         const { data } =
           await api.get(
@@ -137,8 +221,6 @@ const ShopContextProvider = ({
           "FETCH CART ERROR:",
           error
         );
-
-        setCartItems([]);
       }
     };
 
@@ -150,12 +232,8 @@ const ShopContextProvider = ({
 
       try {
 
-        if (!user?._id) {
-
-          setWishlistItems([]);
-
+        if (!user?._id)
           return;
-        }
 
         const { data } =
           await api.get(
@@ -163,11 +241,9 @@ const ShopContextProvider = ({
           );
 
         setWishlistItems(
-          Array.isArray(
+          normalizeWishlist(
             data.wishlist
           )
-            ? data.wishlist
-            : []
         );
 
       } catch (error) {
@@ -176,8 +252,64 @@ const ShopContextProvider = ({
           "FETCH WISHLIST ERROR:",
           error
         );
+      }
+    };
 
-        setWishlistItems([]);
+  // =========================
+  // FETCH NOTIFICATIONS
+  // =========================
+  const fetchNotifications =
+    async () => {
+
+      try {
+
+        const token =
+          localStorage.getItem(
+            "token"
+          );
+
+        if (!token) {
+
+          setNotifications([]);
+
+          setUnreadNotificationCount(
+            0
+          );
+
+          return;
+        }
+
+        const { data } =
+          await api.get(
+            "/notifications/my-notifications",
+            {
+              headers: {
+                Authorization:
+                  `Bearer ${token}`,
+              },
+            }
+          );
+
+        const allNotifications =
+          data.notifications || [];
+
+        setNotifications(
+          allNotifications
+        );
+
+        setUnreadNotificationCount(
+          allNotifications.filter(
+            (item) =>
+              !item.isRead
+          ).length
+        );
+
+      } catch (error) {
+
+        console.log(
+          "FETCH NOTIFICATION ERROR:",
+          error
+        );
       }
     };
 
@@ -197,24 +329,14 @@ const ShopContextProvider = ({
   // =========================
   useEffect(() => {
 
-    const loadData =
-      async () => {
+    if (user?._id) {
 
-        if (user?._id) {
+      fetchCart();
 
-          await fetchCart();
+      fetchWishlist();
 
-          await fetchWishlist();
-
-        } else {
-
-          setCartItems([]);
-
-          setWishlistItems([]);
-        }
-      };
-
-    loadData();
+      fetchNotifications();
+    }
 
   }, [user]);
 
@@ -224,47 +346,90 @@ const ShopContextProvider = ({
   const addToCart =
     async (product) => {
 
-      try {
+      const selectedVariant =
+        product.selectedVariant ||
+        product.variants?.[0];
 
-        if (!user) {
+      if (!selectedVariant)
+        return;
 
-          alert(
-            "Please login first"
+      const cartProduct = {
+
+        productId:
+          product._id,
+
+        variantSize:
+          selectedVariant.size ||
+          "Default",
+
+        variantId:
+          selectedVariant._id,
+
+        name:
+          product.name,
+
+        image:
+          Array.isArray(
+            product.image
+          )
+            ? product.image[0]
+            : product.image,
+
+        category:
+          product.category,
+
+        price:
+          selectedVariant.offerPrice,
+
+        originalPrice:
+          selectedVariant.price,
+
+        quantity: 1,
+      };
+
+      // GUEST
+      if (!user) {
+
+        const existing =
+          cartItems.find(
+            (item) =>
+              item.productId ===
+                cartProduct.productId &&
+              item.variantSize ===
+                cartProduct.variantSize
           );
 
-          return;
+        if (existing) {
+
+          setCartItems(
+            cartItems.map(
+              (item) =>
+                item.productId ===
+                  cartProduct.productId &&
+                item.variantSize ===
+                  cartProduct.variantSize
+                  ? {
+                      ...item,
+                      quantity:
+                        item.quantity + 1,
+                    }
+                  : item
+            )
+          );
+
+        } else {
+
+          setCartItems([
+            ...cartItems,
+            cartProduct,
+          ]);
         }
 
-        const cartProduct = {
+        return;
+      }
 
-          productId:
-            product._id,
-
-          variantSize:
-            product.selectedVariant?.size,
-
-          variantId:
-            product.selectedVariant?._id,
-
-          name:
-            product.name,
-
-          image:
-            product.image?.[0] || "",
-
-          category:
-            product.category,
-
-          price:
-            product.selectedVariant
-              ?.offerPrice,
-
-          originalPrice:
-            product.selectedVariant
-              ?.price,
-
-          quantity: 1,
-        };
+      // USER
+      try {
 
         const { data } =
           await api.post(
@@ -272,7 +437,6 @@ const ShopContextProvider = ({
             {
               userId:
                 user._id,
-
               product:
                 cartProduct,
             }
@@ -280,10 +444,6 @@ const ShopContextProvider = ({
 
         setCartItems(
           data.cart.items
-        );
-
-        alert(
-          "Added To Cart"
         );
 
       } catch (error) {
@@ -304,6 +464,29 @@ const ShopContextProvider = ({
       variantSize
     ) => {
 
+      // GUEST
+      if (!user) {
+
+        setCartItems(
+          cartItems.map(
+            (item) =>
+              item.productId ===
+                productId &&
+              item.variantSize ===
+                variantSize
+                ? {
+                    ...item,
+                    quantity:
+                      item.quantity + 1,
+                  }
+                : item
+          )
+        );
+
+        return;
+      }
+
+      // USER
       try {
 
         const item =
@@ -315,7 +498,8 @@ const ShopContextProvider = ({
                 variantSize
           );
 
-        if (!item) return;
+        if (!item)
+          return;
 
         const { data } =
           await api.put(
@@ -323,11 +507,8 @@ const ShopContextProvider = ({
             {
               userId:
                 user._id,
-
               productId,
-
               variantSize,
-
               quantity:
                 item.quantity + 1,
             }
@@ -355,6 +536,53 @@ const ShopContextProvider = ({
       variantSize
     ) => {
 
+      // GUEST
+      if (!user) {
+
+        const item =
+          cartItems.find(
+            (item) =>
+              item.productId ===
+                productId &&
+              item.variantSize ===
+                variantSize
+          );
+
+        if (!item)
+          return;
+
+        if (
+          item.quantity <= 1
+        ) {
+
+          removeFromCart(
+            productId,
+            variantSize
+          );
+
+          return;
+        }
+
+        setCartItems(
+          cartItems.map(
+            (item) =>
+              item.productId ===
+                productId &&
+              item.variantSize ===
+                variantSize
+                ? {
+                    ...item,
+                    quantity:
+                      item.quantity - 1,
+                  }
+                : item
+          )
+        );
+
+        return;
+      }
+
+      // USER
       try {
 
         const item =
@@ -366,13 +594,14 @@ const ShopContextProvider = ({
                 variantSize
           );
 
-        if (!item) return;
+        if (!item)
+          return;
 
         if (
           item.quantity <= 1
         ) {
 
-          await removeFromCart(
+          removeFromCart(
             productId,
             variantSize
           );
@@ -386,11 +615,8 @@ const ShopContextProvider = ({
             {
               userId:
                 user._id,
-
               productId,
-
               variantSize,
-
               quantity:
                 item.quantity - 1,
             }
@@ -418,6 +644,25 @@ const ShopContextProvider = ({
       variantSize
     ) => {
 
+      // GUEST
+      if (!user) {
+
+        setCartItems(
+          cartItems.filter(
+            (item) =>
+              !(
+                item.productId ===
+                  productId &&
+                item.variantSize ===
+                  variantSize
+              )
+          )
+        );
+
+        return;
+      }
+
+      // USER
       try {
 
         const { data } =
@@ -427,9 +672,7 @@ const ShopContextProvider = ({
               data: {
                 userId:
                   user._id,
-
                 productId,
-
                 variantSize,
               },
             }
@@ -454,12 +697,16 @@ const ShopContextProvider = ({
   const clearCart =
     async () => {
 
-      try {
+      // GUEST
+      if (!user) {
 
         setCartItems([]);
 
-        if (!user?._id)
-          return;
+        return;
+      }
+
+      // USER
+      try {
 
         await api.delete(
           "/cart/clear",
@@ -470,6 +717,8 @@ const ShopContextProvider = ({
             },
           }
         );
+
+        setCartItems([]);
 
       } catch (error) {
 
@@ -484,39 +733,52 @@ const ShopContextProvider = ({
   // ADD TO WISHLIST
   // =========================
   const addToWishlist =
-    async (productId) => {
+    async (product) => {
 
+      // GUEST
+      if (!user) {
+
+        const exists =
+          wishlistItems.find(
+            (item) =>
+              (
+                item.product?._id ||
+                item._id
+              ) === product._id
+          );
+
+        if (exists)
+          return;
+
+        setWishlistItems([
+          ...wishlistItems,
+          product,
+        ]);
+
+        return;
+      }
+
+      // USER
       try {
 
-        if (!user) {
-
-          alert(
-            "Please login first"
-          );
-
-          return;
-        }
-
-        const { data } =
-          await api.post(
-            "/wishlist/add",
-            {
-              userId:
-                user._id,
-
-              productId,
-            }
-          );
+        await api.post(
+          "/wishlist/add",
+          {
+            userId:
+              user._id,
+            productId:
+              product._id,
+          }
+        );
 
         await fetchWishlist();
-
-        return data;
 
       } catch (error) {
 
         console.log(
           "ADD WISHLIST ERROR:",
-          error
+          error.response?.data ||
+            error
         );
       }
     };
@@ -527,6 +789,23 @@ const ShopContextProvider = ({
   const removeFromWishlist =
     async (productId) => {
 
+      // GUEST
+      if (!user) {
+
+        setWishlistItems(
+          wishlistItems.filter(
+            (item) =>
+              (
+                item.product?._id ||
+                item._id
+              ) !== productId
+          )
+        );
+
+        return;
+      }
+
+      // USER
       try {
 
         await api.delete(
@@ -535,18 +814,65 @@ const ShopContextProvider = ({
             data: {
               userId:
                 user._id,
-
               productId,
             },
           }
         );
 
-        await fetchWishlist();
+        setWishlistItems(
+          wishlistItems.filter(
+            (item) =>
+              (
+                item.product?._id ||
+                item._id
+              ) !== productId
+          )
+        );
 
       } catch (error) {
 
         console.log(
           "REMOVE WISHLIST ERROR:",
+          error
+        );
+      }
+    };
+
+  // =========================
+  // MARK NOTIFICATION READ
+  // =========================
+  const markNotificationAsRead =
+    async (id) => {
+
+      try {
+
+        await api.put(
+          `/notifications/read/${id}`
+        );
+
+        setNotifications(
+          (prev) =>
+            prev.map((item) =>
+              item._id === id
+                ? {
+                    ...item,
+                    isRead: true,
+                  }
+                : item
+            )
+        );
+
+        setUnreadNotificationCount(
+          (prev) =>
+            prev > 0
+              ? prev - 1
+              : 0
+        );
+
+      } catch (error) {
+
+        console.log(
+          "MARK READ ERROR:",
           error
         );
       }
@@ -576,10 +902,6 @@ const ShopContextProvider = ({
 
       setUser(null);
 
-      setCartItems([]);
-
-      setWishlistItems([]);
-
       localStorage.removeItem(
         "user"
       );
@@ -588,13 +910,15 @@ const ShopContextProvider = ({
         "token"
       );
 
-      localStorage.removeItem(
-        "cart"
+      setNotifications([]);
+
+      setUnreadNotificationCount(
+        0
       );
     };
 
   // =========================
-  // PROVIDER VALUE
+  // CONTEXT VALUE
   // =========================
   const value = {
 
@@ -603,15 +927,22 @@ const ShopContextProvider = ({
     loadingProducts,
 
     cartItems,
+    wishlistItems,
+
     addToCart,
     increaseQuantity,
     decreaseQuantity,
     removeFromCart,
     clearCart,
 
-    wishlistItems,
     addToWishlist,
     removeFromWishlist,
+
+    notifications,
+    unreadNotificationCount,
+
+    fetchNotifications,
+    markNotificationAsRead,
 
     user,
     loginUser,
@@ -635,4 +966,3 @@ const ShopContextProvider = ({
 
 export default
   ShopContextProvider;
-

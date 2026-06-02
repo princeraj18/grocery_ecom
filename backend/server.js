@@ -28,7 +28,7 @@ import wishlistRoutes
 from "./routes/wishlist.routes.js";
 import categoryRoutes from "./routes/category.routes.js";
 import variantRoutes from "./routes/variant.routes.js";
-
+import notificationRoutes from "./routes/notification.routes.js"
 
 
 connectDB();
@@ -113,6 +113,10 @@ app.use(
 app.use(
   "/api/wishlist",
   wishlistRoutes
+);
+app.use(
+  "/api/notifications",
+  notificationRoutes
 );
 app.use(
   "/api/vendor",

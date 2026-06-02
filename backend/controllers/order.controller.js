@@ -1,18 +1,25 @@
+import mongoose from "mongoose";
+
 import Order from "../models/Order.model.js";
 import Product from "../models/Product.model.js";
-import mongoose from "mongoose";
+import notificationModel from "../models/notification.model.js";
+
 import {
   reduceOrderStock,
   validateOrderStock,
 } from "../utils/stock.js";
+
 // ====================================
 // CREATE ORDER
 // ====================================
+
 const createOrder = async (
   req,
   res
 ) => {
+
   try {
+
     const {
       userId,
       products,
@@ -27,11 +34,17 @@ const createOrder = async (
     const productsSource =
       products || cartItems || [];
 
-    const orderTotal = Number(
-      totalAmount ?? total ?? 0
-    );
+    const orderTotal =
+      Number(
+        totalAmount ?? total ?? 0
+      );
+
+    // =========================
+    // VALIDATION
+    // =========================
 
     if (!userId) {
+
       return res.status(400).json({
         success: false,
         message:
@@ -43,6 +56,7 @@ const createOrder = async (
       !productsSource ||
       productsSource.length === 0
     ) {
+
       return res.status(400).json({
         success: false,
         message:
@@ -50,13 +64,15 @@ const createOrder = async (
       });
     }
 
-    const formattedProducts = [];
+    const formattedProducts =
+      [];
 
-    // =====================
-    // CHECK STOCK
-    // =====================
+    // =========================
+    // VALIDATE PRODUCTS
+    // =========================
 
     for (const item of productsSource) {
+
       const productId =
         item.productId ||
         item._id;
@@ -78,6 +94,7 @@ const createOrder = async (
         );
 
       if (!product) {
+
         return res.status(404).json({
           success: false,
           message:
@@ -85,17 +102,24 @@ const createOrder = async (
         });
       }
 
+      // =========================
+      // STOCK CHECK
+      // =========================
+
       if (
         product.stockQuantity <
         quantity
       ) {
+
         return res.status(400).json({
           success: false,
-          message: `${product.name} has only ${product.stockQuantity} items left in stock`,
+          message:
+            `${product.name} has only ${product.stockQuantity} items left in stock`,
         });
       }
 
       formattedProducts.push({
+
         product:
           product._id,
 
@@ -122,16 +146,21 @@ const createOrder = async (
       });
     }
 
+    // =========================
+    // VALIDATE ORDER STOCK
+    // =========================
+
     await validateOrderStock(
       formattedProducts
     );
 
-    // =====================
+    // =========================
     // CREATE ORDER
-    // =====================
+    // =========================
 
     const order =
       await Order.create({
+
         user: userId,
 
         items:
@@ -154,24 +183,53 @@ const createOrder = async (
           "Order Placed",
       });
 
-    // =====================
+    // =========================
     // REDUCE STOCK
-    // =====================
+    // =========================
 
-    await reduceOrderStock(order);
+    await reduceOrderStock(
+      order
+    );
+
+    // =========================
+    // CREATE ORDER NOTIFICATION
+    // =========================
+
+    await notificationModel.create({
+
+      user: userId,
+
+      title:
+        "Order Placed Successfully",
+
+      message:
+        `Your order #${order._id
+          .toString()
+          .slice(-6)} has been placed successfully.`,
+    });
+
+    // =========================
+    // RESPONSE
+    // =========================
 
     res.status(201).json({
+
       success: true,
+
       order,
     });
+
   } catch (error) {
+
     console.log(
       "CREATE ORDER ERROR:",
       error
     );
 
     res.status(500).json({
+
       success: false,
+
       message:
         error.message,
     });
@@ -181,10 +239,12 @@ const createOrder = async (
 // ====================================
 // GET MY ORDERS
 // ====================================
+
 const getMyOrders = async (
   req,
   res
 ) => {
+
   try {
 
     const { userId } =
@@ -193,12 +253,15 @@ const getMyOrders = async (
     const orders =
       await Order.find({
         user: userId,
-      }).sort({
-        createdAt: -1,
-      });
+      })
+        .sort({
+          createdAt: -1,
+        });
 
     res.status(200).json({
+
       success: true,
+
       orders,
     });
 
@@ -210,8 +273,11 @@ const getMyOrders = async (
     );
 
     res.status(500).json({
+
       success: false,
-      message: error.message,
+
+      message:
+        error.message,
     });
   }
 };
@@ -219,10 +285,12 @@ const getMyOrders = async (
 // ====================================
 // GET ALL ORDERS
 // ====================================
+
 const getAllOrders = async (
   req,
   res
 ) => {
+
   try {
 
     const orders =
@@ -236,7 +304,9 @@ const getAllOrders = async (
         });
 
     res.status(200).json({
+
       success: true,
+
       orders,
     });
 
@@ -248,8 +318,11 @@ const getAllOrders = async (
     );
 
     res.status(500).json({
+
       success: false,
-      message: error.message,
+
+      message:
+        error.message,
     });
   }
 };
@@ -257,17 +330,18 @@ const getAllOrders = async (
 // ====================================
 // GET SINGLE ORDER
 // ====================================
+
 const getSingleOrder =
   async (req, res) => {
 
     try {
 
-      // Validate ID
       if (
         !mongoose.Types.ObjectId.isValid(
           req.params.id
         )
       ) {
+
         return res.status(400).json({
           success: false,
           message:
@@ -284,6 +358,7 @@ const getSingleOrder =
         );
 
       if (!order) {
+
         return res.status(404).json({
           success: false,
           message:
@@ -292,7 +367,9 @@ const getSingleOrder =
       }
 
       res.status(200).json({
+
         success: true,
+
         order,
       });
 
@@ -304,50 +381,52 @@ const getSingleOrder =
       );
 
       res.status(500).json({
+
         success: false,
-        message: error.message,
+
+        message:
+          error.message,
       });
     }
   };
 
 // ====================================
 // GET VENDOR ORDERS
-// ONLY ORDERS OF LOGGED IN VENDOR
 // ====================================
+
 export const getVendorOrders =
   async (req, res) => {
 
     try {
 
-      // ==========================
-      // LOGGED IN VENDOR ID
-      // ==========================
       const vendorId =
         req.vendor._id;
 
-      // ==========================
+      // =========================
       // FIND VENDOR PRODUCTS
-      // ==========================
+      // =========================
+
       const vendorProducts =
         await Product.find({
           vendor: vendorId,
         }).select("_id");
 
-      // Product IDs array
-     const productIds =
-  vendorProducts.map(
-    (product) => product._id
-  );
+      const productIds =
+        vendorProducts.map(
+          (product) =>
+            product._id
+        );
 
-      // ==========================
+      // =========================
       // FIND ORDERS
-      // ==========================
+      // =========================
+
       const orders =
         await Order.find({
-  "items.product": {
-    $in: productIds,
-  },
-})
+          "items.product": {
+            $in: productIds,
+          },
+        })
           .populate(
             "user",
             "name email"
@@ -356,31 +435,34 @@ export const getVendorOrders =
             createdAt: -1,
           });
 
-      // ==========================
-      // FILTER ONLY
-      // VENDOR PRODUCTS
-      // ==========================
-     const filteredOrders =
-  orders.map((order) => {
-    const vendorItems =
-      order.items.filter(
-        (item) =>
-          item.product &&
-          productIds.some(
-            (id) =>
-              id.toString() ===
-              item.product.toString()
-          )
-      );
+      // =========================
+      // FILTER ONLY VENDOR ITEMS
+      // =========================
 
-    return {
-      ...order._doc,
-      items: vendorItems,
-    };
-  });
+      const filteredOrders =
+        orders.map((order) => {
+
+          const vendorItems =
+            order.items.filter(
+              (item) =>
+                item.product &&
+                productIds.some(
+                  (id) =>
+                    id.toString() ===
+                    item.product.toString()
+                )
+            );
+
+          return {
+            ...order._doc,
+            items: vendorItems,
+          };
+        });
 
       res.status(200).json({
+
         success: true,
+
         orders:
           filteredOrders,
       });
@@ -393,7 +475,9 @@ export const getVendorOrders =
       );
 
       res.status(500).json({
+
         success: false,
+
         message:
           error.message,
       });
@@ -403,17 +487,22 @@ export const getVendorOrders =
 // ====================================
 // UPDATE ORDER STATUS
 // ====================================
+
 export const updateOrderStatus =
   async (req, res) => {
 
     try {
 
-      // Validate ID
+      // =========================
+      // VALIDATE ID
+      // =========================
+
       if (
         !mongoose.Types.ObjectId.isValid(
           req.params.id
         )
       ) {
+
         return res.status(400).json({
           success: false,
           message:
@@ -421,19 +510,17 @@ export const updateOrderStatus =
         });
       }
 
+      // =========================
+      // FIND ORDER
+      // =========================
+
       const order =
-        await Order.findByIdAndUpdate(
-          req.params.id,
-          {
-            orderStatus:
-              req.body.orderStatus,
-          },
-          {
-            new: true,
-          }
+        await Order.findById(
+          req.params.id
         );
 
       if (!order) {
+
         return res.status(404).json({
           success: false,
           message:
@@ -441,8 +528,43 @@ export const updateOrderStatus =
         });
       }
 
+      // =========================
+      // UPDATE STATUS
+      // =========================
+
+      order.orderStatus =
+        req.body.orderStatus;
+
+      await order.save();
+
+      // =========================
+      // CREATE NOTIFICATION
+      // =========================
+
+      await notificationModel.create({
+
+        user: order.user,
+
+        title:
+          "Order Status Updated",
+
+        message:
+          `Your order #${order._id
+            .toString()
+            .slice(-6)} status changed to "${req.body.orderStatus}"`,
+      });
+
+      // =========================
+      // RESPONSE
+      // =========================
+
       res.status(200).json({
+
         success: true,
+
+        message:
+          "Order status updated successfully",
+
         order,
       });
 
@@ -454,7 +576,9 @@ export const updateOrderStatus =
       );
 
       res.status(500).json({
+
         success: false,
+
         message:
           error.message,
       });
@@ -464,6 +588,7 @@ export const updateOrderStatus =
 // ====================================
 // EXPORTS
 // ====================================
+
 export {
   createOrder,
   getMyOrders,

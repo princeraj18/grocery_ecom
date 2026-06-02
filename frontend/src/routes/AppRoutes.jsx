@@ -10,6 +10,7 @@ import Home from "../pages/Home";
 import Products from "../pages/Products";
 import ProductDetails from "../pages/ProductDetails";
 import Cart from "../pages/Cart";
+import Coupons from "../pages/Coupons";
 import Checkout from "../pages/Checkout";
 import Login from "../pages/Login";
 import Register from "../pages/Register";
@@ -27,6 +28,7 @@ import WishList from "../pages/WishList";
 import VendorRoutes from "../vendor/routes/VendorRoutes";
 import ForgotPassword from "../pages/ForgotPassword";
 import ResetPassword from "../pages/ResetPassword";
+import Notification from "../pages/Notification";
 
 const AppRoutes = () => {
 
@@ -68,6 +70,10 @@ const user = JSON.parse(
         path="/products/:id"
         element={<ProductDetails />}
       />
+      <Route
+        path="/notification"
+        element={<Notification />}
+      />
 
       <Route
         path="/category/:category"
@@ -77,6 +83,8 @@ const user = JSON.parse(
       <Route path="/about" element={<AboutUs />} />
 
       <Route path="/contact" element={<ContactUs />} />
+
+      <Route path="/coupons" element={<Coupons />} />
 
       {/* AUTH ROUTES */}
       <Route path="/login" element={<Login />} />
@@ -94,27 +102,15 @@ const user = JSON.parse(
       />
 
       {/* PROTECTED ROUTES */}
-      <Route
-        path="/wishlist"
-        element={
-          user ? (
-            <WishList />
-          ) : (
-            <Navigate to="/login" replace />
-          )
-        }
-      />
+     <Route
+  path="/wishlist"
+  element={<WishList />}
+/>
 
-      <Route
-        path="/cart"
-        element={
-          user ? (
-            <Cart />
-          ) : (
-            <Navigate to="/login" replace />
-          )
-        }
-      />
+<Route
+  path="/cart"
+  element={<Cart />}
+/>
 
       <Route
         path="/checkout"

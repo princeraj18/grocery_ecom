@@ -46,13 +46,26 @@ const Products = () => {
   // =========================
   // WISHLIST IDS
   // =========================
-  const wishlistIds = useMemo(() => {
-    return wishlistItems.map(
-      (item) =>
+const wishlistIds = useMemo(() => {
+
+  if (
+    !Array.isArray(
+      wishlistItems
+    )
+  ) {
+    return [];
+  }
+
+  return wishlistItems.map(
+    (item) =>
+      (
         item.product?._id ||
+        item.product ||
         item.productId
-    );
-  }, [wishlistItems]);
+      )?.toString()
+  );
+
+}, [wishlistItems]);
 
   // =========================
   // SEARCH SYNC
@@ -82,36 +95,49 @@ const Products = () => {
   // =========================
   // TOGGLE WISHLIST
   // =========================
-  const toggleWishlist = async (
-    e,
-    productId
-  ) => {
-    e.preventDefault();
+ const toggleWishlist = async (
+  e,
+  product
+) => {
 
-    if (!userId) {
-      alert("Please login first");
-      return;
-    }
+  e.preventDefault();
 
-    try {
-      if (
-        wishlistIds.includes(productId)
-      ) {
-        await removeFromWishlist(
-          productId
-        );
-      } else {
-        await addToWishlist(
-          productId
-        );
-      }
-    } catch (error) {
-      console.log(
-        "WISHLIST ERROR:",
-        error
+  e.stopPropagation();
+
+  if (!userId) {
+
+    alert("Please login first");
+
+    return;
+  }
+
+  try {
+
+    if (
+      wishlistIds.includes(
+        product._id.toString()
+      )
+    ) {
+
+      await removeFromWishlist(
+        product._id
+      );
+
+    } else {
+
+      await addToWishlist(
+        product
       );
     }
-  };
+
+  } catch (error) {
+
+    console.log(
+      "WISHLIST ERROR:",
+      error
+    );
+  }
+};
 
   // =========================
   // FILTER PRODUCTS
@@ -204,18 +230,33 @@ const Products = () => {
       category,
       sortPrice,
       products,
+      categories,
     ]);
 
   // =========================
   // ADD TO CART
   // =========================
-  const handleAdd = (
-    e,
-    item
-  ) => {
-    e.preventDefault();
-    addToCart(item);
-  };
+  const handleAdd = async (
+  e,
+  item
+) => {
+
+  e.preventDefault();
+
+  e.stopPropagation();
+
+  try {
+
+    await addToCart(item);
+
+  } catch (error) {
+
+    console.log(
+      "ADD TO CART ERROR:",
+      error
+    );
+  }
+};
 
   // =========================
   // LOADING
@@ -412,15 +453,15 @@ const Products = () => {
 
                         <button
                           onClick={(e) =>
-                            toggleWishlist(
-                              e,
-                              item._id
-                            )
-                          }
+  toggleWishlist(
+    e,
+    item
+  )
+}
                           className="absolute right-2 top-2 z-20 flex h-8 w-8 items-center justify-center rounded-full bg-white shadow-sm"
                         >
                           {wishlistIds.includes(
-                            item._id
+                            item._id.toString()
                           ) ? (
                             <FaHeart className="text-red-500" />
                           ) : (
@@ -473,16 +514,17 @@ const Products = () => {
                           </div>
 
                           <button
-                            className="rounded border border-[#0c831f] px-3 py-1.5 text-xs font-black text-[#0c831f]"
-                            onClick={(e) =>
-                              handleAdd(
-                                e,
-                                item
-                              )
-                            }
-                          >
-                            ADD
-                          </button>
+  type="button"
+  className="rounded border border-[#0c831f] px-3 py-1.5 text-xs font-black text-[#0c831f]"
+  onClick={(e) =>
+    handleAdd(
+      e,
+      item
+    )
+  }
+>
+  ADD
+</button>
                         </div>
                       </div>
                     </Link>

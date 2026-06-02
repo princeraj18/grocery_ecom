@@ -9,21 +9,14 @@ const vendorAuth = async (
 
   try {
 
-    const authHeader =
-      req.headers.authorization;
+    const authHeader = req.headers.authorization || req.headers["x-access-token"] || req.headers["x-auth-token"];
 
-    if (
-      !authHeader ||
-      !authHeader.startsWith("Bearer ")
-    ) {
-
-      return res.status(401).json({
-        message: "Unauthorized",
-      });
+    if (!authHeader) {
+      return res.status(401).json({ message: "Authorization header missing" });
     }
 
-    const token =
-      authHeader.split(" ")[1];
+    // Support both `Bearer <token>` and bare token values
+    const token = authHeader.startsWith("Bearer ") ? authHeader.split(" ")[1] : authHeader;
 
     const decoded =
       jwt.verify(
@@ -49,10 +42,12 @@ const vendorAuth = async (
 
   } catch (error) {
 
-    console.log(error);
+    // Helpful debug output for development
+    console.log("vendorAuth error:", error.message || error);
 
     return res.status(401).json({
       message: "Invalid token",
+      error: process.env.NODE_ENV === "development" ? error.message : undefined,
     });
   }
 };
