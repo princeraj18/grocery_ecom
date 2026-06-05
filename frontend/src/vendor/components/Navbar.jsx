@@ -6,6 +6,7 @@ import React, {
 import { useNavigate } from "react-router-dom";
 
 import axios from "axios";
+import ThemeToggle from "./ThemeToggle";
 
 export default function Navbar() {
 
@@ -72,7 +73,7 @@ export default function Navbar() {
 
   return (
 
-    <div className="bg-white shadow px-6 py-4 flex items-center justify-between">
+    <div className="bg-white shadow px-6 py-4 flex items-center justify-between dark:bg-slate-900 dark:text-white">
 
       {/* TITLE */}
       <h1 className="text-2xl font-bold">
@@ -116,6 +117,8 @@ export default function Navbar() {
         </div>
 
         {/* LOGOUT */}
+        <ThemeToggle />
+
         <button
           onClick={handleLogout}
           className="bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600 transition"

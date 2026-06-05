@@ -4,6 +4,10 @@ import {
   Navigate,
 } from "react-router-dom";
 
+// ========================================
+// ADMIN PAGES
+// ========================================
+
 import Dashboard from "../pages/Dashboard";
 import User from "../pages/User";
 import Product from "../pages/Product";
@@ -15,36 +19,78 @@ import EditProduct from "../pages/EditProduct";
 import UserDetails from "../pages/UserDetails";
 import Vendors from "../pages/Vendors";
 import VendorDetails from "../pages/VendorDetails";
-
-import ProtectedRoute from "./ProtectedRoute";
-
-import AdminLayout from "../layout/AdminLayout";
-import AdminForgotPassword from "../pages/AdminForgotPassword";
-import AdminResetPassword from "../pages/AdminResetPassword";
 import AddCategory from "../pages/AddCategory";
 import AdminVariant from "../pages/AdminVariant";
 import Support from "../pages/Support";
 
+// ========================================
+// DELIVERY PAGES
+// ========================================
+
+import DeliveryDashboard from "../pages/DeliveryDashboard";
+import DeliveryEarnings from "../pages/DeliveryEarnings";
+
+// ========================================
+// AUTH PAGES
+// ========================================
+
+import AdminForgotPassword from "../pages/AdminForgotPassword";
+import AdminResetPassword from "../pages/AdminResetPassword";
+
+// ========================================
+// LAYOUT + PROTECTED
+// ========================================
+
+import ProtectedRoute from "./ProtectedRoute";
+import AdminLayout from "../layout/AdminLayout";
+import DeliveryPartner from "../pages/DeliveryPartner";
+
 export default function AppRoutes() {
 
   return (
+
     <Routes>
 
-      {/* LOGIN */}
+      {/* ========================================
+          LOGIN
+      ======================================== */}
+
       <Route
         path="/login"
         element={<Login />}
       />
 
-      {/* REGISTER */}
+      {/* ========================================
+          REGISTER
+      ======================================== */}
+
       <Route
         path="/register"
         element={<Register />}
       />
-      <Route path="/admin/forgot-password" element={<AdminForgotPassword />} />
-<Route path="/admin/reset-password/:token" element={<AdminResetPassword />} />
 
-      {/* ROOT */}
+      {/* ========================================
+          FORGOT PASSWORD
+      ======================================== */}
+
+      <Route
+        path="/admin/forgot-password"
+        element={<AdminForgotPassword />}
+      />
+
+      {/* ========================================
+          RESET PASSWORD
+      ======================================== */}
+
+      <Route
+        path="/admin/reset-password/:token"
+        element={<AdminResetPassword />}
+      />
+
+      {/* ========================================
+          ROOT REDIRECT
+      ======================================== */}
+
       <Route
         path="/"
         element={
@@ -55,7 +101,10 @@ export default function AppRoutes() {
         }
       />
 
-      {/* ADMIN ROUTES */}
+      {/* ========================================
+          ADMIN DASHBOARD
+      ======================================== */}
+
       <Route
         path="/admin"
         element={
@@ -67,6 +116,10 @@ export default function AppRoutes() {
         }
       />
 
+      {/* ========================================
+          USERS
+      ======================================== */}
+
       <Route
         path="/admin/users"
         element={
@@ -77,49 +130,25 @@ export default function AppRoutes() {
           </ProtectedRoute>
         }
       />
-      <Route
-  path="/admin/users/:id"
-  element={
-    <ProtectedRoute>
 
-  <UserDetails />
-    </ProtectedRoute>
-
-
-  }
-/>
+      {/* ========================================
+          USER DETAILS
+      ======================================== */}
 
       <Route
-        path="/admin/categories/create"
-        element={
-          <ProtectedRoute>
-          <AddCategory/>
-          </ProtectedRoute>
-        }
-      />
-   <Route
-  path="/admin/variants/create"
-  element={
-    <ProtectedRoute>
-      <AdminLayout>
-        <AdminVariant />
-      </AdminLayout>
-    </ProtectedRoute>
-  }
-/>
-
-      
-
-     <Route
-        path="/admin/support"
+        path="/admin/users/:id"
         element={
           <ProtectedRoute>
             <AdminLayout>
-              <Support />
+              <UserDetails />
             </AdminLayout>
           </ProtectedRoute>
         }
       />
+
+      {/* ========================================
+          VENDORS
+      ======================================== */}
 
       <Route
         path="/admin/vendors"
@@ -132,6 +161,10 @@ export default function AppRoutes() {
         }
       />
 
+      {/* ========================================
+          VENDOR DETAILS
+      ======================================== */}
+
       <Route
         path="/admin/vendors/:id"
         element={
@@ -143,12 +176,100 @@ export default function AppRoutes() {
         }
       />
 
+      {/* ========================================
+          ORDERS
+      ======================================== */}
+
       <Route
         path="/admin/orders"
         element={
           <ProtectedRoute>
             <AdminLayout>
               <Order />
+            </AdminLayout>
+          </ProtectedRoute>
+        }
+      />
+
+      {/* ========================================
+          ADD CATEGORY
+      ======================================== */}
+
+      <Route
+        path="/admin/categories/create"
+        element={
+          <ProtectedRoute>
+            <AdminLayout>
+              <AddCategory />
+            </AdminLayout>
+          </ProtectedRoute>
+        }
+      />
+
+      {/* ========================================
+          ADD VARIANT
+      ======================================== */}
+
+      <Route
+        path="/admin/variants/create"
+        element={
+          <ProtectedRoute>
+            <AdminLayout>
+              <AdminVariant />
+            </AdminLayout>
+          </ProtectedRoute>
+        }
+      />
+
+      {/* ========================================
+          SUPPORT
+      ======================================== */}
+
+      <Route
+        path="/admin/support"
+        element={
+          <ProtectedRoute>
+            <AdminLayout>
+              <Support />
+            </AdminLayout>
+          </ProtectedRoute>
+        }
+      />
+<Route
+  path="/admin/delivery-partners"
+  element={
+    <ProtectedRoute>
+      <AdminLayout>
+        <DeliveryPartner />
+      </AdminLayout>
+    </ProtectedRoute>
+  }
+/>
+      {/* ========================================
+          DELIVERY DASHBOARD
+      ======================================== */}
+
+      <Route
+        path="/delivery/dashboard"
+        element={
+          <ProtectedRoute>
+            <AdminLayout>
+              <DeliveryDashboard />
+            </AdminLayout>
+          </ProtectedRoute>
+        }
+      />
+
+      {/* ========================================
+          DELIVERY EARNINGS
+      ======================================== */}
+
+      <Route
+        path="/delivery/earnings"
+        element={
+          <ProtectedRoute>
+            <AdminLayout>
+              <DeliveryEarnings />
             </AdminLayout>
           </ProtectedRoute>
         }

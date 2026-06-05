@@ -2,6 +2,7 @@ import React, {
   useEffect,
   useState,
 } from "react";
+
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
 import axios from "axios";
@@ -16,7 +17,13 @@ import {
 
 export default function Orders() {
 
+  // =========================================
+  // STATES
+  // =========================================
   const [orders, setOrders] =
+    useState([]);
+
+  const [partners, setPartners] =
     useState([]);
 
   const [loading, setLoading] =
@@ -24,57 +31,10 @@ export default function Orders() {
 
   const [sidebarOpen, setSidebarOpen] =
     useState(false);
-const downloadOrdersPDF = () => {
-  const doc = new jsPDF();
 
-  doc.setFontSize(18);
-  doc.text("Vendor Orders Report", 14, 20);
-
-  const tableData = [];
-
-  orders.forEach((order) => {
-    order.items.forEach((item) => {
-      tableData.push([
-        order._id.slice(-8),
-        item.name,
-        item.quantity,
-        `₹${item.price}`,
-        `₹${item.price * item.quantity}`,
-        order.orderStatus,
-        order.paymentStatus,
-        order.user?.name || "N/A",
-      ]);
-    });
-  });
-
-  autoTable(doc, {
-    startY: 30,
-    head: [
-      [
-        "Order ID",
-        "Product",
-        "Qty",
-        "Price",
-        "Subtotal",
-        "Status",
-        "Payment",
-        "Customer",
-      ],
-    ],
-    body: tableData,
-    styles: {
-      fontSize: 8,
-    },
-    headStyles: {
-      fillColor: [0, 0, 0],
-    },
-  });
-
-  doc.save("VendorOrders.pdf");
-};
-  // ====================================
+  // =========================================
   // FETCH ORDERS
-  // ====================================
+  // =========================================
   const fetchOrders =
     async () => {
 
@@ -102,7 +62,10 @@ const downloadOrdersPDF = () => {
 
       } catch (error) {
 
-        console.log(error);
+        console.log(
+          "FETCH ORDERS ERROR:",
+          error
+        );
 
       } finally {
 
@@ -110,9 +73,51 @@ const downloadOrdersPDF = () => {
       }
     };
 
-  // ====================================
+  // =========================================
+  // FETCH DELIVERY PARTNERS
+  // =========================================
+  const fetchPartners =
+    async () => {
+
+      try {
+
+        const token =
+          localStorage.getItem(
+            "vendorToken"
+          );
+
+        const { data } =
+          await axios.get(
+            "http://localhost:5000/api/delivery-partners/all",
+            {
+              headers: {
+                Authorization:
+                  `Bearer ${token}`,
+              },
+            }
+          );
+
+        console.log(
+          "PARTNERS:",
+          data
+        );
+
+        setPartners(
+          data.partners || []
+        );
+
+      } catch (error) {
+
+        console.log(
+          "FETCH PARTNERS ERROR:",
+          error
+        );
+      }
+    };
+
+  // =========================================
   // UPDATE ORDER STATUS
-  // ====================================
+  // =========================================
   const updateStatus =
     async (
       orderId,
@@ -146,14 +151,163 @@ const downloadOrdersPDF = () => {
         console.log(error);
 
         alert(
-          "Failed to update status"
+          "Failed to update order status"
         );
       }
     };
 
+  // =========================================
+  // ASSIGN DELIVERY PARTNER
+  // =========================================
+  const assignPartner =
+    async (
+      orderId,
+      partnerId
+    ) => {
+
+      if (!partnerId) return;
+
+      try {
+
+        const token =
+          localStorage.getItem(
+            "vendorToken"
+          );
+
+        const { data } =
+          await axios.put(
+            "http://localhost:5000/api/orders/assign-delivery-partner",
+            {
+              orderId,
+              deliveryPartnerId:
+                partnerId,
+            },
+            {
+              headers: {
+                Authorization:
+                  `Bearer ${token}`,
+              },
+            }
+          );
+
+        alert(
+          data.message ||
+            "Delivery Partner Assigned"
+        );
+
+        fetchOrders();
+
+      } catch (error) {
+
+        console.log(
+          "ASSIGN PARTNER ERROR:",
+          error
+        );
+
+        alert(
+          error?.response?.data
+            ?.message ||
+            "Failed to assign partner"
+        );
+      }
+    };
+
+  // =========================================
+  // DOWNLOAD PDF
+  // =========================================
+  const downloadOrdersPDF =
+    () => {
+
+      const doc =
+        new jsPDF();
+
+      doc.setFontSize(18);
+
+      doc.text(
+        "Vendor Orders Report",
+        14,
+        20
+      );
+
+      const tableData = [];
+
+      orders.forEach(
+        (order) => {
+
+          order.items.forEach(
+            (item) => {
+
+              tableData.push([
+                order._id.slice(-8),
+
+                item.name,
+
+                item.quantity,
+
+                `₹${item.price}`,
+
+                `₹${
+                  item.price *
+                  item.quantity
+                }`,
+
+                order.orderStatus,
+
+                order.paymentStatus,
+
+                order.user?.name ||
+                  "N/A",
+
+                order
+                  ?.deliveryPartner
+                  ?.name ||
+                  "Not Assigned",
+              ]);
+            }
+          );
+        }
+      );
+
+      autoTable(doc, {
+
+        startY: 30,
+
+        head: [[
+          "Order ID",
+          "Product",
+          "Qty",
+          "Price",
+          "Subtotal",
+          "Status",
+          "Payment",
+          "Customer",
+          "Delivery Partner",
+        ]],
+
+        body: tableData,
+
+        styles: {
+          fontSize: 8,
+        },
+
+        headStyles: {
+          fillColor: [0, 0, 0],
+        },
+      });
+
+      doc.save(
+        "VendorOrders.pdf"
+      );
+    };
+
+  // =========================================
+  // INITIAL LOAD
+  // =========================================
   useEffect(() => {
 
     fetchOrders();
+
+    fetchPartners();
 
   }, []);
 
@@ -161,48 +315,44 @@ const downloadOrdersPDF = () => {
 
     <div className="flex min-h-screen bg-gray-100 overflow-hidden">
 
-      {/* ====================================
-          MOBILE SIDEBAR OVERLAY
-      ==================================== */}
-      {
-        sidebarOpen && (
-          <div
-            className="fixed inset-0 bg-black/50 z-40 lg:hidden"
-            onClick={() =>
-              setSidebarOpen(false)
-            }
-          />
-        )
-      }
+      {/* MOBILE OVERLAY */}
+      {sidebarOpen && (
 
-      {/* ====================================
-          SIDEBAR
-      ==================================== */}
+        <div
+          className="fixed inset-0 bg-black/50 z-40 lg:hidden"
+          onClick={() =>
+            setSidebarOpen(false)
+          }
+        />
+
+      )}
+
+      {/* SIDEBAR */}
       <div
         className={`
           fixed lg:static z-50
           h-full
           transition-transform duration-300
-          ${sidebarOpen
-            ? "translate-x-0"
-            : "-translate-x-full lg:translate-x-0"
+          ${
+            sidebarOpen
+              ? "translate-x-0"
+              : "-translate-x-full lg:translate-x-0"
           }
         `}
       >
+
         <Sidebar />
+
       </div>
 
-      {/* ====================================
-          MAIN CONTENT
-      ==================================== */}
+      {/* MAIN CONTENT */}
       <div className="flex-1 flex flex-col w-full overflow-hidden">
 
-        {/* TOP NAV */}
+        {/* NAVBAR */}
         <div className="sticky top-0 z-30 bg-white shadow-sm">
 
           <div className="flex items-center">
 
-            {/* MOBILE MENU BUTTON */}
             <button
               onClick={() =>
                 setSidebarOpen(
@@ -226,37 +376,41 @@ const downloadOrdersPDF = () => {
 
         </div>
 
-        {/* PAGE CONTENT */}
+        {/* PAGE */}
         <div className="flex-1 overflow-y-auto p-3 sm:p-5 md:p-6">
 
-          {/* HEADING */}
+          {/* HEADER */}
           <div className="mb-6 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
 
-  <div>
-    <h1 className="text-2xl md:text-3xl font-bold">
-      Orders
-    </h1>
+            <div>
 
-    <p className="text-gray-500 mt-1 text-sm md:text-base">
-      Manage and track all customer orders
-    </p>
-  </div>
+              <h1 className="text-2xl md:text-3xl font-bold">
+                Orders
+              </h1>
 
-  <button
-    onClick={downloadOrdersPDF}
-    className="bg-black text-white px-5 py-3 rounded-xl hover:bg-gray-800 transition font-medium"
-  >
-    Download Orders PDF
-  </button>
+              <p className="text-gray-500 mt-1 text-sm md:text-base">
+                Manage vendor orders and assign delivery partners
+              </p>
 
-</div>
+            </div>
+
+            <button
+              onClick={
+                downloadOrdersPDF
+              }
+              className="bg-black text-white px-5 py-3 rounded-xl hover:bg-gray-800 transition"
+            >
+              Download Orders PDF
+            </button>
+
+          </div>
 
           {/* LOADING */}
           {loading ? (
 
             <div className="flex justify-center items-center h-[50vh]">
 
-              <div className="text-xl md:text-2xl font-semibold animate-pulse">
+              <div className="text-2xl font-semibold animate-pulse">
                 Loading Orders...
               </div>
 
@@ -266,13 +420,9 @@ const downloadOrdersPDF = () => {
 
             <div className="bg-white rounded-2xl shadow p-10 text-center">
 
-              <h2 className="text-2xl font-bold mb-3">
+              <h2 className="text-2xl font-bold">
                 No Orders Found
               </h2>
-
-              <p className="text-gray-500">
-                No customer orders available yet.
-              </p>
 
             </div>
 
@@ -288,12 +438,9 @@ const downloadOrdersPDF = () => {
                     className="bg-white rounded-2xl shadow-md p-4 md:p-6"
                   >
 
-                    {/* ====================================
-                        TOP SECTION
-                    ==================================== */}
+                    {/* TOP */}
                     <div className="flex flex-col xl:flex-row xl:items-center xl:justify-between gap-5">
 
-                      {/* LEFT */}
                       <div className="space-y-2">
 
                         <div>
@@ -302,7 +449,7 @@ const downloadOrdersPDF = () => {
                             Order ID
                           </h2>
 
-                          <p className="text-gray-500 break-all text-sm">
+                          <p className="text-gray-500 text-sm break-all">
                             {order._id}
                           </p>
 
@@ -310,21 +457,23 @@ const downloadOrdersPDF = () => {
 
                         <div className="space-y-1">
 
-                          <p className="text-sm md:text-base">
+                          <p className="text-sm">
                             <span className="font-semibold">
                               Customer:
                             </span>{" "}
                             {
-                              order.user?.name
+                              order.user
+                                ?.name
                             }
                           </p>
 
-                          <p className="text-sm md:text-base">
+                          <p className="text-sm">
                             <span className="font-semibold">
                               Email:
                             </span>{" "}
                             {
-                              order.user?.email
+                              order.user
+                                ?.email
                             }
                           </p>
 
@@ -332,7 +481,6 @@ const downloadOrdersPDF = () => {
 
                       </div>
 
-                      {/* RIGHT */}
                       <div className="space-y-2">
 
                         <p className="text-2xl font-bold text-green-600">
@@ -343,8 +491,6 @@ const downloadOrdersPDF = () => {
                         </p>
 
                         <p className="text-gray-500 text-sm">
-                          Payment Method:
-                          {" "}
                           {
                             order.paymentMethod
                           }
@@ -367,9 +513,7 @@ const downloadOrdersPDF = () => {
 
                     </div>
 
-                    {/* ====================================
-                        PRODUCTS
-                    ==================================== */}
+                    {/* PRODUCTS */}
                     <div className="mt-6">
 
                       <h3 className="font-bold text-lg mb-4">
@@ -389,7 +533,6 @@ const downloadOrdersPDF = () => {
                               className="flex flex-col sm:flex-row gap-4 border rounded-xl p-4"
                             >
 
-                              {/* IMAGE */}
                               <img
                                 src={
                                   item.image
@@ -400,8 +543,7 @@ const downloadOrdersPDF = () => {
                                 className="w-full sm:w-24 h-48 sm:h-24 object-cover rounded-xl border"
                               />
 
-                              {/* DETAILS */}
-                              <div className="flex-1 space-y-1">
+                              <div className="flex-1">
 
                                 <h4 className="font-bold text-lg">
                                   {
@@ -409,18 +551,15 @@ const downloadOrdersPDF = () => {
                                   }
                                 </h4>
 
-                                <p className="text-gray-500 text-sm">
-                                  Quantity:
-                                  {" "}
+                                <p className="text-sm text-gray-500">
+                                  Quantity:{" "}
                                   {
                                     item.quantity
                                   }
                                 </p>
 
-                                <p className="text-gray-500 text-sm">
-                                  Price:
-                                  {" "}
-                                  ₹
+                                <p className="text-sm text-gray-500">
+                                  Price: ₹
                                   {
                                     item.price
                                   }
@@ -436,16 +575,14 @@ const downloadOrdersPDF = () => {
 
                     </div>
 
-                    {/* ====================================
-                        SHIPPING
-                    ==================================== */}
+                    {/* SHIPPING */}
                     <div className="mt-6">
 
                       <h3 className="font-bold text-lg mb-3">
                         Shipping Address
                       </h3>
 
-                      <div className="bg-gray-50 rounded-xl p-4 text-sm md:text-base space-y-1">
+                      <div className="bg-gray-50 rounded-xl p-4 text-sm space-y-1">
 
                         <p>
                           {
@@ -472,33 +609,9 @@ const downloadOrdersPDF = () => {
                               .shippingAddress
                               ?.city
                           }
-                          ,{" "}
-                          {
-                            order
-                              .shippingAddress
-                              ?.state
-                          }
                         </p>
 
                         <p>
-                          {
-                            order
-                              .shippingAddress
-                              ?.country
-                          }
-                          {" "}
-                          -
-                          {" "}
-                          {
-                            order
-                              .shippingAddress
-                              ?.zipcode
-                          }
-                        </p>
-
-                        <p>
-                          Phone:
-                          {" "}
                           {
                             order
                               .shippingAddress
@@ -510,39 +623,13 @@ const downloadOrdersPDF = () => {
 
                     </div>
 
-                    {/* ====================================
-                        STATUS
-                    ==================================== */}
-                    <div className="mt-6 flex flex-col lg:flex-row lg:items-center gap-4">
+                    {/* ORDER STATUS */}
+                    <div className="mt-6">
 
-                      {/* CURRENT STATUS */}
-                      <div>
+                      <p className="font-semibold mb-2">
+                        Order Status
+                      </p>
 
-                        <p className="font-semibold text-sm md:text-base">
-                          Current Status
-                        </p>
-
-                        <p
-                          className={`font-bold mt-1 ${
-                            order.orderStatus ===
-                            "Delivered"
-                              ? "text-green-600"
-
-                              : order.orderStatus ===
-                                "Cancelled"
-                              ? "text-red-500"
-
-                              : "text-blue-600"
-                          }`}
-                        >
-                          {
-                            order.orderStatus
-                          }
-                        </p>
-
-                      </div>
-
-                      {/* UPDATE STATUS */}
                       <select
                         value={
                           order.orderStatus
@@ -553,7 +640,7 @@ const downloadOrdersPDF = () => {
                             e.target.value
                           )
                         }
-                        className="border p-3 rounded-xl w-full lg:w-72 focus:outline-none focus:ring-2 focus:ring-black"
+                        className="border p-3 rounded-xl w-full lg:w-72"
                       >
 
                         <option value="Order Placed">
@@ -583,6 +670,99 @@ const downloadOrdersPDF = () => {
                       </select>
 
                     </div>
+
+                    {/* DELIVERY STATUS */}
+                    <div className="mt-5">
+
+                      <p className="font-semibold mb-2">
+                        Delivery Status
+                      </p>
+
+                      <div className="inline-block px-4 py-2 rounded-full bg-orange-100 text-orange-600 font-medium">
+
+                        {
+                          order.deliveryStatus ||
+                          "Pending"
+                        }
+
+                      </div>
+
+                    </div>
+
+                    {/* ASSIGNED PARTNER */}
+                    <div className="mt-5">
+
+                      <p className="font-semibold mb-2">
+                        Assigned Partner
+                      </p>
+
+                      <div className="text-sm text-gray-600">
+
+                        {
+                          order
+                            ?.deliveryPartner
+                            ?.name ||
+                          "No Partner Assigned"
+                        }
+
+                      </div>
+
+                    </div>
+
+                   {/* ASSIGN DELIVERY PARTNER */}
+{!(
+  order.orderStatus === "Delivered" &&
+  order.deliveryStatus === "Delivered"
+) && (
+  <div className="mt-5">
+
+    <p className="font-semibold mb-2">
+      Assign Delivery Partner
+    </p>
+
+    <select
+      onChange={(e) =>
+        assignPartner(
+          order._id,
+          e.target.value
+        )
+      }
+      className="border p-3 rounded-xl w-full lg:w-72"
+      defaultValue=""
+    >
+
+      <option value="">
+        Select Partner
+      </option>
+
+      {partners.length > 0 ? (
+
+        partners.map(
+          (partner) => (
+
+            <option
+              key={partner._id}
+              value={partner._id}
+            >
+              {partner.name}
+              {" - "}
+              {partner.phone}
+            </option>
+          )
+        )
+
+      ) : (
+
+        <option disabled>
+          No Delivery Partners Found
+        </option>
+
+      )}
+
+    </select>
+
+  </div>
+)}
 
                   </div>
                 )

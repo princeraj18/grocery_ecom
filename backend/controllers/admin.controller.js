@@ -3,6 +3,9 @@ import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import crypto from "crypto";
 import nodemailer from "nodemailer";
+import WithdrawRequest from "../models/withdrawRequest.model.js";
+import DeliveryPartner from "../models/DeliveryPartner.model.js";
+import Order from "../models/Order.model.js";
 
 // =======================================
 // REGISTER ADMIN
@@ -241,3 +244,358 @@ export const resetAdminPassword = async (req, res) => {
     res.status(500).json({ success: false, message: "Internal Server Error" });
   }
 };
+
+
+
+// =======================================
+// APPROVE WITHDRAW REQUEST
+// =======================================
+export const approveWithdrawRequest =
+  async (req, res) => {
+
+    try {
+
+      const request =
+        await WithdrawRequest.findById(
+          req.params.id
+        ).populate("partner");
+
+      if (!request) {
+        return res.status(404).json({
+          success: false,
+          message:
+            "Withdraw request not found",
+        });
+      }
+
+      if (
+        request.status !== "Pending"
+      ) {
+        return res.status(400).json({
+          success: false,
+          message:
+            "Request already processed",
+        });
+      }
+
+      const partner =
+        request.partner;
+
+      // ===================================
+      // CHECK BALANCE
+      // ===================================
+
+      if (
+        partner.walletBalance <
+        request.amount
+      ) {
+        return res.status(400).json({
+          success: false,
+          message:
+            "Insufficient balance",
+        });
+      }
+
+      // ===================================
+      // DEDUCT BALANCE
+      // ===================================
+
+      partner.walletBalance -=
+        request.amount;
+
+      partner.withdrawnAmount +=
+        request.amount;
+
+      await partner.save();
+
+      // ===================================
+      // APPROVE REQUEST
+      // ===================================
+
+      request.status = "Approved";
+
+      await request.save();
+
+      res.status(200).json({
+        success: true,
+        message:
+          "Withdraw approved successfully",
+      });
+
+    } catch (error) {
+
+      console.log(error);
+
+      res.status(500).json({
+        success: false,
+        message: error.message,
+      });
+    }
+  };
+
+// =======================================
+// REJECT WITHDRAW REQUEST
+// =======================================
+export const rejectWithdrawRequest =
+  async (req, res) => {
+
+    try {
+
+      const request =
+        await WithdrawRequest.findById(
+          req.params.id
+        );
+
+      if (!request) {
+        return res.status(404).json({
+          success: false,
+          message:
+            "Withdraw request not found",
+        });
+      }
+
+      if (
+        request.status !== "Pending"
+      ) {
+        return res.status(400).json({
+          success: false,
+          message:
+            "Request already processed",
+        });
+      }
+
+      request.status = "Rejected";
+
+      await request.save();
+
+      res.status(200).json({
+        success: true,
+        message:
+          "Withdraw request rejected",
+      });
+
+    } catch (error) {
+
+      console.log(error);
+
+      res.status(500).json({
+        success: false,
+        message: error.message,
+      });
+    }
+  };
+
+// =======================================
+// ADMIN DELIVERY DASHBOARD
+// =======================================
+export const getDeliveryDashboard =
+  async (req, res) => {
+
+    try {
+
+      const [
+        totalPartners,
+        availablePartners,
+        totals,
+        totalOrders,
+        activeDeliveries,
+        completedDeliveries,
+        assignedOrders,
+        pendingOrders,
+        topPartners,
+        recentWithdrawRequests,
+      ] = await Promise.all([
+        DeliveryPartner.countDocuments(),
+        DeliveryPartner.countDocuments({
+          isAvailable: true,
+        }),
+        DeliveryPartner.aggregate([
+          {
+            $group: {
+              _id: null,
+              totalEarnings: {
+                $sum: "$totalEarnings",
+              },
+              walletBalance: {
+                $sum: "$walletBalance",
+              },
+              withdrawnAmount: {
+                $sum: "$withdrawnAmount",
+              },
+            },
+          },
+        ]),
+        Order.countDocuments({
+          deliveryPartner: {
+            $ne: null,
+          },
+        }),
+        Order.countDocuments({
+          deliveryStatus: {
+            $in: [
+              "Assigned",
+              "Accepted",
+              "Picked",
+              "Out for Delivery",
+            ],
+          },
+        }),
+        Order.countDocuments({
+          deliveryStatus: "Delivered",
+        }),
+        Order.countDocuments({
+          deliveryStatus: "Assigned",
+        }),
+        Order.countDocuments({
+          deliveryStatus: "Pending",
+        }),
+        DeliveryPartner.find()
+          .select(
+            "name phone vehicleType isAvailable totalEarnings walletBalance withdrawnAmount totalAcceptedOrders totalRejectedOrders"
+          )
+          .sort({ totalEarnings: -1 })
+          .limit(5)
+          .lean(),
+        WithdrawRequest.find()
+          .populate(
+            "partner",
+            "name email phone walletBalance"
+          )
+          .sort({ createdAt: -1 })
+          .limit(5)
+          .lean(),
+      ]);
+
+      const summary =
+        totals[0] || {
+          totalEarnings: 0,
+          walletBalance: 0,
+          withdrawnAmount: 0,
+        };
+
+      res.status(200).json({
+        success: true,
+        dashboard: {
+          totalPartners,
+          availablePartners,
+          busyPartners:
+            totalPartners -
+            availablePartners,
+          totalEarnings:
+            summary.totalEarnings || 0,
+          walletBalance:
+            summary.walletBalance || 0,
+          withdrawnAmount:
+            summary.withdrawnAmount || 0,
+          activeDeliveries,
+          completedDeliveries,
+          totalOrders,
+          assignedOrders,
+          pendingOrders,
+          topPartners,
+          recentWithdrawRequests,
+        },
+      });
+
+    } catch (error) {
+
+      console.log(error);
+
+      res.status(500).json({
+        success: false,
+        message: error.message,
+      });
+    }
+  };
+
+// =======================================
+// ADMIN DELIVERY EARNINGS
+// =======================================
+export const getDeliveryEarnings =
+  async (req, res) => {
+
+    try {
+
+      const [
+        partners,
+        deliveredOrders,
+        withdrawRequests,
+      ] = await Promise.all([
+        DeliveryPartner.find()
+          .select(
+            "name email phone vehicleType totalEarnings walletBalance withdrawnAmount"
+          )
+          .sort({ totalEarnings: -1 })
+          .lean(),
+        Order.find({
+          deliveryStatus: "Delivered",
+          deliveryPartner: {
+            $ne: null,
+          },
+        })
+          .populate(
+            "deliveryPartner",
+            "name email phone"
+          )
+          .sort({ deliveredAt: -1 })
+          .limit(100)
+          .lean(),
+        WithdrawRequest.find()
+          .populate(
+            "partner",
+            "name email phone walletBalance"
+          )
+          .sort({ createdAt: -1 })
+          .lean(),
+      ]);
+
+      const summary =
+        partners.reduce(
+          (acc, partner) => {
+            acc.totalEarnings +=
+              partner.totalEarnings || 0;
+            acc.walletBalance +=
+              partner.walletBalance || 0;
+            acc.withdrawnAmount +=
+              partner.withdrawnAmount || 0;
+            return acc;
+          },
+          {
+            totalEarnings: 0,
+            walletBalance: 0,
+            withdrawnAmount: 0,
+          }
+        );
+
+      summary.pendingWithdrawAmount =
+        withdrawRequests
+          .filter(
+            (request) =>
+              request.status === "Pending"
+          )
+          .reduce(
+            (total, request) =>
+              total + (request.amount || 0),
+            0
+          );
+
+      res.status(200).json({
+        success: true,
+        earnings: {
+          summary,
+          partners,
+          deliveredOrders,
+          withdrawRequests,
+        },
+      });
+
+    } catch (error) {
+
+      console.log(error);
+
+      res.status(500).json({
+        success: false,
+        message: error.message,
+      });
+    }
+  };

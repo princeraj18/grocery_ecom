@@ -2,59 +2,97 @@ import mongoose from "mongoose";
 
 const orderSchema = new mongoose.Schema(
   {
+    // =====================================
+    // USER
+    // =====================================
+
     user: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
       required: true,
     },
 
+    // =====================================
+    // ORDER ITEMS
+    // =====================================
+
     items: [
       {
         product: {
           type: mongoose.Schema.Types.ObjectId,
           ref: "Product",
+          required: true,
         },
 
         variant: {
           type: mongoose.Schema.Types.ObjectId,
           ref: "Variant",
+          default: null,
         },
 
-        variantSize: String,
+        variantSize: {
+          type: String,
+          default: "Default",
+        },
 
         clientId: String,
 
-        name: String,
+        name: {
+          type: String,
+          required: true,
+        },
 
-        image: String,
+        image: {
+          type: String,
+          default: "",
+        },
 
         quantity: {
           type: Number,
           required: true,
+          min: 1,
         },
 
         price: {
           type: Number,
           required: true,
+          min: 0,
         },
       },
     ],
 
+    // =====================================
+    // SHIPPING ADDRESS
+    // =====================================
+
     shippingAddress: {
       firstName: String,
+
       lastName: String,
+
       email: String,
+
       street: String,
+
       city: String,
+
       state: String,
+
       zipcode: Number,
+
       country: String,
+
       phone: String,
     },
+
+    // =====================================
+    // PAYMENT
+    // =====================================
 
     totalAmount: {
       type: Number,
       required: true,
+      min: 0,
     },
 
     paymentMethod: {
@@ -73,6 +111,15 @@ const orderSchema = new mongoose.Schema(
       default: "Pending",
     },
 
+    isPaid: {
+      type: Boolean,
+      default: false,
+    },
+
+    // =====================================
+    // ORDER STATUS
+    // =====================================
+
     orderStatus: {
       type: String,
       enum: [
@@ -82,20 +129,81 @@ const orderSchema = new mongoose.Schema(
         "Out For Delivery",
         "Delivered",
         "Cancelled",
-        
       ],
       default: "Order Placed",
     },
 
-    isPaid: {
-      type: Boolean,
-      default: false,
-    },
+    // =====================================
+    // STOCK
+    // =====================================
 
     stockReduced: {
       type: Boolean,
       default: false,
     },
+
+    // =====================================
+    // VENDOR
+    // =====================================
+
+    vendor: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Vendor",
+    },
+
+    // =====================================
+    // DELIVERY PARTNER
+    // =====================================
+
+    deliveryPartner: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "DeliveryPartner",
+      default: null,
+    },
+
+    deliveryStatus: {
+      type: String,
+      enum: [
+        "Pending",
+        "Assigned",
+        "Accepted",
+        "Picked",
+        "Out for Delivery",
+        "Delivered",
+        "Rejected",
+      ],
+      default: "Pending",
+    },
+
+    // =====================================
+    // DELIVERY EARNING
+    // =====================================
+
+    partnerEarning: {
+      type: Number,
+      default: 0,
+    },
+
+    earningTransferred: {
+      type: Boolean,
+      default: false,
+    },
+
+    // =====================================
+    // DELIVERY DATES
+    // =====================================
+
+    acceptedAt: Date,
+
+    pickedAt: Date,
+
+    deliveredAt: Date,
+
+    rejectedAt: Date,
+
+    estimatedDeliveryTime: String,
+
+    deliveryNotes: String,
   },
   {
     timestamps: true,

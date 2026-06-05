@@ -29,7 +29,9 @@ from "./routes/wishlist.routes.js";
 import categoryRoutes from "./routes/category.routes.js";
 import variantRoutes from "./routes/variant.routes.js";
 import notificationRoutes from "./routes/notification.routes.js"
-
+import deliveryPartnerRoutes from "./routes/deliveryPartner.routes.js";
+import adminDeliveryRoutes
+from "./routes/adminDelivery.routes.js";
 
 connectDB();
 // Ensure Cloudinary is checked at startup so controllers can skip cloud operations when unavailable
@@ -127,6 +129,19 @@ app.use(
   couponRoutes
 );
 app.use("/api/reviews", reviewRoutes);
+
+
+
+app.use(
+  "/api/delivery-partners",
+  deliveryPartnerRoutes
+);
+
+
+app.use(
+  "/api/admin/delivery-partners",
+  adminDeliveryRoutes
+);
 // Serve local uploads as a fallback when Cloudinary isn't available
 app.use("/uploads", express.static(path.join(process.cwd(), "uploads")));
 // ======================

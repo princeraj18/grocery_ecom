@@ -3,6 +3,7 @@ import express from "express";
 import {
   getVendorOrders,
   updateOrderStatus,
+  assignDeliveryPartner,
 } from "../controllers/order.controller.js";
 import vendorAuth from "../middleware/vendorAuth.js";
 
@@ -24,8 +25,15 @@ router.get(
   vendorAuth,
   getVendorOrders
 );
-router.get("/:id", getSingleOrder);
-
+router.get(
+  "/:id",
+  getSingleOrder
+);
+router.put(
+  "/assign-delivery-partner",
+  vendorAuth,
+  assignDeliveryPartner
+);
 router.put(
   "/:id",
   vendorAuth,

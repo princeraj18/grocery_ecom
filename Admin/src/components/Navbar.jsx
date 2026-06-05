@@ -1,5 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
+import ThemeToggle from "./ThemeToggle";
 
 export default function Navbar() {
 
@@ -16,18 +17,22 @@ export default function Navbar() {
   };
 
   return (
-    <div className="bg-white shadow px-6 py-4 flex items-center justify-between">
+    <div className="bg-white shadow px-6 py-4 flex items-center justify-between dark:bg-slate-900 dark:text-white">
 
       <h2 className="text-2xl font-semibold">
         Admin Dashboard
       </h2>
 
-      <button
-        onClick={handleLogout}
-        className="bg-red-500 text-white px-4 py-2 rounded-lg"
-      >
-        Logout
-      </button>
+      <div className="flex items-center gap-3">
+        <ThemeToggle />
+
+        <button
+          onClick={handleLogout}
+          className="bg-red-500 text-white px-4 py-2 rounded-lg"
+        >
+          Logout
+        </button>
+      </div>
 
     </div>
   );

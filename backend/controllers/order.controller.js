@@ -2,6 +2,7 @@ import mongoose from "mongoose";
 
 import Order from "../models/Order.model.js";
 import Product from "../models/Product.model.js";
+import DeliveryPartner from "../models/DeliveryPartner.model.js";
 import notificationModel from "../models/notification.model.js";
 
 import {
@@ -9,213 +10,108 @@ import {
   validateOrderStock,
 } from "../utils/stock.js";
 
-// ====================================
+// ======================================================
 // CREATE ORDER
-// ====================================
+// ======================================================
 
-const createOrder = async (
-  req,
-  res
-) => {
-
+export const createOrder = async (req, res) => {
   try {
 
     const {
       userId,
       products,
-      cartItems,
       shippingAddress,
       totalAmount,
-      total,
       paymentMethod,
       paymentStatus,
     } = req.body;
-
-    const productsSource =
-      products || cartItems || [];
-
-    const orderTotal =
-      Number(
-        totalAmount ?? total ?? 0
-      );
 
     // =========================
     // VALIDATION
     // =========================
 
-    if (!userId) {
-
-      return res.status(400).json({
-        success: false,
-        message:
-          "User ID is required",
-      });
-    }
-
     if (
-      !productsSource ||
-      productsSource.length === 0
+      !userId ||
+      !products ||
+      products.length === 0
     ) {
-
       return res.status(400).json({
         success: false,
-        message:
-          "Products are required",
+        message: "Invalid order data",
       });
     }
 
-    const formattedProducts =
-      [];
-
     // =========================
-    // VALIDATE PRODUCTS
+    // FORMAT ITEMS
     // =========================
 
-    for (const item of productsSource) {
-
-      const productId =
-        item.productId ||
-        item._id;
-
-      const quantity =
-        Number(item.quantity);
-
-      if (
-        !mongoose.Types.ObjectId.isValid(
-          productId
-        )
-      ) {
-        continue;
-      }
-
-      const product =
-        await Product.findById(
-          productId
-        );
-
-      if (!product) {
-
-        return res.status(404).json({
-          success: false,
-          message:
-            "Product not found",
-        });
-      }
-
-      // =========================
-      // STOCK CHECK
-      // =========================
-
-      if (
-        product.stockQuantity <
-        quantity
-      ) {
-
-        return res.status(400).json({
-          success: false,
-          message:
-            `${product.name} has only ${product.stockQuantity} items left in stock`,
-        });
-      }
-
-      formattedProducts.push({
-
-        product:
-          product._id,
-
-        name:
-          product.name,
-
-        image:
-          product.image?.[0] ||
-          "",
-
-        price:
-          Number(item.price),
-
-        quantity,
-
-        variant:
-          item.variantId ||
-          item.variant ||
-          undefined,
+    const formattedItems =
+      products.map((item) => ({
+        product: item.productId,
+        variant: item.variantId || null,
 
         variantSize:
-          item.variantSize ||
-          item.size,
-      });
-    }
+          item.variantSize || "Default",
 
-    // =========================
-    // VALIDATE ORDER STOCK
-    // =========================
+        name: item.name,
+        image: item.image,
 
-    await validateOrderStock(
-      formattedProducts
-    );
+        quantity: item.quantity,
+        price: item.price,
+      }));
 
     // =========================
     // CREATE ORDER
     // =========================
 
-    const order =
-      await Order.create({
-
-        user: userId,
-
-        items:
-          formattedProducts,
-
-        shippingAddress,
-
-        totalAmount:
-          orderTotal,
-
-        paymentMethod:
-          paymentMethod ||
-          "COD",
-
-        paymentStatus:
-          paymentStatus ||
-          "Pending",
-
-        orderStatus:
-          "Order Placed",
-      });
-
-    // =========================
-    // REDUCE STOCK
-    // =========================
-
-    await reduceOrderStock(
-      order
-    );
-
-    // =========================
-    // CREATE ORDER NOTIFICATION
-    // =========================
-
-    await notificationModel.create({
-
+    const order = await Order.create({
       user: userId,
 
-      title:
-        "Order Placed Successfully",
+      items: formattedItems,
 
-      message:
-        `Your order #${order._id
-          .toString()
-          .slice(-6)} has been placed successfully.`,
+      // IMPORTANT
+      shippingAddress: {
+        firstName:
+          shippingAddress.firstName,
+
+        lastName:
+          shippingAddress.lastName,
+
+        email:
+          shippingAddress.email,
+
+        phone:
+          shippingAddress.phone,
+
+        street:
+          shippingAddress.street,
+
+        city:
+          shippingAddress.city,
+
+        state:
+          shippingAddress.state,
+
+        zipcode:
+          shippingAddress.zipcode,
+
+        country:
+          shippingAddress.country,
+      },
+
+      totalAmount,
+
+      paymentMethod,
+
+      paymentStatus,
+
+      orderStatus: "Order Placed",
+
+      deliveryStatus: "Pending",
     });
 
-    // =========================
-    // RESPONSE
-    // =========================
-
     res.status(201).json({
-
       success: true,
-
       order,
     });
 
@@ -227,41 +123,31 @@ const createOrder = async (
     );
 
     res.status(500).json({
-
       success: false,
-
-      message:
-        error.message,
+      message: error.message,
     });
   }
 };
 
-// ====================================
-// GET MY ORDERS
-// ====================================
-
-const getMyOrders = async (
-  req,
-  res
-) => {
-
+// ======================================================
+// GET USER ORDERS
+// ======================================================
+export const getMyOrders = async (req, res) => {
   try {
 
-    const { userId } =
-      req.params;
+    const { userId } = req.params;
 
-    const orders =
-      await Order.find({
-        user: userId,
-      })
-        .sort({
-          createdAt: -1,
-        });
+    const orders = await Order.find({
+      user: userId,
+    })
+      .populate(
+        "deliveryPartner",
+        "name phone vehicleType"
+      )
+      .sort({ createdAt: -1 });
 
     res.status(200).json({
-
       success: true,
-
       orders,
     });
 
@@ -273,40 +159,31 @@ const getMyOrders = async (
     );
 
     res.status(500).json({
-
       success: false,
-
-      message:
-        error.message,
+      message: error.message,
     });
   }
 };
 
-// ====================================
+// ======================================================
 // GET ALL ORDERS
-// ====================================
-
-const getAllOrders = async (
-  req,
-  res
-) => {
-
+// ======================================================
+export const getAllOrders = async (req, res) => {
   try {
 
-    const orders =
-      await Order.find()
-        .populate(
-          "user",
-          "name email"
-        )
-        .sort({
-          createdAt: -1,
-        });
+    const orders = await Order.find()
+      .populate(
+        "user",
+        "name email"
+      )
+      .populate(
+        "deliveryPartner",
+        "name phone vehicleType"
+      )
+      .sort({ createdAt: -1 });
 
     res.status(200).json({
-
       success: true,
-
       orders,
     });
 
@@ -318,195 +195,243 @@ const getAllOrders = async (
     );
 
     res.status(500).json({
-
       success: false,
-
-      message:
-        error.message,
+      message: error.message,
     });
   }
 };
 
-// ====================================
+// ======================================================
 // GET SINGLE ORDER
-// ====================================
+// ======================================================
+export const getSingleOrder = async (req, res) => {
+  try {
 
-const getSingleOrder =
-  async (req, res) => {
-
-    try {
-
-      if (
-        !mongoose.Types.ObjectId.isValid(
-          req.params.id
-        )
-      ) {
-
-        return res.status(400).json({
-          success: false,
-          message:
-            "Invalid order id",
-        });
-      }
-
-      const order =
-        await Order.findById(
-          req.params.id
-        ).populate(
-          "user",
-          "name email"
-        );
-
-      if (!order) {
-
-        return res.status(404).json({
-          success: false,
-          message:
-            "Order not found",
-        });
-      }
-
-      res.status(200).json({
-
-        success: true,
-
-        order,
-      });
-
-    } catch (error) {
-
-      console.log(
-        "GET SINGLE ORDER ERROR:",
-        error
-      );
-
-      res.status(500).json({
-
+    if (
+      !mongoose.Types.ObjectId.isValid(
+        req.params.id
+      )
+    ) {
+      return res.status(400).json({
         success: false,
-
-        message:
-          error.message,
+        message: "Invalid order id",
       });
     }
-  };
 
-// ====================================
+    const order = await Order.findById(
+      req.params.id
+    )
+      .populate(
+        "user",
+        "name email"
+      )
+      .populate(
+        "deliveryPartner",
+        "name phone vehicleType"
+      );
+
+    if (!order) {
+      return res.status(404).json({
+        success: false,
+        message: "Order not found",
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      order,
+    });
+
+  } catch (error) {
+
+    console.log(
+      "GET SINGLE ORDER ERROR:",
+      error
+    );
+
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+
+// ======================================================
 // GET VENDOR ORDERS
-// ====================================
+// ======================================================
+export const getVendorOrders = async (req, res) => {
+  try {
 
-export const getVendorOrders =
-  async (req, res) => {
+    const vendorId = req.vendor._id;
 
-    try {
+    // ======================================================
+    // FIND VENDOR PRODUCTS
+    // ======================================================
 
-      const vendorId =
-        req.vendor._id;
+    const vendorProducts =
+      await Product.find({
+        vendor: vendorId,
+      }).select("_id");
 
-      // =========================
-      // FIND VENDOR PRODUCTS
-      // =========================
-
-      const vendorProducts =
-        await Product.find({
-          vendor: vendorId,
-        }).select("_id");
-
-      const productIds =
-        vendorProducts.map(
-          (product) =>
-            product._id
-        );
-
-      // =========================
-      // FIND ORDERS
-      // =========================
-
-      const orders =
-        await Order.find({
-          "items.product": {
-            $in: productIds,
-          },
-        })
-          .populate(
-            "user",
-            "name email"
-          )
-          .sort({
-            createdAt: -1,
-          });
-
-      // =========================
-      // FILTER ONLY VENDOR ITEMS
-      // =========================
-
-      const filteredOrders =
-        orders.map((order) => {
-
-          const vendorItems =
-            order.items.filter(
-              (item) =>
-                item.product &&
-                productIds.some(
-                  (id) =>
-                    id.toString() ===
-                    item.product.toString()
-                )
-            );
-
-          return {
-            ...order._doc,
-            items: vendorItems,
-          };
-        });
-
-      res.status(200).json({
-
-        success: true,
-
-        orders:
-          filteredOrders,
-      });
-
-    } catch (error) {
-
-      console.log(
-        "GET VENDOR ORDERS ERROR:",
-        error
+    const productIds =
+      vendorProducts.map(
+        (product) => product._id
       );
 
-      res.status(500).json({
+    // ======================================================
+    // FIND ORDERS
+    // ======================================================
 
+    const orders = await Order.find({
+      "items.product": {
+        $in: productIds,
+      },
+    })
+      .populate(
+        "user",
+        "name email"
+      )
+      .populate(
+        "deliveryPartner",
+        "name phone vehicleType profileImage"
+      )
+      .sort({ createdAt: -1 });
+
+    // ======================================================
+    // FILTER ONLY VENDOR ITEMS
+    // ======================================================
+
+    const filteredOrders =
+      orders.map((order) => {
+
+        const vendorItems =
+          order.items.filter(
+            (item) =>
+              item.product &&
+              productIds.some(
+                (id) =>
+                  id.toString() ===
+                  item.product.toString()
+              )
+          );
+
+        return {
+          ...order._doc,
+          items: vendorItems,
+        };
+      });
+
+    res.status(200).json({
+      success: true,
+      orders: filteredOrders,
+    });
+
+  } catch (error) {
+
+    console.log(
+      "GET VENDOR ORDERS ERROR:",
+      error
+    );
+
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+
+// ======================================================
+// UPDATE ORDER STATUS (VENDOR)
+// ======================================================
+export const updateOrderStatus = async (req, res) => {
+  try {
+
+    if (
+      !mongoose.Types.ObjectId.isValid(
+        req.params.id
+      )
+    ) {
+      return res.status(400).json({
         success: false,
-
-        message:
-          error.message,
+        message: "Invalid order id",
       });
     }
-  };
 
-// ====================================
-// UPDATE ORDER STATUS
-// ====================================
+    const order =
+      await Order.findById(
+        req.params.id
+      );
 
-export const updateOrderStatus =
+    if (!order) {
+      return res.status(404).json({
+        success: false,
+        message: "Order not found",
+      });
+    }
+
+    order.orderStatus =
+      req.body.orderStatus;
+
+    await order.save();
+
+    // ======================================================
+    // NOTIFICATION
+    // ======================================================
+
+    await notificationModel.create({
+      user: order.user,
+
+      title:
+        "Order Status Updated",
+
+      message:
+        `Your order #${order._id
+          .toString()
+          .slice(-6)} status changed to "${req.body.orderStatus}"`,
+    });
+
+    res.status(200).json({
+      success: true,
+      message:
+        "Order status updated successfully",
+      order,
+    });
+
+  } catch (error) {
+
+    console.log(
+      "UPDATE ORDER STATUS ERROR:",
+      error
+    );
+
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+
+// ======================================================
+// ASSIGN DELIVERY PARTNER
+// ======================================================
+export const assignDeliveryPartner =
   async (req, res) => {
 
     try {
 
-      // =========================
-      // VALIDATE ID
-      // =========================
+      const {
+        orderId,
+        deliveryPartnerId,
+      } = req.body;
 
       if (
-        !mongoose.Types.ObjectId.isValid(
-          req.params.id
-        )
+        !orderId ||
+        !deliveryPartnerId
       ) {
-
         return res.status(400).json({
           success: false,
           message:
-            "Invalid order id",
+            "Order ID and Delivery Partner ID are required",
         });
       }
 
@@ -515,83 +440,130 @@ export const updateOrderStatus =
       // =========================
 
       const order =
-        await Order.findById(
-          req.params.id
-        );
+        await Order.findById(orderId);
 
       if (!order) {
-
         return res.status(404).json({
           success: false,
+          message: "Order not found",
+        });
+      }
+
+      // Prevent duplicate assignment
+      if (order.deliveryPartner) {
+        return res.status(400).json({
+          success: false,
           message:
-            "Order not found",
+            "Order already assigned",
         });
       }
 
       // =========================
-      // UPDATE STATUS
+      // FIND PARTNER
       // =========================
 
+      const partner =
+        await DeliveryPartner.findById(
+          deliveryPartnerId
+        );
+
+      if (!partner) {
+        return res.status(404).json({
+          success: false,
+          message:
+            "Delivery Partner not found",
+        });
+      }
+
+      // =========================
+      // CHECK ACTIVE ORDERS
+      // =========================
+
+      const activeOrdersCount =
+        partner.currentOrders?.length || 0;
+
+      if (activeOrdersCount >= 10) {
+
+        partner.isAvailable = false;
+
+        await partner.save();
+
+        return res.status(400).json({
+          success: false,
+          message:
+            "Delivery Partner already has 10 active orders",
+        });
+      }
+
+      // =========================
+      // ASSIGN ORDER
+      // =========================
+
+      order.deliveryPartner =
+        partner._id;
+
+      order.deliveryStatus =
+        "Assigned";
+
       order.orderStatus =
-        req.body.orderStatus;
+        "Processing";
+
+      // 10% earning
+      order.partnerEarning =
+        Math.round(
+          order.totalAmount * 0.1
+        );
 
       await order.save();
 
       // =========================
-      // CREATE NOTIFICATION
+      // UPDATE PARTNER
+      // =========================
+
+      partner.currentOrders.push(
+        order._id
+      );
+
+      // Max 10 orders
+      if (
+        partner.currentOrders.length >= 10
+      ) {
+        partner.isAvailable = false;
+      }
+
+      await partner.save();
+
+      // =========================
+      // NOTIFICATION
       // =========================
 
       await notificationModel.create({
-
         user: order.user,
 
         title:
-          "Order Status Updated",
+          "Delivery Partner Assigned",
 
         message:
-          `Your order #${order._id
-            .toString()
-            .slice(-6)} status changed to "${req.body.orderStatus}"`,
+          `${partner.name} has been assigned to your order.`,
       });
 
-      // =========================
-      // RESPONSE
-      // =========================
-
       res.status(200).json({
-
         success: true,
-
         message:
-          "Order status updated successfully",
-
+          "Delivery Partner assigned successfully",
         order,
       });
 
     } catch (error) {
 
       console.log(
-        "UPDATE ORDER STATUS ERROR:",
+        "ASSIGN DELIVERY PARTNER ERROR:",
         error
       );
 
       res.status(500).json({
-
         success: false,
-
-        message:
-          error.message,
+        message: error.message,
       });
     }
   };
-
-// ====================================
-// EXPORTS
-// ====================================
-
-export {
-  createOrder,
-  getMyOrders,
-  getAllOrders,
-  getSingleOrder,
-};

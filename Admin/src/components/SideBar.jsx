@@ -1,22 +1,30 @@
-import { NavLink } from "react-router-dom"
+import { NavLink } from "react-router-dom";
 
 export default function Sidebar() {
+
+  const navLinkClass = ({ isActive }) =>
+    `p-3 rounded-xl transition-all duration-200 font-medium ${
+      isActive
+        ? "bg-white text-black"
+        : "text-gray-300 hover:bg-gray-800 hover:text-white"
+    }`;
+
   return (
-    <div className="w-64 bg-black text-white min-h-screen p-5">
-      <h1 className="text-2xl font-bold mb-10">
+
+    <div className="w-64 bg-black text-white min-h-screen p-5 border-r border-gray-800">
+
+      {/* LOGO */}
+      <h1 className="text-3xl font-extrabold mb-10 tracking-wide">
         Admin Panel
       </h1>
 
-      <div className="flex flex-col gap-2">
+      {/* MENU */}
+      <div className="flex flex-col gap-3">
 
         {/* DASHBOARD */}
         <NavLink
           to="/admin"
-          className={({ isActive }) =>
-            `p-2 rounded ${
-              isActive ? "bg-white text-black" : ""
-            }`
-          }
+          className={navLinkClass}
         >
           Dashboard
         </NavLink>
@@ -24,11 +32,7 @@ export default function Sidebar() {
         {/* USERS */}
         <NavLink
           to="/admin/users"
-          className={({ isActive }) =>
-            `p-2 rounded ${
-              isActive ? "bg-white text-black" : ""
-            }`
-          }
+          className={navLinkClass}
         >
           Users
         </NavLink>
@@ -36,40 +40,28 @@ export default function Sidebar() {
         {/* VENDORS */}
         <NavLink
           to="/admin/vendors"
-          className={({ isActive }) =>
-            `p-2 rounded ${
-              isActive ? "bg-white text-black" : ""
-            }`
-          }
+          className={navLinkClass}
         >
           Vendors
         </NavLink>
 
-        {/* 🛒 ORDERS (IMPORTANT - YOU WERE MISSING THIS) */}
+        {/* ORDERS */}
         <NavLink
           to="/admin/orders"
-          className={({ isActive }) =>
-            `p-2 rounded ${
-              isActive ? "bg-white text-black" : ""
-            }`
-          }
+          className={navLinkClass}
         >
           Orders
         </NavLink>
- <NavLink
-  to="/admin/variants/create"
-  className={({ isActive }) =>
-    `p-2 rounded ${
-      isActive
-        ? "bg-white text-black"
-        : ""
-    }`
-  }
->
-  Add Variant
-</NavLink>
+
+        {/* DELIVERY DASHBOARD */}
         <NavLink
-  to="/admin/categories/create"
+          to="/delivery/dashboard"
+          className={navLinkClass}
+        >
+          Delivery Dashboard
+        </NavLink>
+<NavLink
+  to="/admin/delivery-partners"
   className={({ isActive }) =>
     `p-2 rounded ${
       isActive
@@ -78,24 +70,41 @@ export default function Sidebar() {
     }`
   }
 >
-  Add Category
+  Delivery Partners
 </NavLink>
+        {/* DELIVERY EARNINGS */}
+        <NavLink
+          to="/delivery/earnings"
+          className={navLinkClass}
+        >
+          Delivery Earnings
+        </NavLink>
 
+        {/* ADD VARIANT */}
+        <NavLink
+          to="/admin/variants/create"
+          className={navLinkClass}
+        >
+          Add Variant
+        </NavLink>
 
- <NavLink
-  to="/admin/support"
-  className={({ isActive }) =>
-    `p-2 rounded ${
-      isActive
-        ? "bg-white text-black"
-        : ""
-    }`
-  }
->
-  Support
-</NavLink>
+        {/* ADD CATEGORY */}
+        <NavLink
+          to="/admin/categories/create"
+          className={navLinkClass}
+        >
+          Add Category
+        </NavLink>
+
+        {/* SUPPORT */}
+        <NavLink
+          to="/admin/support"
+          className={navLinkClass}
+        >
+          Support
+        </NavLink>
 
       </div>
     </div>
-  )
+  );
 }
