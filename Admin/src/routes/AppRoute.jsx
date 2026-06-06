@@ -19,6 +19,7 @@ import EditProduct from "../pages/EditProduct";
 import UserDetails from "../pages/UserDetails";
 import Vendors from "../pages/Vendors";
 import VendorDetails from "../pages/VendorDetails";
+import DeliveryPartnerDetails from "../pages/DeliveryPartnerDetails";
 import AddCategory from "../pages/AddCategory";
 import AdminVariant from "../pages/AdminVariant";
 import Support from "../pages/Support";
@@ -44,6 +45,7 @@ import AdminResetPassword from "../pages/AdminResetPassword";
 import ProtectedRoute from "./ProtectedRoute";
 import AdminLayout from "../layout/AdminLayout";
 import DeliveryPartner from "../pages/DeliveryPartner";
+import WithdrawalRequest from "../pages/WithdrawalRequest";
 
 export default function AppRoutes() {
 
@@ -145,6 +147,16 @@ export default function AppRoutes() {
           </ProtectedRoute>
         }
       />
+        <Route
+          path="/admin/delivery-partners/:id"
+          element={
+            <ProtectedRoute>
+              <AdminLayout>
+                <DeliveryPartnerDetails />
+              </AdminLayout>
+            </ProtectedRoute>
+          }
+        />
 
       {/* ========================================
           VENDORS
@@ -245,6 +257,17 @@ export default function AppRoutes() {
     </ProtectedRoute>
   }
 />
+
+      <Route
+        path="/admin/withdrawal-requests"
+        element={
+          <ProtectedRoute>
+            <AdminLayout>
+              <WithdrawalRequest />
+            </AdminLayout>
+          </ProtectedRoute>
+        }
+      />
       {/* ========================================
           DELIVERY DASHBOARD
       ======================================== */}

@@ -1,650 +1,200 @@
-import React, {
-  useEffect,
-  useState,
-} from "react";
-
-import axios from "axios";
-
+import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import {
-  Bike,
-  Wallet,
-  IndianRupee,
-  CheckCircle,
-  XCircle,
+  UserCheck,
+  Truck,
+  Search,
+  Eye,
+  MapPin,
   Phone,
-  Mail,
-  User,
-  Calendar,
-  Package,
+  CircleDot
 } from "lucide-react";
+import api from "../services/api";
 
-const money = (value = 0) =>
-  `₹ ${Number(value || 0).toLocaleString("en-IN")}`;
-
-export default function DeliveryPartner() {
-
-  const [partners, setPartners] =
-    useState([]);
-
-  const [loading, setLoading] =
-    useState(true);
-
-  const [selectedPartner, setSelectedPartner] =
-    useState(null);
-
-  const [detailsOpen, setDetailsOpen] =
-    useState(false);
-
-  // =====================================
-  // FETCH DELIVERY PARTNERS
-  // =====================================
+const DeliveryPartner = () => {
+  const [partners, setPartners] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [searchTerm, setSearchTerm] = useState("");
+  const navigate = useNavigate();
 
   useEffect(() => {
-    fetchPartners();
-  }, []);
-
-  const fetchPartners =
-    async () => {
-
+    const fetchPartners = async () => {
       try {
-
-        const token =
-          localStorage.getItem(
-            "adminToken"
-          );
-
-        const res =
-          await axios.get(
-            "http://localhost:5000/api/admin/delivery-partners/dashboard",
-            {
-              headers: {
-                Authorization:
-                  `Bearer ${token}`,
-              },
-            }
-          );
-
-        if (
-          res.data?.success
-        ) {
-
-          setPartners(
-            res.data.partners || []
-          );
-        }
-
+        const response = await api.get("/admin/delivery-dashboard");;
+        if (response.data?.success) {
+setPartners(
+  response.data.dashboard?.topPartners || []
+);        }
       } catch (error) {
-
-        console.log(error);
-
+        console.error("Error fetching delivery partners:", error);
       } finally {
-
         setLoading(false);
       }
     };
+    fetchPartners();
+  }, []);
 
-  // =====================================
-  // LOADING
-  // =====================================
+const filteredPartners = partners.filter((partner) => {
+  const search = searchTerm.trim().toLowerCase();
+
+  return (
+    partner?.name?.toLowerCase().includes(search) ||
+    partner?.email?.toLowerCase().includes(search) ||
+    partner?.phone?.toLowerCase().includes(search) ||
+    partner?.vehicleType?.toLowerCase().includes(search) ||
+    partner?.address?.toLowerCase().includes(search)
+  );
+});
+
+  const activePartners = partners.filter(p => p.isAvailable).length;
 
   if (loading) {
-
     return (
-      <div className="p-6  text-xl">
-        Loading delivery partners...
+      <div className="flex justify-center items-center h-screen bg-slate-50">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600"></div>
       </div>
     );
   }
 
-  // =====================================
-  // STATS
-  // =====================================
-
-  const totalPartners =
-    partners?.length || 0;
-
-  const availablePartners =
-    partners.filter(
-      (p) => p?.isAvailable
-    ).length;
-
-  const busyPartners =
-    partners.filter(
-      (p) => !p?.isAvailable
-    ).length;
-
-  const totalEarnings =
-    partners.reduce(
-      (acc, item) =>
-        acc +
-        (item?.totalEarnings || 0),
-      0
-    );
-
-  const totalWallet =
-    partners.reduce(
-      (acc, item) =>
-        acc +
-        (item?.walletBalance || 0),
-      0
-    );
-
   return (
+    <div className="min-h-screen bg-slate-50 p-6 md:p-10">
+      {/* Header Section */}
+      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-8">
+        <div>
+          <h1 className="text-3xl font-bold text-slate-800 tracking-tight">Delivery Fleet</h1>
+          <p className="text-slate-500 mt-1">Manage and monitor your active delivery workforce.</p>
+        </div>
 
-    <div className="space-y-6 p-6 bg-slate-950 min-h-screen text-white">
+        {/* Search Bar */}
+        <div className="relative max-w-md w-full">
+          <Search className="absolute left-3 top-1/3 -translate-y-1/2 text-slate-400 h-5 w-5" />
+         <input
+  type="text"
+  placeholder="Search by name, email, phone, vehicle..."
+  className="w-full pl-10 pr-4 py-2.5 bg-white border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all text-sm shadow-sm"
+  value={searchTerm}
+  onChange={(e) => setSearchTerm(e.target.value)}
+/>
 
-      {/* ================================= */}
-      {/* HEADER */}
-      {/* ================================= */}
-
-      <div>
-
-        <h1 className="text-3xl font-bold">
-          Delivery Partners
-        </h1>
-
-        <p className="text-slate-400 mt-1">
-          Manage all registered delivery partners
-        </p>
-
+<p className="text-sm text-slate-500 mt-2">
+  {filteredPartners.length} partner(s) found
+</p>
+        </div>
       </div>
 
-      {/* ================================= */}
-      {/* STATS */}
-      {/* ================================= */}
-
-      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-5 gap-5">
-
-        {/* TOTAL */}
-        <div className="bg-slate-900 border border-slate-800 rounded-2xl p-5">
-
-          <p className="text-slate-400 text-sm">
-            Total Partners
-          </p>
-
-          <h2 className="text-3xl font-bold mt-2">
-            {totalPartners}
-          </h2>
-
+      {/* Metrics Dashboard Row */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+        <div className="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm flex items-center gap-4">
+          <div className="p-3 bg-indigo-50 rounded-xl text-indigo-600">
+            <Truck className="h-6 w-6" />
+          </div>
+          <div>
+            <p className="text-sm font-medium text-slate-400 uppercase tracking-wider">Total Fleet Size</p>
+            <h3 className="text-2xl font-bold text-slate-800 mt-0.5">{partners.length}</h3>
+          </div>
         </div>
 
-        {/* AVAILABLE */}
-        <div className="bg-slate-900 border border-slate-800 rounded-2xl p-5">
-
-          <p className="text-slate-400 text-sm">
-            Available
-          </p>
-
-          <h2 className="text-3xl font-bold text-emerald-400 mt-2">
-            {availablePartners}
-          </h2>
-
+        <div className="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm flex items-center gap-4">
+          <div className="p-3 bg-emerald-50 rounded-xl text-emerald-600">
+            <UserCheck className="h-6 w-6" />
+          </div>
+          <div>
+            <p className="text-sm font-medium text-slate-400 uppercase tracking-wider">Available Partners</p>
+            <h3 className="text-2xl font-bold text-slate-800 mt-0.5">{activePartners}</h3>
+          </div>
         </div>
 
-        {/* BUSY */}
-        <div className="bg-slate-900 border border-slate-800 rounded-2xl p-5">
-
-          <p className="text-slate-400 text-sm">
-            Busy
-          </p>
-
-          <h2 className="text-3xl font-bold text-red-400 mt-2">
-            {busyPartners}
-          </h2>
-
+        <div className="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm flex items-center gap-4">
+          <div className="p-3 bg-amber-50 rounded-xl text-amber-600">
+            <CircleDot className="h-6 w-6" />
+          </div>
+          <div>
+            <p className="text-sm font-medium text-slate-400 uppercase tracking-wider">On-Duty Load</p>
+            <h3 className="text-2xl font-bold text-slate-800 mt-0.5">
+              {partners.reduce((acc, curr) => acc + (curr.currentOrders?.length || 0), 0)} Active Orders
+            </h3>
+          </div>
         </div>
-
-        {/* EARNINGS */}
-        <div className="bg-slate-900 border border-slate-800 rounded-2xl p-5">
-
-          <p className="text-slate-400 text-sm">
-            Total Earnings
-          </p>
-
-          <h2 className="text-2xl font-bold text-yellow-400 mt-2">
-            {money(totalEarnings)}
-          </h2>
-
-        </div>
-
-        {/* WALLET */}
-        <div className="bg-slate-900 border border-slate-800 rounded-2xl p-5">
-
-          <p className="text-slate-400 text-sm">
-            Wallet Balance
-          </p>
-
-          <h2 className="text-2xl font-bold text-cyan-400 mt-2">
-            {money(totalWallet)}
-          </h2>
-
-        </div>
-
       </div>
 
-      {/* ================================= */}
-      {/* TABLE */}
-      {/* ================================= */}
-
-      <div className="bg-slate-900 border border-slate-800 rounded-2xl overflow-hidden">
-
-        <div className="overflow-x-auto">
-
-          <table className="w-full">
-
-            <thead className="bg-slate-800">
-
-              <tr>
-
-                <th className="text-left p-4 text-slate-300">
-                  Partner
-                </th>
-
-                <th className="text-left p-4 text-slate-300">
-                  Vehicle
-                </th>
-
-                <th className="text-left p-4 text-slate-300">
-                  Active Orders
-                </th>
-
-                <th className="text-left p-4 text-slate-300">
-                  Wallet
-                </th>
-
-                <th className="text-left p-4 text-slate-300">
-                  Earnings
-                </th>
-
-                <th className="text-left p-4 text-slate-300">
-                  Withdrawn
-                </th>
-
-                <th className="text-left p-4 text-slate-300">
-                  Status
-                </th>
-
-                <th className="text-left p-4 text-slate-300">
-                  Action
-                </th>
-
-              </tr>
-
-            </thead>
-
-            <tbody>
-
-              {partners.length === 0 ? (
-
-                <tr>
-
-                  <td
-                    colSpan="8"
-                    className="text-center p-6 text-slate-400"
-                  >
-                    No delivery partners found
-                  </td>
-
-                </tr>
-
-              ) : (
-
-                partners.map(
-                  (partner) => (
-
-                    <tr
-                      key={
-                        partner._id
-                      }
-                      className="border-t border-slate-800 hover:bg-slate-800/40 transition"
-                    >
-
-                      {/* PARTNER */}
-                      <td className="p-4">
-
-                        <div className="flex items-center gap-3">
-
-                          <img
-                            src={
-                              partner.profileImage ||
-                              "https://ui-avatars.com/api/?name=Delivery+Partner"
-                            }
-                            alt=""
-                            className="w-12 h-12 rounded-full object-cover"
-                          />
-
-                          <div>
-
-                            <h2 className="font-semibold">
-                              {
-                                partner.name
-                              }
-                            </h2>
-
-                            <div className="flex items-center gap-1 text-slate-400 text-sm">
-
-                              <Mail size={14} />
-
-                              {
-                                partner.email
-                              }
-
-                            </div>
-
-                            <div className="flex items-center gap-1 text-slate-400 text-sm mt-1">
-
-                              <Phone size={14} />
-
-                              {
-                                partner.phone
-                              }
-
-                            </div>
-
-                          </div>
-
-                        </div>
-
-                      </td>
-
-                      {/* VEHICLE */}
-                      <td className="p-4">
-
-                        <div className="flex items-center gap-2 text-slate-300">
-
-                          <Bike
-                            size={18}
-                          />
-
-                          {
-                            partner.vehicleType
-                          }
-
-                        </div>
-
-                      </td>
-
-                      {/* ACTIVE ORDERS */}
-                      <td className="p-4 font-semibold">
-
-                        {
-                          partner
-                            ?.currentOrders
-                            ?.length || 0
-                        }
-
-                      </td>
-
-                      {/* WALLET */}
-                      <td className="p-4">
-
-                        <div className="flex items-center gap-1 text-cyan-400 font-bold">
-
-                          <Wallet
-                            size={18}
-                          />
-
-                          {
-                            money(
-                              partner.walletBalance
-                            )
-                          }
-
-                        </div>
-
-                      </td>
-
-                      {/* EARNINGS */}
-                      <td className="p-4">
-
-                        <div className="flex items-center gap-1 text-emerald-400 font-bold">
-
-                          <IndianRupee
-                            size={18}
-                          />
-
-                          {
-                            money(
-                              partner.totalEarnings
-                            )
-                          }
-
-                        </div>
-
-                      </td>
-
-                      {/* WITHDRAWN */}
-                      <td className="p-4 text-yellow-400 font-bold">
-
-                        {
-                          money(
-                            partner.withdrawnAmount
-                          )
-                        }
-
-                      </td>
-
-                      {/* STATUS */}
-                      <td className="p-4">
-
-                        {partner.isAvailable ? (
-
-                          <div className="inline-flex items-center gap-2 bg-emerald-500/10 text-emerald-400 px-3 py-1 rounded-full text-sm">
-
-                            <CheckCircle
-                              size={16}
-                            />
-
-                            Available
-
-                          </div>
-
-                        ) : (
-
-                          <div className="inline-flex items-center gap-2 bg-red-500/10 text-red-400 px-3 py-1 rounded-full text-sm">
-
-                            <XCircle
-                              size={16}
-                            />
-
-                            Busy
-
-                          </div>
-
-                        )}
-
-                      </td>
-
-                      {/* ACTION */}
-                      <td className="p-4">
-
-                        <button
-                          onClick={() => {
-                            setSelectedPartner(partner);
-                            setDetailsOpen(true);
-                          }}
-                          className="bg-slate-800 hover:bg-slate-700 px-4 py-2 rounded-lg text-sm"
-                        >
-                          View
-                        </button>
-
-                      </td>
-
-                    </tr>
-                  )
-                )
-              )}
-
-            </tbody>
-
-          </table>
-
+      {/* Fleet Cards Grid */}
+      {filteredPartners.length === 0 ? (
+        <div className="bg-white rounded-2xl border border-dashed border-slate-200 p-12 text-center">
+          <p className="text-slate-500 font-medium">No delivery partners match your structural scope.</p>
         </div>
-
-      </div>
-
-      {/* ================================= */}
-      {/* DETAILS MODAL */}
-      {/* ================================= */}
-
-      {detailsOpen &&
-        selectedPartner && (
-
-          <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4">
-
-            <div className="bg-slate-900 border border-slate-700 rounded-2xl w-full max-w-2xl p-6 relative">
-
-              {/* CLOSE */}
-              <button
-                onClick={() =>
-                  setDetailsOpen(false)
-                }
-                className="absolute top-4 right-4 text-slate-400 hover:text-white text-xl"
-              >
-                ✕
-              </button>
-
-              {/* HEADER */}
-              <div className="flex items-center gap-4 mb-6">
-
-                <img
-                  src={
-                    selectedPartner.profileImage ||
-                    "https://ui-avatars.com/api/?name=Partner"
-                  }
-                  alt=""
-                  className="w-20 h-20 rounded-full object-cover"
-                />
-
-                <div>
-
-                  <h2 className="text-2xl font-bold">
-                    {
-                      selectedPartner.name
-                    }
-                  </h2>
-
-                  <p className="text-slate-400">
-                    {
-                      selectedPartner.email
-                    }
-                  </p>
-
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {filteredPartners.map((partner) => (
+            <div
+              key={partner._id}
+              onClick={() => navigate(`/admin/delivery-partners/${partner._id}`)}
+              className="bg-white rounded-2xl border border-slate-100 shadow-sm hover:shadow-md transition-shadow duration-200 flex flex-col overflow-hidden cursor-pointer"
+            >
+              {/* Status Header Top Strip */}
+              <div className="px-6 pt-6 flex justify-between items-start gap-4">
+                <div className="flex items-center gap-3">
+                  <div className="h-12 w-12 rounded-full bg-slate-100 overflow-hidden border border-slate-200 flex-shrink-0">
+                    {partner.profileImage ? (
+                      <img src={partner.profileImage} alt={partner.name} className="w-full h-full object-cover" />
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center font-bold text-slate-400 bg-slate-100 uppercase">
+                        {partner.name.slice(0, 2)}
+                      </div>
+                    )}
+                  </div>
+                  <div>
+                    <h4 className="font-semibold text-slate-800 line-clamp-1">{partner.name}</h4>
+                    <span className="inline-flex items-center gap-1.5 mt-1 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-indigo-50 text-indigo-700">
+                      {partner.vehicleType}
+                    </span>
+                  </div>
                 </div>
 
+                <span className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium ${partner.isAvailable
+                    ? "bg-emerald-50 text-emerald-700 border border-emerald-200"
+                    : "bg-rose-50 text-rose-700 border border-rose-100"
+                  }`}>
+                  <span className={`h-1.5 w-1.5 rounded-full ${partner.isAvailable ? "bg-emerald-500" : "bg-rose-500"}`} />
+                  {partner.isAvailable ? "Available" : "Busy"}
+                </span>
               </div>
 
-              {/* DETAILS */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+              {/* Quick Details Body */}
+              <div className="p-6 flex-grow border-b border-slate-50 space-y-3">
+                <div className="flex items-center gap-2 text-sm text-slate-600">
+                  <Phone className="h-4 w-4 text-slate-400" />
+                  <span>{partner.phone}</span>
+                </div>
+                {partner.address && (
+                  <div className="flex items-start gap-2 text-sm text-slate-600">
+                    <MapPin className="h-4 w-4 text-slate-400 mt-0.5 flex-shrink-0" />
+                    <span className="line-clamp-1">{partner.address}</span>
+                  </div>
+                )}
 
-                <DetailCard
-                  icon={<Phone size={18} />}
-                  label="Phone"
-                  value={
-                    selectedPartner.phone
-                  }
-                />
-
-                <DetailCard
-                  icon={<Bike size={18} />}
-                  label="Vehicle Type"
-                  value={
-                    selectedPartner.vehicleType
-                  }
-                />
-
-                <DetailCard
-                  icon={<User size={18} />}
-                  label="Vehicle Number"
-                  value={
-                    selectedPartner.vehicleNumber ||
-                    "N/A"
-                  }
-                />
-
-                <DetailCard
-                  icon={<Package size={18} />}
-                  label="Active Orders"
-                  value={
-                    selectedPartner
-                      ?.currentOrders
-                      ?.length || 0
-                  }
-                />
-
-                <DetailCard
-                  icon={<Wallet size={18} />}
-                  label="Wallet Balance"
-                  value={money(
-                    selectedPartner.walletBalance
-                  )}
-                />
-
-                <DetailCard
-                  icon={
-                    <IndianRupee size={18} />
-                  }
-                  label="Total Earnings"
-                  value={money(
-                    selectedPartner.totalEarnings
-                  )}
-                />
-
-                <DetailCard
-                  icon={<Wallet size={18} />}
-                  label="Withdrawn Amount"
-                  value={money(
-                    selectedPartner.withdrawnAmount
-                  )}
-                />
-
-                <DetailCard
-                  icon={
-                    <Calendar size={18} />
-                  }
-                  label="Joined"
-                  value={new Date(
-                    selectedPartner.createdAt
-                  ).toLocaleDateString()}
-                />
-
+                {/* Micro-load indicator */}
+                <div className="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-xs text-slate-500">
+                  <span>Current Load:</span>
+                  <span className="font-semibold text-slate-700">{partner.currentOrders?.length || 0} / {partner.maxOrders || 10} Orders</span>
+                </div>
               </div>
 
+              {/* Action Bar footer */}
+              <div className="px-6 py-4 bg-slate-50/50 flex justify-end">
+                <button
+                  onClick={() => navigate(`/admin/delivery-partners/${partner._id}`)}
+                  className="inline-flex items-center gap-2 text-sm font-semibold text-indigo-600 hover:text-indigo-800 transition-colors"
+                >
+                  <Eye className="h-4 w-4" />
+                  View Management Profile
+                </button>
+              </div>
             </div>
-
-          </div>
-        )}
-
+          ))}
+        </div>
+      )}
     </div>
   );
-}
+};
 
-// =====================================
-// DETAIL CARD
-// =====================================
-
-function DetailCard({
-  icon,
-  label,
-  value,
-}) {
-
-  return (
-
-    <div className="bg-slate-800 rounded-xl p-4">
-
-      <div className="flex items-center gap-2 text-slate-400 text-sm mb-2">
-
-        {icon}
-
-        {label}
-
-      </div>
-
-      <div className="text-lg font-semibold">
-        {value}
-      </div>
-
-    </div>
-  );
-}
+export default DeliveryPartner;

@@ -3,7 +3,7 @@ import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import crypto from "crypto";
 import nodemailer from "nodemailer";
-import WithdrawRequest from "../models/withdrawRequest.model.js";
+import WithdrawRequest from "../models/WithdrawRequest.model.js";
 import DeliveryPartner from "../models/DeliveryPartner.model.js";
 import Order from "../models/Order.model.js";
 
@@ -61,9 +61,7 @@ export const registerAdmin = async (req, res) => {
 // LOGIN ADMIN
 // =======================================
 export const loginAdmin = async (req, res) => {
-
   try {
-
     const { email, password } = req.body;
 
     // check admin
@@ -77,10 +75,7 @@ export const loginAdmin = async (req, res) => {
     }
 
     // compare password
-    const isMatch = await bcrypt.compare(
-      password,
-      admin.password
-    );
+    const isMatch = await bcrypt.compare(password, admin.password);
 
     if (!isMatch) {
       return res.status(400).json({
@@ -89,30 +84,30 @@ export const loginAdmin = async (req, res) => {
       });
     }
 
-    // create token
-    const token = jwt.sign(
-      {
-        id: admin._id,
-      },
-      process.env.JWT_SECRET,
-      {
-        expiresIn: "7d",
-      }
-    );
+    // create access token
+    const token = jwt.sign({ id: admin._id }, process.env.JWT_SECRET, {
+      expiresIn: "7d",
+    });
+
+    // create refresh token (longer lived) and persist it
+    const refreshToken = jwt.sign({ id: admin._id }, process.env.JWT_SECRET, {
+      expiresIn: "30d",
+    });
+
+    admin.refreshToken = refreshToken;
+    await admin.save();
 
     res.status(200).json({
       success: true,
       token,
+      refreshToken,
       _id: admin._id,
       name: admin.name,
       email: admin.email,
       role: admin.role,
     });
-
   } catch (error) {
-
     console.log(error);
-
     res.status(500).json({
       success: false,
       message: "Server Error",
@@ -123,37 +118,77 @@ export const loginAdmin = async (req, res) => {
 // =======================================
 // GET ADMIN PROFILE
 // =======================================
-export const getAdminProfile = async (
-  req,
-  res
-) => {
-
+export const getAdminProfile = async (req, res) => {
   try {
-
-    const admin = await Admin.findById(
-      req.admin.id
-    ).select("-password");
+    const admin = await Admin.findById(req.admin.id).select("-password");
 
     if (!admin) {
-      return res.status(404).json({
-        success: false,
-        message: "Admin not found",
-      });
+      return res.status(404).json({ success: false, message: "Admin not found" });
     }
 
-    res.status(200).json({
-      success: true,
-      admin,
-    });
-
+    res.status(200).json({ success: true, admin });
   } catch (error) {
-
     console.log(error);
+    res.status(500).json({ success: false, message: "Server Error" });
+  }
+};
 
-    res.status(500).json({
-      success: false,
-      message: "Server Error",
-    });
+// =======================================
+// REFRESH TOKEN
+// =======================================
+export const refreshAdminToken = async (req, res) => {
+  try {
+    const { refreshToken } = req.body;
+    if (!refreshToken) {
+      return res.status(400).json({ success: false, message: "Refresh token required" });
+    }
+
+    let decoded;
+    try {
+      decoded = jwt.verify(refreshToken, process.env.JWT_SECRET);
+    } catch (error) {
+      if (error && error.name === "TokenExpiredError") {
+        return res.status(401).json({ success: false, message: "Refresh token expired" });
+      }
+      return res.status(401).json({ success: false, message: "Invalid refresh token" });
+    }
+
+    const admin = await Admin.findById(decoded.id);
+    if (!admin || admin.refreshToken !== refreshToken) {
+      return res.status(401).json({ success: false, message: "Invalid refresh token" });
+    }
+
+    const token = jwt.sign({ id: admin._id }, process.env.JWT_SECRET, { expiresIn: "7d" });
+
+    res.status(200).json({ success: true, token });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ success: false, message: "Server Error" });
+  }
+};
+
+// =======================================
+// LOGOUT ADMIN
+// =======================================
+export const logoutAdmin = async (req, res) => {
+  try {
+    const { refreshToken } = req.body;
+    if (!refreshToken) {
+      return res.status(400).json({ success: false, message: "Refresh token required" });
+    }
+
+    const admin = await Admin.findOne({ refreshToken });
+    if (!admin) {
+      return res.status(200).json({ success: true, message: "Logged out" });
+    }
+
+    admin.refreshToken = undefined;
+    await admin.save();
+
+    res.status(200).json({ success: true, message: "Logged out successfully" });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ success: false, message: "Server Error" });
   }
 };
 
@@ -245,145 +280,6 @@ export const resetAdminPassword = async (req, res) => {
   }
 };
 
-
-
-// =======================================
-// APPROVE WITHDRAW REQUEST
-// =======================================
-export const approveWithdrawRequest =
-  async (req, res) => {
-
-    try {
-
-      const request =
-        await WithdrawRequest.findById(
-          req.params.id
-        ).populate("partner");
-
-      if (!request) {
-        return res.status(404).json({
-          success: false,
-          message:
-            "Withdraw request not found",
-        });
-      }
-
-      if (
-        request.status !== "Pending"
-      ) {
-        return res.status(400).json({
-          success: false,
-          message:
-            "Request already processed",
-        });
-      }
-
-      const partner =
-        request.partner;
-
-      // ===================================
-      // CHECK BALANCE
-      // ===================================
-
-      if (
-        partner.walletBalance <
-        request.amount
-      ) {
-        return res.status(400).json({
-          success: false,
-          message:
-            "Insufficient balance",
-        });
-      }
-
-      // ===================================
-      // DEDUCT BALANCE
-      // ===================================
-
-      partner.walletBalance -=
-        request.amount;
-
-      partner.withdrawnAmount +=
-        request.amount;
-
-      await partner.save();
-
-      // ===================================
-      // APPROVE REQUEST
-      // ===================================
-
-      request.status = "Approved";
-
-      await request.save();
-
-      res.status(200).json({
-        success: true,
-        message:
-          "Withdraw approved successfully",
-      });
-
-    } catch (error) {
-
-      console.log(error);
-
-      res.status(500).json({
-        success: false,
-        message: error.message,
-      });
-    }
-  };
-
-// =======================================
-// REJECT WITHDRAW REQUEST
-// =======================================
-export const rejectWithdrawRequest =
-  async (req, res) => {
-
-    try {
-
-      const request =
-        await WithdrawRequest.findById(
-          req.params.id
-        );
-
-      if (!request) {
-        return res.status(404).json({
-          success: false,
-          message:
-            "Withdraw request not found",
-        });
-      }
-
-      if (
-        request.status !== "Pending"
-      ) {
-        return res.status(400).json({
-          success: false,
-          message:
-            "Request already processed",
-        });
-      }
-
-      request.status = "Rejected";
-
-      await request.save();
-
-      res.status(200).json({
-        success: true,
-        message:
-          "Withdraw request rejected",
-      });
-
-    } catch (error) {
-
-      console.log(error);
-
-      res.status(500).json({
-        success: false,
-        message: error.message,
-      });
-    }
-  };
 
 // =======================================
 // ADMIN DELIVERY DASHBOARD
@@ -599,3 +495,65 @@ export const getDeliveryEarnings =
       });
     }
   };
+
+
+
+export const getDeliveryPartnerDetails = async (req, res) => {
+  try {
+    const partner = await DeliveryPartner.findById(req.params.id)
+      .select("-password")
+      .lean();
+
+    if (!partner) {
+      return res.status(404).json({
+        success: false,
+        message: "Delivery partner not found",
+      });
+    }
+
+    const totalResponses =
+      (partner.totalAcceptedOrders || 0) +
+      (partner.totalRejectedOrders || 0);
+
+    const acceptanceRate =
+      totalResponses === 0
+        ? 0
+        : Math.round(
+            (partner.totalAcceptedOrders / totalResponses) * 100
+          );
+
+    res.status(200).json({
+      success: true,
+      partner: {
+        ...partner,
+
+        walletBalance:
+          partner.walletBalance || 0,
+
+        totalEarnings:
+          partner.totalEarnings || 0,
+
+        withdrawnAmount:
+          partner.withdrawnAmount || 0,
+
+        totalAcceptedOrders:
+          partner.totalAcceptedOrders || 0,
+
+        totalRejectedOrders:
+          partner.totalRejectedOrders || 0,
+
+        acceptanceRate,
+      },
+    });
+  } catch (error) {
+    console.log(
+      "GET DELIVERY PARTNER DETAILS ERROR:",
+      error
+    );
+
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};

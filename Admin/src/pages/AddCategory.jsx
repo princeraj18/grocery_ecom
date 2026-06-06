@@ -93,48 +93,12 @@ const AddCategory = () => {
       )}
 
       {/* SIDEBAR */}
-      <div
-        className={`
-          fixed lg:static z-50 h-full
-          transition-transform duration-300
-          ${
-            sidebarOpen
-              ? "translate-x-0"
-              : "-translate-x-full lg:translate-x-0"
-          }
-        `}
-      >
-        <Sidebar />
-      </div>
+      
 
       {/* MAIN CONTENT */}
       <div className="flex-1 flex flex-col overflow-hidden">
 
-        {/* NAVBAR */}
-        <div className="sticky top-0 z-30 bg-white shadow-sm">
-
-          <div className="flex items-center">
-
-            <button
-              onClick={() =>
-                setSidebarOpen(!sidebarOpen)
-              }
-              className="lg:hidden p-4"
-            >
-              {sidebarOpen ? (
-                <X size={28} />
-              ) : (
-                <Menu size={28} />
-              )}
-            </button>
-
-            <div className="flex-1">
-              <Navbar />
-            </div>
-
-          </div>
-
-        </div>
+       
 
         {/* PAGE CONTENT */}
         <div className="flex-1 overflow-y-auto p-4 md:p-6">

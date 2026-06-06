@@ -25,6 +25,21 @@ const productSchema = new mongoose.Schema(
       required: true,
     },
 
+    // =========================
+    // ADD THESE
+    // =========================
+    price: {
+      type: Number,
+      required: true,
+      default: 0,
+    },
+
+    offerPrice: {
+      type: Number,
+      required: true,
+      default: 0,
+    },
+
     stockQuantity: {
       type: Number,
       required: true,

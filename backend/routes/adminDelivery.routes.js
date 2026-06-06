@@ -3,8 +3,8 @@ import express from "express";
 import adminAuth from "../middleware/adminAuth.js";
 
 import {
-  getDeliveryDashboard,
-  
+  getDeliveryPartnersDashboard,
+  getDeliveryPartner,
 } from "../controllers/adminDelivery.controller.js";
 
 const router = express.Router();
@@ -16,7 +16,9 @@ const router = express.Router();
 router.get(
   "/dashboard",
   adminAuth,
-  getDeliveryDashboard
+  getDeliveryPartnersDashboard
 );
+
+router.get("/:id", adminAuth, getDeliveryPartner);
 
 export default router;

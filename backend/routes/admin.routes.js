@@ -4,13 +4,22 @@ import {
   registerAdmin,
   loginAdmin,
   getAdminProfile,
+  refreshAdminToken,
+  logoutAdmin,
   forgotAdminPassword,
   resetAdminPassword,
   getDeliveryDashboard,
   getDeliveryEarnings,
+  getDeliveryPartnerDetails,
+
+} from "../controllers/admin.controller.js";
+
+import {
+  getAllWithdrawRequests,
+  getWithdrawRequestById,
   approveWithdrawRequest,
   rejectWithdrawRequest,
-} from "../controllers/admin.controller.js";
+} from "../controllers/withdraw.controller.js";
 
 import {
   getVendors,
@@ -32,6 +41,18 @@ router.post(
 router.post(
   "/login",
   loginAdmin
+);
+
+// REFRESH ACCESS TOKEN
+router.post(
+  "/refresh-token",
+  refreshAdminToken
+);
+
+// LOGOUT
+router.post(
+  "/logout",
+  logoutAdmin
 );
 
 // PROFILE
@@ -60,6 +81,18 @@ router.get(
   getDeliveryEarnings
 );
 
+router.get(
+  "/withdraw-requests",
+  adminAuth,
+  getAllWithdrawRequests
+);
+
+router.get(
+  "/withdraw-requests/:id",
+  adminAuth,
+  getWithdrawRequestById
+);
+
 router.put(
   "/withdraw-requests/:id/approve",
   adminAuth,
@@ -71,5 +104,9 @@ router.put(
   adminAuth,
   rejectWithdrawRequest
 );
-
+router.get(
+  "/delivery-partners/:id",
+  adminAuth,
+  getDeliveryPartnerDetails
+);
 export default router;

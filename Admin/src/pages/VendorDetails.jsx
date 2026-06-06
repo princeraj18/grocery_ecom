@@ -1,12 +1,13 @@
 import { useEffect, useState } from "react";
 
-import { useParams } from "react-router-dom";
+import { useParams, useLocation } from "react-router-dom";
 
 import api from "../services/api";
 
 export default function VendorDetails() {
 
   const { id } = useParams();
+  const location = useLocation();
 
   const [vendor, setVendor] =
     useState(null);
@@ -17,6 +18,19 @@ export default function VendorDetails() {
   const [loading, setLoading] =
     useState(true);
 
+  const [error, setError] =
+    useState(null);
+
+  // DETERMINE ENDPOINT
+  const isDeliveryPartner =
+    location.pathname.includes(
+      "delivery-partners"
+    );
+
+  const endpoint = isDeliveryPartner
+    ? `/admin/delivery-partners/${id}`
+    : `/admin/vendors/${id}`;
+
   useEffect(() => {
 
     const fetchVendorDetails =
@@ -24,40 +38,49 @@ export default function VendorDetails() {
 
         try {
 
+          setLoading(true);
+          setError(null);
+
           // =========================
-          // GET VENDOR DETAILS
+          // GET VENDOR/DELIVERY PARTNER DETAILS
           // =========================
           const vendorRes =
-            await api.get(
-              `/admin/vendors/${id}`
-            );
+            await api.get(endpoint);
 
           setVendor(
-            vendorRes.data.vendor
+            vendorRes.data.vendor ||
+            vendorRes.data.deliveryPartner ||
+            vendorRes.data.partner
           );
 
           // =========================
-          // GET ALL PRODUCTS
+          // GET ALL PRODUCTS (only for vendors)
           // =========================
-          const productRes =
-            await api.get(
-              "/products"
-            );
+          if (!isDeliveryPartner) {
+            const productRes =
+              await api.get(
+                "/products"
+              );
 
-          // FILTER PRODUCTS OF THIS VENDOR
-          const vendorProducts =
-            productRes.data.products.filter(
-              (product) =>
-                product.vendor?._id === id
-            );
+            // FILTER PRODUCTS OF THIS VENDOR
+            const vendorProducts =
+              productRes.data.products.filter(
+                (product) =>
+                  product.vendor?._id === id
+              );
 
-          setProducts(
-            vendorProducts
-          );
+            setProducts(
+              vendorProducts
+            );
+          }
 
         } catch (error) {
 
           console.log(error);
+          setError(
+            error.response?.data?.message ||
+            "Failed to fetch details"
+          );
 
         } finally {
 
@@ -67,7 +90,7 @@ export default function VendorDetails() {
 
     fetchVendorDetails();
 
-  }, [id]);
+  }, [id, endpoint, isDeliveryPartner]);
 
   // =========================
   // LOADING
@@ -82,13 +105,31 @@ export default function VendorDetails() {
   }
 
   // =========================
+  // ERROR
+  // =========================
+  if (error) {
+
+    return (
+      <div className="p-10">
+        <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
+          <p className="font-bold">Error</p>
+          <p>{error}</p>
+        </div>
+      </div>
+    );
+  }
+
+  // =========================
   // NO VENDOR
   // =========================
   if (!vendor) {
 
     return (
-      <div className="p-10 text-red-500">
-        Vendor not found
+      <div className="p-10">
+        <div className="bg-yellow-100 border border-yellow-400 text-yellow-700 px-4 py-3 rounded">
+          <p className="font-bold">{isDeliveryPartner ? "Delivery Partner" : "Vendor"} Not Found</p>
+          <p>The requested {isDeliveryPartner ? "delivery partner" : "vendor"} could not be found.</p>
+        </div>
       </div>
     );
   }
@@ -111,6 +152,7 @@ export default function VendorDetails() {
           <img
             src={
               vendor.logo ||
+              vendor.profileImage ||
               "https://i.pravatar.cc/150"
             }
             alt="logo"
@@ -120,14 +162,16 @@ export default function VendorDetails() {
           <div>
 
             <h2 className="text-3xl font-bold">
-              {vendor.shopName}
+              {vendor.shopName || vendor.name}
             </h2>
 
+            {vendor.ownerName && (
             <p className="text-gray-500 mt-1">
               Owner :
               {" "}
               {vendor.ownerName}
             </p>
+            )}
 
             <p className="text-gray-500">
               Email :
@@ -164,8 +208,9 @@ export default function VendorDetails() {
       </div>
 
       {/* ================================= */}
-      {/* VENDOR PRODUCTS */}
+      {/* VENDOR PRODUCTS - Only show for vendors */}
       {/* ================================= */}
+      {!isDeliveryPartner && (
       <div className="mt-10">
 
         <h2 className="text-2xl font-bold mb-6">
@@ -210,29 +255,29 @@ export default function VendorDetails() {
 
                     <p className="text-gray-500 text-sm mb-3">
                       {
-                        product.category
+                        product.category?.text || product.category?.name || "Uncategorized"
                       }
                     </p>
 
                     <div className="flex items-center justify-between">
 
-                      <div>
+                     <div>
 
-                        <p className="text-gray-400 line-through">
-                          ₹
-                          {
-                            product.price
-                          }
-                        </p>
+  <p className="text-gray-400 line-through">
+    ₹
+    {
+      product.variants?.[0]?.price || 0
+    }
+  </p>
 
-                        <p className="text-green-600 font-bold text-xl">
-                          ₹
-                          {
-                            product.offerPrice
-                          }
-                        </p>
+  <p className="text-green-600 font-bold text-xl">
+    ₹
+    {
+      product.variants?.[0]?.offerPrice || 0
+    }
+  </p>
 
-                      </div>
+</div>
 
                       <div className="text-sm text-gray-500">
                         Stock :
@@ -254,6 +299,7 @@ export default function VendorDetails() {
         )}
 
       </div>
+      )}
 
     </div>
   );

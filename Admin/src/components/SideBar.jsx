@@ -1,83 +1,56 @@
 import { NavLink } from "react-router-dom";
 
 export default function Sidebar() {
-
   const navLinkClass = ({ isActive }) =>
-    `p-3 rounded-xl transition-all duration-200 font-medium ${
+    `p-2.5 rounded-lg transition-all duration-200 text-sm font-medium ${
       isActive
         ? "bg-white text-black"
         : "text-gray-300 hover:bg-gray-800 hover:text-white"
     }`;
 
   return (
-
-    <div className="w-64 bg-black text-white min-h-screen p-5 border-r border-gray-800">
-
+    <div className="w-72 bg-black text-white min-h-screen p-5 border-r border-gray-800">
       {/* LOGO */}
-      <h1 className="text-3xl font-extrabold mb-10 tracking-wide">
+      <h1 className="text-2xl font-extrabold mb-6 tracking-wide">
         Admin Panel
       </h1>
 
       {/* MENU */}
-      <div className="flex flex-col gap-3">
-
+      <div className="flex flex-col gap-1">
         {/* DASHBOARD */}
-        <NavLink
-          to="/admin"
-          className={navLinkClass}
-        >
+        <NavLink to="/admin" className={navLinkClass}>
           Dashboard
         </NavLink>
 
         {/* USERS */}
-        <NavLink
-          to="/admin/users"
-          className={navLinkClass}
-        >
+        <NavLink to="/admin/users" className={navLinkClass}>
           Users
         </NavLink>
 
         {/* VENDORS */}
-        <NavLink
-          to="/admin/vendors"
-          className={navLinkClass}
-        >
+        <NavLink to="/admin/vendors" className={navLinkClass}>
           Vendors
         </NavLink>
 
         {/* ORDERS */}
-        <NavLink
-          to="/admin/orders"
-          className={navLinkClass}
-        >
+        <NavLink to="/admin/orders" className={navLinkClass}>
           Orders
         </NavLink>
 
-        {/* DELIVERY DASHBOARD */}
+        {/* DELIVERY PARTNERS */}
         <NavLink
-          to="/delivery/dashboard"
+          to="/admin/delivery-partners"
           className={navLinkClass}
         >
-          Delivery Dashboard
+          Delivery Partners
         </NavLink>
-<NavLink
-  to="/admin/delivery-partners"
-  className={({ isActive }) =>
-    `p-2 rounded ${
-      isActive
-        ? "bg-white text-black"
-        : ""
-    }`
-  }
->
-  Delivery Partners
-</NavLink>
-        {/* DELIVERY EARNINGS */}
+
+        {/* WITHDRAWAL REQUESTS */}
         <NavLink
-          to="/delivery/earnings"
+          to="/admin/withdrawal-requests"
           className={navLinkClass}
         >
-          Delivery Earnings
+          Withdrawal Requests
         </NavLink>
 
         {/* ADD VARIANT */}
@@ -103,7 +76,6 @@ export default function Sidebar() {
         >
           Support
         </NavLink>
-
       </div>
     </div>
   );

@@ -207,141 +207,188 @@ export const getMyOrders = async (req, res) => {
 // ====================================================================
 // GET DELIVERY PARTNERS (Filtered by Vendor context if authenticated)
 // ====================================================================
-export const getDeliveryPartners =
-async (req, res) => {
-
+// ====================================================================
+export const getDeliveryPartners = async (req, res) => {
   try {
+    const { availableOnly } = req.query;
+    
+    // Build a dynamic filter object
+    let filter = {};
+    
+    // If frontend sends ?availableOnly=true, strictly filter. Otherwise, fetch all.
+    if (availableOnly === "true") {
+      filter.isAvailable = true;
+    }
 
-    const partners =
-      await DeliveryPartner.find({
-        isAvailable: true,
-      })
+    // Optional: If you want vendors to only see partners matching their setup,
+    // you can uncomment the line below:
+    // if (req.vendor?._id) filter.vendor = req.vendor._id;
+
+    const partners = await DeliveryPartner.find(filter)
       .select("-password")
       .sort({ createdAt: -1 });
 
     res.status(200).json({
-
       success: true,
-
+      count: partners.length,
       partners,
     });
 
   } catch (error) {
-
-    console.log(
-      "GET DELIVERY PARTNERS ERROR:",
-      error
-    );
-
+    console.log("GET DELIVERY PARTNERS ERROR:", error);
     res.status(500).json({
-
       success: false,
-
       message: error.message,
     });
   }
 };
 
+// ======================================
+// GET SINGLE DELIVERY PARTNER
+// ======================================
+export const getSingleDeliveryPartner = async (req, res) => {
+  try {
+    const partner = await DeliveryPartner.findById(req.params.id)
+      .select(
+        "-password name email phone address profileImage isAvailable isVerified role vehicleType vehicleNumber walletBalance totalEarnings withdrawnAmount totalAcceptedOrders totalRejectedOrders"
+      );
 
+    if (!partner) {
+      return res.status(404).json({
+        success: false,
+        message: "Delivery partner not found",
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      partner: {
+        ...partner.toObject(),
+        totalEarnings: partner.totalEarnings || 0,
+      },
+    });
+  } catch (error) {
+    console.log("GET SINGLE DELIVERY PARTNER ERROR:", error);
+
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
 export const getDashboardData = async (req, res) => {
   try {
-
     const partnerId = req.deliveryPartner._id;
 
-    const partner =
-      await DeliveryPartner.findById(partnerId);
+    const partner = await DeliveryPartner.findById(partnerId);
+
+    if (!partner) {
+      return res.status(404).json({
+        success: false,
+        message: "Partner not found",
+      });
+    }
 
     // Active Order
-    const activeOrder =
-      await Order.findOne({
-        deliveryPartner: partnerId,
-        deliveryStatus: {
-          $in: [
-            "Assigned",
-            "Accepted",
-            "Picked",
-            "Out for Delivery",
-          ],
-        },
-      });
+    const activeOrder = await Order.findOne({
+      deliveryPartner: partnerId,
+      deliveryStatus: {
+        $in: [
+          "Assigned",
+          "Accepted",
+          "Picked",
+          "Out for Delivery",
+        ],
+      },
+    });
 
-    // Completed Deliveries
-    const completedTrips =
-      await Order.countDocuments({
-        deliveryPartner: partnerId,
-        deliveryStatus: "Delivered",
-      });
+    // Completed Trips
+    const completedTrips = await Order.countDocuments({
+      deliveryPartner: partnerId,
+      deliveryStatus: "Delivered",
+    });
 
     // Today's Earnings
-    const today = new Date();
+    const startOfDay = new Date();
+    startOfDay.setHours(0, 0, 0, 0);
 
-    today.setHours(0, 0, 0, 0);
+    const endOfDay = new Date();
+    endOfDay.setHours(23, 59, 59, 999);
 
     const todayOrders = await Order.find({
       deliveryPartner: partnerId,
       deliveryStatus: "Delivered",
-      deliveredAt: { $gte: today },
+      deliveredAt: {
+        $gte: startOfDay,
+        $lte: endOfDay,
+      },
     });
 
-    const todayEarnings =
-      todayOrders.reduce(
-        (acc, order) =>
-          acc + (order.partnerEarning || 0),
-        0
-      );
+    const todayEarnings = todayOrders.reduce(
+      (sum, order) => sum + Number(order.partnerEarning || 0),
+      0
+    );
+
+    // Total Earnings from Orders
+    const deliveredOrders = await Order.find({
+      deliveryPartner: partnerId,
+      deliveryStatus: "Delivered",
+    });
+
+    const totalEarnings = deliveredOrders.reduce(
+      (sum, order) => sum + Number(order.partnerEarning || 0),
+      0
+    );
 
     // Acceptance Rate
     const totalResponses =
-      partner.totalAcceptedOrders +
-      partner.totalRejectedOrders;
+      (partner.totalAcceptedOrders || 0) +
+      (partner.totalRejectedOrders || 0);
 
     const acceptanceRate =
       totalResponses === 0
         ? 0
         : Math.round(
-            (
-              partner.totalAcceptedOrders /
-              totalResponses
-            ) * 100
+            ((partner.totalAcceptedOrders || 0) /
+              totalResponses) *
+              100
           );
 
-    // Format Active Order
-    const formattedActiveOrder =
-      activeOrder
-        ? {
-            _id: activeOrder._id,
+    const formattedActiveOrder = activeOrder
+      ? {
+          _id: activeOrder._id,
+          orderStatus: activeOrder.deliveryStatus,
+          pickupAddress:
+            activeOrder.vendor
+              ? "Vendor Pickup"
+              : "Store Pickup",
+          deliveryAddress: `
+            ${activeOrder.shippingAddress?.street || ""},
+            ${activeOrder.shippingAddress?.city || ""},
+            ${activeOrder.shippingAddress?.state || ""}
+          `,
+        }
+      : null;
 
-            orderStatus:
-              activeOrder.deliveryStatus,
-
-            pickupAddress:
-              activeOrder.vendor
-                ? "Vendor Pickup"
-                : "Store Pickup",
-
-            deliveryAddress:
-              `${activeOrder.shippingAddress.street},
-               ${activeOrder.shippingAddress.city},
-               ${activeOrder.shippingAddress.state}`,
-          }
-        : null;
-
-    res.status(200).json({
+    return res.status(200).json({
       success: true,
-  partnerName: partner.name,
+      partnerName: partner.name,
+
       stats: {
         todayEarnings,
+        totalEarnings,
+        walletBalance: partner.walletBalance || 0,
+        withdrawnAmount: partner.withdrawnAmount || 0,
         completedTrips,
         acceptanceRate,
       },
 
-      activeOrder:
-        formattedActiveOrder,
+      activeOrder: formattedActiveOrder,
     });
-
   } catch (error) {
+    console.log("DASHBOARD ERROR:", error);
 
-    res.status(500).json({
+    return res.status(500).json({
       success: false,
       message: error.message,
     });
@@ -510,11 +557,10 @@ export const updateDeliveryStatus =
         deliveryStatus === "Delivered"
       ) {
 
-        order.orderStatus =
-          "Delivered";
-
-        order.deliveredAt =
-          new Date();
+        order.orderStatus = "Delivered";
+        order.deliveredAt = new Date();
+        order.paymentStatus = "Paid";
+        order.isPaid = true;
 
         const partner =
           await DeliveryPartner.findById(
@@ -705,9 +751,7 @@ export const requestWithdraw =
 
     try {
 
-      const partnerId =
-        req.partner._id;
-
+     const partnerId = req.deliveryPartner._id;
       const { amount } =
         req.body;
 
@@ -760,9 +804,9 @@ export const markOrderDelivered =
       const { orderId } = req.body;
 
       const partner =
-        await DeliveryPartner.findById(
-          req.partner._id
-        );
+  await DeliveryPartner.findById(
+    req.deliveryPartner._id
+  );
 
       const order =
         await Order.findById(orderId);
@@ -845,43 +889,53 @@ export const markOrderDelivered =
 // =======================================
 // CREATE WITHDRAW REQUEST
 // =======================================
-export const createWithdrawRequest =
-  async (req, res) => {
+export const createWithdrawRequest = async (req, res) => {
+  try {
+    const { amount } = req.body;
 
-    try {
-
-      const { amount } = req.body;
-
-      if (!amount || amount <= 0) {
-
-        return res.status(400).json({
-          success: false,
-          message: "Invalid amount",
-        });
-      }
-
-      const withdrawRequest =
-        await WithdrawRequest.create({
-
-          partner: req.partner.id,
-
-          amount,
-        });
-
-      res.status(201).json({
-        success: true,
-        message:
-          "Withdraw request submitted",
-        withdrawRequest,
-      });
-
-    } catch (error) {
-
-      console.log(error);
-
-      res.status(500).json({
+    if (!amount || amount <= 0) {
+      return res.status(400).json({
         success: false,
-        message: "Server Error",
+        message: "Invalid amount",
       });
     }
-  };
+
+    const partner = await DeliveryPartner.findById(
+      req.deliveryPartner._id
+    );
+
+    if (!partner) {
+      return res.status(404).json({
+        success: false,
+        message: "Delivery partner not found",
+      });
+    }
+
+    if (amount > partner.walletBalance) {
+      return res.status(400).json({
+        success: false,
+        message: "Insufficient balance",
+      });
+    }
+
+    const withdrawRequest =
+      await WithdrawRequest.create({
+        partner: req.deliveryPartner._id,
+        amount,
+      });
+
+    res.status(201).json({
+      success: true,
+      message: "Withdraw request submitted",
+      withdrawRequest,
+    });
+
+  } catch (error) {
+    console.log("CREATE WITHDRAW ERROR:", error);
+
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};

@@ -27,6 +27,7 @@ const adminSchema =
       },
       resetPasswordToken: String,
       resetPasswordExpires: Date,
+      refreshToken: String,
     },
     {
       timestamps: true,

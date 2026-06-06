@@ -38,7 +38,9 @@ export const createProduct = async (
   name,
   description,
   category,
-   stockQuantity
+  price,
+  offerPrice,
+  stockQuantity
 } = req.body;
 
 console.log("CATEGORY RECEIVED:", category);
@@ -217,6 +219,8 @@ if (parsedVariants.length > 0) {
   name,
   description: [description],
   category,
+  price: Number(price) || 0,
+  offerPrice: Number(offerPrice) || 0,
   stockQuantity:
     computedStock || Number(stockQuantity) || 0,
   variants: variantIds,
@@ -496,6 +500,14 @@ export const updateProduct =
   product.category =
     req.body.category;
 }
+
+      if (req.body.price !== undefined) {
+        product.price = Number(req.body.price);
+      }
+
+      if (req.body.offerPrice !== undefined) {
+        product.offerPrice = Number(req.body.offerPrice);
+      }
 
       if (req.body.variants) {
   const parsedVariants = JSON.parse(

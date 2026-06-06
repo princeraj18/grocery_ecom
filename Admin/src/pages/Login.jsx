@@ -32,6 +32,7 @@ export default function Login() {
 
       // Normalize response: backend may return admin fields at top-level
       const token = data?.token;
+      const refreshToken = data?.refreshToken;
 
       const adminData =
         data?.admin ?? {
@@ -41,9 +42,12 @@ export default function Login() {
           role: data?.role,
         };
 
-      // SAVE TOKEN (if present)
+      // SAVE TOKENS (if present)
       if (token) {
         localStorage.setItem("adminToken", token);
+      }
+      if (refreshToken) {
+        localStorage.setItem("adminRefreshToken", refreshToken);
       }
 
       // SAVE ADMIN

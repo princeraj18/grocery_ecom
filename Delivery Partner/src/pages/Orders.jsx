@@ -1,8 +1,10 @@
 import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import axios from "axios";
 
 export default function Orders() {
 
+  const navigate = useNavigate();
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -133,7 +135,11 @@ export default function Orders() {
 
             <div
               key={order._id}
-              className="bg-slate-900 p-5 rounded-2xl border border-slate-800 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4"
+              onClick={(e) => {
+                if (e.target.closest("button")) return;
+                navigate(`/delivery-map/${order._id}`);
+              }}
+              className="bg-slate-900 p-5 rounded-2xl border border-slate-800 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 cursor-pointer hover:border-slate-700 transition"
             >
 
               {/* Left Side */}
@@ -257,8 +263,7 @@ export default function Orders() {
 
                   <button
   onClick={() =>
-    window.location.href =
-      `/delivery-map/${order._id}`
+    navigate(`/delivery-map/${order._id}`)
   }
   className="mt-2 bg-blue-500 hover:bg-blue-600 text-white text-sm font-semibold px-4 py-2 rounded-xl transition-colors"
 >

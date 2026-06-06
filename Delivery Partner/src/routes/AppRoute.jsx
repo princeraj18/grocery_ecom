@@ -69,9 +69,9 @@ export default function AppRoute() {
         {/* Catch-all Redirect for unknown URLs */}
         <Route path="*" element={<Navigate to={isAuthenticated ? "/" : "/login"} />} />
         <Route
-  path="/delivery-map/:orderId"
-  element={<DeliveryMap />}
-/>
+          path="/delivery-map/:orderId"
+          element={isAuthenticated ? <ProtectedLayout><DeliveryMap /></ProtectedLayout> : <Navigate to="/login" />}
+        />
       </Routes>
     </Router>
   );

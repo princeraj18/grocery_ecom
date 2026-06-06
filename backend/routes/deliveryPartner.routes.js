@@ -11,6 +11,9 @@ import {
   getEarningsHistory,
   updateProfile,
   getProfile,
+    getSingleDeliveryPartner,
+  createWithdrawRequest,
+
   
 } from "../controllers/deliveryPartner.controller.js";
 
@@ -21,7 +24,7 @@ import {
 import vendorAuth from "../middleware/vendorAuth.js";
 
 import upload from "../middleware/upload.js";
-import { createWithdrawRequest } from "../controllers/withdraw.controller.js";
+// import { createWithdrawRequest } from "../controllers/withdraw.controller.js";
 
 const router = express.Router();
 
@@ -45,7 +48,7 @@ router.post(
 
 router.get(
   "/all",
-  vendorAuth,
+  
   getDeliveryPartners
 );
 
@@ -100,6 +103,10 @@ router.get(
 // WITHDRAW REQUEST
 // =======================================
 
+router.get(
+  "/:id",
+  getSingleDeliveryPartner
+);
 router.post(
   "/withdraw-request",
   protectDeliveryPartner,

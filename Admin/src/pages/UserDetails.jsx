@@ -57,7 +57,7 @@ export default function UserDetails() {
   return (
 
     <div className="p-10">
-<Navbar />
+{/* <Navbar /> */}
       <h1 className="text-3xl mt-5 font-bold mb-8">
         User Details
       </h1>

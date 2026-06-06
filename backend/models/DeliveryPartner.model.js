@@ -38,6 +38,7 @@ const deliveryPartnerSchema =
           "Scooter",
           "Car",
           "Bicycle",
+          "Cycle",
         ],
         default: "Bike",
       },
@@ -128,6 +129,11 @@ const deliveryPartnerSchema =
         type: String,
         default: "deliveryPartner",
       },
+      vendor: {
+  type: mongoose.Schema.Types.ObjectId,
+  ref: "Vendor",
+  default: null,
+}
     },
     {
       timestamps: true,

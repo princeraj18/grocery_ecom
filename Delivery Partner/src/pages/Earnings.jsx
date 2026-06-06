@@ -14,11 +14,20 @@ export default function Earnings() {
   const [totalEarnings, setTotalEarnings] =
     useState(0);
 
+  const [walletBalance, setWalletBalance] =
+    useState(0);
+
+  const [allTimeEarnings, setAllTimeEarnings] =
+    useState(0);
+
+  const [withdrawnAmount, setWithdrawnAmountState] =
+    useState(0);
+
   const [loading, setLoading] =
     useState(true);
 
   const [filter, setFilter] =
-    useState("today");
+    useState("all");
 
   // =========================================
   // WITHDRAW STATES
@@ -60,6 +69,9 @@ export default function Earnings() {
         setEarnings(
           res.data.earnings || []
         );
+        setWalletBalance(res.data.walletBalance || 0);
+        setAllTimeEarnings(res.data.totalEarnings || 0);
+        setWithdrawnAmountState(res.data.withdrawnAmount || 0);
       }
 
     } catch (error) {
@@ -245,7 +257,7 @@ export default function Earnings() {
 
       if (
         Number(withdrawAmount) >
-        totalEarnings
+        walletBalance
       ) {
 
         return setWithdrawMessage(
@@ -281,6 +293,7 @@ export default function Earnings() {
         );
 
         setWithdrawAmount("");
+        fetchEarnings();
       }
 
     } catch (error) {
@@ -324,6 +337,19 @@ export default function Earnings() {
 
         {/* FILTER BUTTONS */}
         <div className="flex flex-wrap gap-2">
+
+          <button
+            onClick={() =>
+              setFilter("all")
+            }
+            className={`px-4 py-2 rounded-xl text-sm font-medium transition ${
+              filter === "all"
+                ? "bg-emerald-500 text-white"
+                : "bg-slate-800 text-slate-300 hover:bg-slate-700"
+            }`}
+          >
+            All Time
+          </button>
 
           <button
             onClick={() =>
@@ -381,24 +407,61 @@ export default function Earnings() {
 
       </div>
 
-      {/* TOTAL EARNINGS CARD */}
-      <div className="bg-gradient-to-br from-slate-900 to-slate-800 p-6 rounded-2xl border border-slate-800">
+      {/* STATS GRID */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        {/* Wallet Balance */}
+        <div className="bg-gradient-to-br from-slate-900 to-slate-800 p-6 rounded-2xl border border-slate-800 shadow-lg">
+          <p className="text-sm text-slate-400 font-medium uppercase tracking-wider">
+            Wallet Balance
+          </p>
+          <p className="text-3xl font-extrabold text-emerald-400 mt-2">
+            ₹{Number(walletBalance).toLocaleString("en-IN")}
+          </p>
+          <p className="text-xs text-slate-500 mt-2">
+            Available for withdrawal
+          </p>
+        </div>
 
-        <p className="text-sm text-slate-400 font-medium">
-          Total Earnings
+        {/* Total Earnings */}
+        <div className="bg-gradient-to-br from-slate-900 to-slate-800 p-6 rounded-2xl border border-slate-800 shadow-lg">
+          <p className="text-sm text-slate-400 font-medium uppercase tracking-wider">
+            Total Earnings (All-Time)
+          </p>
+          <p className="text-3xl font-extrabold text-cyan-400 mt-2">
+            ₹{Number(allTimeEarnings).toLocaleString("en-IN")}
+          </p>
+          <p className="text-xs text-slate-500 mt-2">
+            All lifetime earnings
+          </p>
+        </div>
+
+        {/* Withdrawn Amount */}
+        <div className="bg-gradient-to-br from-slate-900 to-slate-800 p-6 rounded-2xl border border-slate-800 shadow-lg">
+          <p className="text-sm text-slate-400 font-medium uppercase tracking-wider">
+            Withdrawn Amount
+          </p>
+          <p className="text-3xl font-extrabold text-orange-400 mt-2">
+            ₹{Number(withdrawnAmount).toLocaleString("en-IN")}
+          </p>
+          <p className="text-xs text-slate-500 mt-2">
+            Transferred to bank
+          </p>
+        </div>
+      </div>
+
+      {/* FILTER SUMMARY CARD */}
+      <div className="bg-slate-900 p-4 rounded-xl border border-slate-800 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
+        <p className="text-sm text-slate-300">
+          Showing stats for: <span className="font-semibold text-white capitalize">{filter === '10days' ? 'Last 10 Days' : filter === 'all' ? 'All Time' : filter}</span>
         </p>
-
-        <p className="text-4xl font-extrabold text-white mt-2">
-          ₹{totalEarnings}
-        </p>
-
-        <p className="text-sm text-emerald-400 mt-2">
-          {
-            filteredEarnings.length
-          }{" "}
-          deliveries completed
-        </p>
-
+        <div className="flex flex-wrap gap-4">
+          <span className="text-sm text-slate-400">
+            Deliveries: <span className="font-bold text-white">{filteredEarnings.length}</span>
+          </span>
+          <span className="text-sm text-slate-400">
+            Period Earnings: <span className="font-bold text-emerald-400">₹{Number(totalEarnings).toLocaleString("en-IN")}</span>
+          </span>
+        </div>
       </div>
 
       {/* WITHDRAW SECTION */}
