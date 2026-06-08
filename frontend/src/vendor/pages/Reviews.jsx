@@ -1,395 +1,232 @@
-import React, {
-  useEffect,
-  useState,
-} from "react";
-
+import React, { useEffect, useState } from "react";
 import axios from "axios";
-
 import Sidebar from "../components/Sidebar";
 import Navbar from "../components/Navbar";
-
-import {
-  Menu,
-  X,
-} from "lucide-react";
+import { Menu, X, Trash2, Star, MessageSquare } from "lucide-react";
 
 export default function Reviews() {
-
-  const [reviews, setReviews] =
-    useState([]);
-
-  const [loading, setLoading] =
-    useState(true);
-
-  // MOBILE SIDEBAR
-  const [sidebarOpen, setSidebarOpen] =
-    useState(false);
+  const [reviews, setReviews] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
 
   // ====================================
   // FETCH VENDOR REVIEWS
   // ====================================
-  const fetchReviews =
-    async () => {
-
-      try {
-
-        const token =
-          localStorage.getItem(
-            "vendorToken"
-          );
-
-        const { data } =
-          await axios.get(
-            "http://localhost:5000/api/reviews/vendor",
-            {
-              headers: {
-                Authorization:
-                  `Bearer ${token}`,
-              },
-            }
-          );
-
-        setReviews(
-          data.reviews || []
-        );
-
-      } catch (error) {
-
-        console.log(error);
-
-      } finally {
-
-        setLoading(false);
-      }
-    };
+  const fetchReviews = async () => {
+    try {
+      const token = localStorage.getItem("vendorToken");
+      const { data } = await axios.get(
+        "http://localhost:5000/api/reviews/vendor",
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      setReviews(data.reviews || []);
+    } catch (error) {
+      console.error("Error fetching reviews:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   // ====================================
   // DELETE REVIEW
   // ====================================
-  const deleteReview =
-    async (id) => {
+  const deleteReview = async (id) => {
+    try {
+      const token = localStorage.getItem("vendorToken");
+      const confirmDelete = window.confirm("Delete this review?");
+      if (!confirmDelete) return;
 
-      try {
+      await axios.delete(`http://localhost:5000/api/reviews/${id}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
 
-        const token =
-          localStorage.getItem(
-            "vendorToken"
-          );
-
-        const confirmDelete =
-          window.confirm(
-            "Delete this review?"
-          );
-
-        if (!confirmDelete)
-          return;
-
-        await axios.delete(
-          `http://localhost:5000/api/reviews/${id}`,
-          {
-            headers: {
-              Authorization:
-                `Bearer ${token}`,
-            },
-          }
-        );
-
-        setReviews(
-          reviews.filter(
-            (review) =>
-              review._id !== id
-          )
-        );
-
-      } catch (error) {
-
-        console.log(error);
-
-        alert(
-          "Failed to delete review"
-        );
-      }
-    };
+      setReviews(reviews.filter((review) => review._id !== id));
+    } catch (error) {
+      console.error("Error deleting review:", error);
+      alert("Failed to delete review");
+    }
+  };
 
   useEffect(() => {
-
     fetchReviews();
-
   }, []);
 
   return (
-
-    <div className="flex bg-gray-100 min-h-screen overflow-hidden">
-
-      {/* ========================================= */}
-      {/* DESKTOP SIDEBAR */}
-      {/* ========================================= */}
-      <div className="hidden lg:block">
-
-        <Sidebar />
-
-      </div>
-
-      {/* ========================================= */}
-      {/* MOBILE SIDEBAR */}
-      {/* ========================================= */}
+    <div className="flex h-screen w-screen bg-gray-50 overflow-hidden relative text-gray-900 framework-sans">
+      {/* MOBILE OVERLAY */}
       {sidebarOpen && (
-
-        <>
-
-          {/* OVERLAY */}
-          <div
-            className="fixed inset-0 bg-black/50 z-40 lg:hidden"
-            onClick={() =>
-              setSidebarOpen(false)
-            }
-          />
-
-          {/* SIDEBAR */}
-          <div className="fixed top-0 left-0 h-full z-50 lg:hidden">
-
-            <Sidebar />
-
-          </div>
-
-        </>
+        <div
+          className="fixed inset-0 bg-gray-900/40 backdrop-blur-sm z-40 lg:hidden transition-opacity duration-300"
+          onClick={() => setSidebarOpen(false)}
+        />
       )}
 
-      {/* ========================================= */}
-      {/* MAIN */}
-      {/* ========================================= */}
-      <div className="flex-1 flex flex-col overflow-hidden">
-
-        {/* ========================================= */}
-        {/* TOP NAVBAR */}
-        {/* ========================================= */}
-        <div className="sticky top-0 z-30 bg-white shadow-sm">
-        
-                  <div className="flex items-center">
-        
-                    {/* MOBILE MENU */}
-                    <button
-                      onClick={() =>
-                        setSidebarOpen(
-                          !sidebarOpen
-                        )
-                      }
-                      className="lg:hidden p-4"
-                    >
-                      {sidebarOpen ? (
-                        <X size={28} />
-                      ) : (
-                        <Menu size={28} />
-                      )}
-                    </button>
-        
-                    <div className="flex-1">
-                      <Navbar />
-                    </div>
-        
-                  </div>
-        
-                </div>
-
-        {/* ========================================= */}
-        {/* PAGE CONTENT */}
-        {/* ========================================= */}
-        <div className="flex-1 overflow-y-auto p-4 sm:p-6">
-
-          {/* HEADER */}
-          <div className="mb-8">
-
-            <h1 className="hidden lg:block text-3xl font-bold">
-              Product Reviews
-            </h1>
-
-            <p className="text-gray-500 mt-2">
-              Reviews related to your
-              products
-            </p>
-
-          </div>
-
-          {/* LOADING */}
-          {loading ? (
-
-            <div className="flex justify-center items-center h-[50vh]">
-
-              <div className="text-xl font-semibold animate-pulse">
-                Loading Reviews...
-              </div>
-
-            </div>
-
-          ) : reviews.length === 0 ? (
-
-            <div className="bg-white p-10 rounded-2xl shadow text-center">
-
-              <h2 className="text-2xl font-bold mb-2">
-                No Reviews Found
-              </h2>
-
-              <p className="text-gray-500">
-                No customer reviews yet
-              </p>
-
-            </div>
-
-          ) : (
-
-            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-
-              {reviews.map(
-                (review) => (
-
-                  <div
-                    key={review._id}
-                    className="bg-white rounded-2xl shadow-sm hover:shadow-xl transition-all duration-300 overflow-hidden border"
-                  >
-
-                    {/* PRODUCT IMAGE */}
-                    <div className="relative">
-
-                      <img
-                        src={
-                          Array.isArray(
-                            review.product?.image
-                          )
-                            ? review.product
-                                ?.image[0]
-                            : review.product
-                                ?.image
-                        }
-                        alt=""
-                        className="w-full h-52 object-cover"
-                      />
-
-                      <div className="absolute bottom-3 left-3 bg-black/70 text-white px-3 py-1 rounded-full text-sm">
-                        {
-                          review.product
-                            ?.category
-                        }
-                      </div>
-
-                    </div>
-
-                    {/* CONTENT */}
-                    <div className="p-5">
-
-                      {/* PRODUCT */}
-                      <div className="mb-5">
-
-                        <h2 className="text-xl font-bold text-gray-800 line-clamp-2">
-                          {
-                            review.product
-                              ?.name
-                          }
-                        </h2>
-
-                      </div>
-
-                      {/* CUSTOMER */}
-                      <div className="mb-5">
-
-                        <p className="text-sm text-gray-500 mb-1">
-                          Customer
-                        </p>
-
-                        <h3 className="font-semibold text-gray-800">
-                          {
-                            review.user
-                              ?.name
-                          }
-                        </h3>
-
-                        <p className="text-sm text-gray-500 break-all">
-                          {
-                            review.user
-                              ?.email
-                          }
-                        </p>
-
-                      </div>
-
-                      {/* RATING */}
-                      <div className="mb-5">
-
-                        <p className="text-sm text-gray-500 mb-2">
-                          Rating
-                        </p>
-
-                        <div className="flex items-center gap-1">
-
-                          {[1, 2, 3, 4, 5].map(
-                            (star) => (
-
-                              <span
-                                key={star}
-                                className={`text-2xl ${
-                                  star <=
-                                  review.rating
-                                    ? "text-yellow-500"
-                                    : "text-gray-300"
-                                }`}
-                              >
-                                ★
-                              </span>
-                            )
-                          )}
-
-                        </div>
-
-                      </div>
-
-                      {/* COMMENT */}
-                      <div className="mb-5">
-
-                        <p className="text-sm text-gray-500 mb-2">
-                          Comment
-                        </p>
-
-                        <p className="text-gray-700 leading-relaxed text-sm">
-                          {
-                            review.comment
-                          }
-                        </p>
-
-                      </div>
-
-                      {/* DATE */}
-                      <div className="mb-5 text-sm text-gray-400">
-
-                        {new Date(
-                          review.createdAt
-                        ).toLocaleDateString()}
-
-                      </div>
-
-                      {/* DELETE */}
-                      <button
-                        onClick={() =>
-                          deleteReview(
-                            review._id
-                          )
-                        }
-                        className="w-full bg-red-500 hover:bg-red-600 text-white py-3 rounded-xl transition font-semibold"
-                      >
-                        Delete Review
-                      </button>
-
-                    </div>
-
-                  </div>
-                )
-              )}
-
-            </div>
-          )}
-
-        </div>
-
+      {/* SIDEBAR CONTAINER */}
+      <div
+        className={`fixed lg:static top-0 bottom-0 left-0 z-50 w-64 bg-white h-full border-r border-gray-200 transition-transform duration-300 ease-in-out ${
+          sidebarOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"
+        }`}
+      >
+        <Sidebar />
       </div>
 
+      {/* MAIN LAYOUT WRAPPER */}
+      <div className="flex-1 flex flex-col h-full min-w-0 overflow-hidden">
+        {/* TOP NAV BAR */}
+        <div className="sticky top-0 z-30 bg-white border-b border-gray-200 flex items-center h-16 px-4">
+          <button
+            onClick={() => setSidebarOpen(!sidebarOpen)}
+            className="lg:hidden p-2 text-gray-600 hover:bg-gray-100 rounded-lg transition-colors mr-2"
+            aria-label="Toggle Menu"
+          >
+            {sidebarOpen ? <X size={22} /> : <Menu size={22} />}
+          </button>
+          
+          <div className="flex-1 min-w-0">
+            <Navbar />
+          </div>
+        </div>
+
+        {/* SCROLLABLE PAGE CONTENT */}
+        <div className="flex-1 overflow-y-auto bg-gray-50/50 p-4 sm:p-6 lg:p-8">
+          {/* HEADER */}
+          <div className="mb-8">
+            <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-gray-900">
+              Product Reviews
+            </h1>
+            <p className="text-gray-500 mt-1 text-xs sm:text-sm">
+              Manage and monitor customer feedback across your product listings.
+            </p>
+          </div>
+
+          {/* MAIN STATES CONTAINER */}
+          {loading ? (
+            <div className="flex flex-col justify-center items-center h-[50vh] gap-3">
+              <div className="w-7 h-7 border-2 border-gray-900 border-t-transparent rounded-full animate-spin"></div>
+              <div className="text-xs font-medium text-gray-400">
+                Loading feedback history...
+              </div>
+            </div>
+          ) : reviews.length === 0 ? (
+            <div className="bg-white border border-gray-200 p-16 rounded-xl text-center max-w-md mx-auto mt-12 shadow-sm">
+              <div className="w-12 h-12 rounded-full bg-gray-50 flex items-center justify-center mx-auto mb-4 border border-gray-100">
+                <MessageSquare size={20} className="text-gray-400" />
+              </div>
+              <h2 className="text-base font-semibold text-gray-900 mb-1">
+                No Reviews Found
+              </h2>
+              <p className="text-gray-500 text-xs max-w-xs mx-auto leading-relaxed">
+                Customers haven't submitted any performance reviews for your items yet.
+              </p>
+            </div>
+          ) : (
+            /* FIXED REVIEWS GRID */
+            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 max-w-[1600px] mx-auto">
+              {reviews.map((review) => (
+                <div
+                  key={review._id}
+                  className="bg-white rounded-xl border border-gray-200 shadow-sm hover:shadow-md transition-all duration-200 flex flex-col justify-between h-[440px] w-full min-w-0"
+                >
+                  {/* TOP CONTAINER (IMAGE & DATA PACKET) */}
+                  <div className="flex flex-col min-h-0">
+                    
+                    {/* FIXED PRODUCT BANNER IMAGE */}
+                    <div className="relative h-40 w-full bg-gray-50 border-b border-gray-100 flex-shrink-0 overflow-hidden">
+                      <img
+                        src={
+                          Array.isArray(review.product?.image)
+                            ? review.product?.image[0]
+                            : review.product?.image || "/placeholder.png"
+                        }
+                        alt={review.product?.name || "Product"}
+                        className="w-full h-full object-cover transition-transform duration-300 hover:scale-105"
+                        onError={(e) => {
+                          e.target.src = "https://images.unsplash.com/photo-1531403009284-440f080d1e12?w=600&auto=format&fit=crop&q=60";
+                        }}
+                      />
+                      {review.product?.category && (
+                        <span className="absolute top-3 right-3 bg-white/90 backdrop-blur-sm border border-gray-200/50 text-gray-800 px-2.5 py-0.5 rounded-md text-[11px] font-medium uppercase tracking-wider">
+                          {review.product.category}
+                        </span>
+                      )}
+                    </div>
+
+                    {/* CONTENT INNER WRAPPER */}
+                    <div className="p-5 space-y-3.5 min-h-0 flex flex-col">
+                      {/* Product Name Title */}
+                      <div>
+                        <h2 className="text-sm font-bold text-gray-900 line-clamp-1 group-hover:text-blue-600" title={review.product?.name}>
+                          {review.product?.name || "Unknown Product"}
+                        </h2>
+                      </div>
+
+                      {/* Customer Summary Mini-Panel */}
+                      <div className="bg-gray-50/70 p-2.5 rounded-lg border border-gray-100 flex flex-col justify-center h-[54px] flex-shrink-0">
+                        <h3 className="font-semibold text-xs text-gray-800 line-clamp-1">
+                          {review.user?.name || "Anonymous User"}
+                        </h3>
+                        <p className="text-[11px] text-gray-400 break-all line-clamp-1 mt-0.5">
+                          {review.user?.email || "No email available"}
+                        </p>
+                      </div>
+
+                      {/* Star Rating Tracker */}
+                      <div className="flex-shrink-0">
+                        <div className="flex items-center gap-0.5">
+                          {[1, 2, 3, 4, 5].map((star) => (
+                            <Star
+                              key={star}
+                              size={15}
+                              className={`${
+                                star <= review.rating
+                                  ? "text-amber-400 fill-amber-400"
+                                  : "text-gray-200"
+                              }`}
+                            />
+                          ))}
+                        </div>
+                      </div>
+
+                      {/* Comment Body - Uniformly Restricted */}
+                      <div className="flex-1 min-h-0">
+                        <p className="text-gray-600 leading-relaxed text-xs line-clamp-3 italic">
+                          "{review.comment || "No written feedback text was provided by the buyer."}"
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* BOTTOM ACTION BAR - RIGID ALIGNMENT */}
+                  <div className="px-5 py-4 border-t border-gray-100 flex items-center justify-between gap-4 flex-shrink-0 bg-gray-50/30 rounded-b-xl">
+                    <span className="text-[11px] font-medium text-gray-400 tracking-wide">
+                      {new Date(review.createdAt).toLocaleDateString("en-IN", {
+                        day: "numeric",
+                        month: "short",
+                        year: "numeric",
+                      })}
+                    </span>
+                    
+                    <button
+                      onClick={() => deleteReview(review._id)}
+                      className="border border-gray-200 hover:border-red-200 text-gray-600 hover:text-red-600 hover:bg-red-50/50 px-3 py-1.5 rounded-lg text-[11px] font-semibold flex items-center gap-1.5 transition-all duration-150 active:scale-[0.97]"
+                    >
+                      <Trash2 size={13} />
+                      Delete
+                    </button>
+                  </div>
+
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      </div>
     </div>
   );
 }

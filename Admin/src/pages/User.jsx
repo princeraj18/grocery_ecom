@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { Search, Eye, Trash2, ShieldAlert, UserCheck, Users as UsersIcon, Loader2 } from "lucide-react";
 import api from "../services/api";
 
 export default function Users() {
@@ -15,11 +16,7 @@ export default function Users() {
   const fetchUsers = async () => {
     try {
       setLoading(true);
-
-      const { data } = await api.get(
-        `/users?search=${search}`
-      );
-
+      const { data } = await api.get(`/users?search=${search}`);
       setUsers(data.users || []);
     } catch (error) {
       console.log(error);
@@ -47,165 +44,152 @@ export default function Users() {
     if (!confirmDelete) return;
 
     try {
-      const { data } = await api.delete(
-        `/users/${id}`
-      );
-
+      const { data } = await api.delete(`/users/${id}`);
       alert(data.message);
-
       fetchUsers();
     } catch (error) {
       console.log(error);
-
-      alert(
-        error.response?.data?.message ||
-          "Delete failed"
-      );
+      alert(error.response?.data?.message || "Delete failed");
     }
   };
 
   return (
-    <div className="p-4 md:p-6">
+    <div className="min-h-full bg-slate-50 text-slate-800 p-6 space-y-6">
 
-      {/* HEADER */}
-      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6">
-
+      {/* ========================================================
+          HEADER SECTION
+         ======================================================== */}
+      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 border-b border-slate-200 pb-6">
         <div>
-          <h1 className="text-2xl md:text-3xl font-bold">
-            Users
-          </h1>
-
-          <p className="text-gray-500 mt-1">
-            Total Users: {users.length}
+          <div className="flex items-center gap-2.5">
+            <UsersIcon className="text-indigo-600" size={24} />
+            <h1 className="text-2xl md:text-3xl font-extrabold uppercase tracking-wide text-slate-900">
+              Users Portal
+            </h1>
+          </div>
+          <p className="text-xs text-slate-500 mt-1 uppercase font-bold tracking-widest">
+            Total Active Accounts: <span className="text-indigo-600 font-black">{users.length}</span>
           </p>
         </div>
 
-        <input
-          type="text"
-          placeholder="Search users..."
-          value={search}
-          onChange={(e) =>
-            setSearch(e.target.value)
-          }
-          className="border border-gray-300 rounded-xl px-4 py-3 w-full md:w-80 focus:outline-none focus:ring-2 focus:ring-black"
-        />
-
+        {/* SEARCH BOX */}
+        <div className="relative w-full md:w-80 shrink-0">
+          <Search size={18} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" />
+          <input
+            type="text"
+            placeholder="Search accounts..."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            className="w-full bg-white border border-slate-200 rounded-xl pl-10 pr-4 py-2.5 text-sm text-slate-800 placeholder-slate-400 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition-all shadow-sm"
+          />
+        </div>
       </div>
 
-      {/* LOADING */}
+      {/* ========================================================
+          DATA RENDER GRID
+         ======================================================== */}
       {loading ? (
-        <div className="bg-white rounded-2xl shadow p-10 text-center">
-          <h2 className="text-xl font-semibold">
-            Loading Users...
+        /* LOADING STATE */
+        <div className="bg-white border border-slate-200 rounded-2xl p-16 text-center flex flex-col items-center justify-center gap-3 shadow-sm">
+          <Loader2 className="animate-spin text-indigo-600" size={32} />
+          <h2 className="text-sm font-bold uppercase tracking-widest text-slate-500">
+            Syncing database records...
           </h2>
         </div>
       ) : users.length === 0 ? (
-        <div className="bg-white rounded-2xl shadow p-10 text-center">
-          <h2 className="text-xl font-semibold">
-            No Users Found
+        /* EMPTY STATE */
+        <div className="bg-white border border-slate-200 rounded-2xl p-16 text-center shadow-sm">
+          <h2 className="text-sm font-bold uppercase tracking-widest text-slate-400">
+            No matching users discovered
           </h2>
         </div>
       ) : (
-        <div className="bg-white rounded-2xl shadow overflow-hidden">
-
-          {/* TABLE */}
+        /* TABLE INTERFACE */
+        <div className="bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-sm">
           <div className="overflow-x-auto">
-
-            <table className="min-w-full">
-
-              <thead className="bg-black text-white">
-
+            <table className="min-w-full border-collapse">
+              
+              {/* TABLE HEAD */}
+              <thead className="bg-slate-100/70 border-b border-slate-200">
                 <tr>
-                  <th className="p-4 text-left">
-                    Name
-                  </th>
-
-                  <th className="p-4 text-left">
-                    Email
-                  </th>
-
-                  <th className="p-4 text-left">
-                    Role
-                  </th>
-
-                  <th className="p-4 text-center">
-                    Actions
-                  </th>
+                  <th className="p-4 text-left text-xs font-bold uppercase tracking-wider text-slate-600">Name</th>
+                  <th className="p-4 text-left text-xs font-bold uppercase tracking-wider text-slate-600">Email Address</th>
+                  <th className="p-4 text-left text-xs font-bold uppercase tracking-wider text-slate-600">Security Access</th>
+                  <th className="p-4 text-center text-xs font-bold uppercase tracking-wider text-slate-600">Actions</th>
                 </tr>
-
               </thead>
 
-              <tbody>
-
+              {/* TABLE BODY */}
+              <tbody className="divide-y divide-slate-100">
                 {users.map((user) => (
                   <tr
                     key={user._id}
-                    className="border-b hover:bg-gray-50 transition"
+                    className="hover:bg-slate-50/70 transition-colors group"
                   >
-
-                    <td className="p-4 font-medium">
+                    {/* User Name */}
+                    <td className="p-4 text-sm font-semibold text-slate-900">
                       {user.name}
                     </td>
 
-                    <td className="p-4 text-gray-600 break-all">
+                    {/* Email */}
+                    <td className="p-4 text-sm text-slate-600 font-mono break-all">
                       {user.email}
                     </td>
 
+                    {/* Role Badge */}
                     <td className="p-4">
-
                       <span
-                        className={`px-3 py-1 rounded-full text-sm font-medium ${
+                        className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-bold uppercase tracking-wider border ${
                           user.isAdmin
-                            ? "bg-purple-100 text-purple-700"
-                            : "bg-blue-100 text-blue-700"
+                            ? "bg-purple-50 text-purple-700 border-purple-200"
+                            : "bg-indigo-50 text-indigo-700 border-indigo-200"
                         }`}
                       >
-                        {user.isAdmin
-                          ? "Admin"
-                          : "User"}
+                        {user.isAdmin ? (
+                          <>
+                            <ShieldAlert size={12} />
+                            Admin
+                          </>
+                        ) : (
+                          <>
+                            <UserCheck size={12} />
+                            User
+                          </>
+                        )}
                       </span>
-
                     </td>
 
+                    {/* Action Row Buttons */}
                     <td className="p-4">
-
-                      <div className="flex flex-col sm:flex-row gap-2 justify-center">
-
+                      <div className="flex items-center gap-2 justify-center">
+                        {/* View Button */}
                         <button
-                          onClick={() =>
-                            navigate(
-                              `/admin/users/${user._id}`
-                            )
-                          }
-                          className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition"
+                          onClick={() => navigate(`/admin/users/${user._id}`)}
+                          className="flex items-center gap-1.5 bg-white hover:bg-slate-50 border border-slate-200 text-slate-700 hover:text-slate-900 px-3 py-1.5 rounded-lg text-xs font-bold uppercase tracking-wider transition-all shadow-sm"
+                          title="View Details"
                         >
-                          View
+                          <Eye size={14} />
+                          <span>View</span>
                         </button>
 
+                        {/* Delete Button */}
                         <button
-                          onClick={() =>
-                            handleDelete(
-                              user._id
-                            )
-                          }
-                          className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg transition"
+                          onClick={() => handleDelete(user._id)}
+                          className="flex items-center gap-1.5 bg-red-50 hover:bg-red-100 border border-red-200 text-red-600 hover:text-red-700 px-3 py-1.5 rounded-lg text-xs font-bold uppercase tracking-wider transition-all shadow-sm"
+                          title="Terminate Account"
                         >
-                          Delete
+                          <Trash2 size={14} />
+                          <span>Delete</span>
                         </button>
-
                       </div>
-
                     </td>
 
                   </tr>
                 ))}
-
               </tbody>
 
             </table>
-
           </div>
-
         </div>
       )}
 

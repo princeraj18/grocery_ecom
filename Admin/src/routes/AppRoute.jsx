@@ -46,6 +46,8 @@ import ProtectedRoute from "./ProtectedRoute";
 import AdminLayout from "../layout/AdminLayout";
 import DeliveryPartner from "../pages/DeliveryPartner";
 import WithdrawalRequest from "../pages/WithdrawalRequest";
+import AdminProfile from "../pages/AdminProfile";
+import AdminSetting from "../pages/AdminSetting";
 
 export default function AppRoutes() {
 
@@ -157,7 +159,18 @@ export default function AppRoutes() {
             </ProtectedRoute>
           }
         />
+<Route path="/profile" element={
+  <AdminLayout>
+<AdminProfile />
+  </AdminLayout>
+  } />
 
+
+  <Route path="/setting" element={
+  <AdminLayout>
+<AdminSetting />
+  </AdminLayout>
+  } />
       {/* ========================================
           VENDORS
       ======================================== */}

@@ -6,6 +6,7 @@ import nodemailer from "nodemailer";
 import WithdrawRequest from "../models/WithdrawRequest.model.js";
 import DeliveryPartner from "../models/DeliveryPartner.model.js";
 import Order from "../models/Order.model.js";
+import Setting from "../models/Setting.model.js"; // Import the model at the top
 
 // =======================================
 // REGISTER ADMIN
@@ -284,126 +285,268 @@ export const resetAdminPassword = async (req, res) => {
 // =======================================
 // ADMIN DELIVERY DASHBOARD
 // =======================================
-export const getDeliveryDashboard =
-  async (req, res) => {
+// =======================================
+// UPDATED ADMIN DELIVERY DASHBOARD
+// =======================================
+// =======================================================================
+// UPDATED ADMIN DELIVERY DASHBOARD (WITH FULL COMPREHENSIVE ANALYTICS)
+// =======================================================================
+export const getDeliveryDashboard = async (req, res) => {
+  try {
+    // Current timestamp variables for historical aggregation parsing (2026)
+    const baseDate = new Date();
+    const sixMonthsAgo = new Date(baseDate.getFullYear(), baseDate.getMonth() - 5, 1);
 
-    try {
+    const [
+      totalPartners,
+      availablePartners,
+      totals,
+      totalOrders,
+      activeDeliveries,
+      completedDeliveries,
+      assignedOrders,
+      pendingOrders,
+      topPartners,
+      recentWithdrawRequests,
+      
+      // REAL DATA SETS COMPILED GLOBALLY FOR YOUR 7 GRAPHS
+      monthlyRevenueTrend,
+      orderStatusDistribution,
+      paymentMethodShare,
+      vehicleTypeDistribution,
+      orderValueBands,
+      engagementScatterPoints,
+      hourlyTrafficLoad
+    ] = await Promise.all([
+      DeliveryPartner.countDocuments(),
+      DeliveryPartner.countDocuments({ isAvailable: true }),
+      DeliveryPartner.aggregate([
+        {
+          $group: {
+            _id: null,
+            totalEarnings: { $sum: "$totalEarnings" },
+            walletBalance: { $sum: "$walletBalance" },
+            withdrawnAmount: { $sum: "$withdrawnAmount" },
+          },
+        },
+      ]),
+      Order.countDocuments({ deliveryPartner: { $ne: null } }),
+      Order.countDocuments({
+        deliveryStatus: { $in: ["Assigned", "Accepted", "Picked", "Out for Delivery"] },
+      }),
+      Order.countDocuments({ deliveryStatus: "Delivered" }),
+      Order.countDocuments({ deliveryStatus: "Assigned" }),
+      Order.countDocuments({ deliveryStatus: "Pending" }),
+      DeliveryPartner.find()
+        .select("name phone vehicleType isAvailable totalEarnings walletBalance withdrawnAmount totalAcceptedOrders totalRejectedOrders")
+        .sort({ totalEarnings: -1 })
+        .limit(5)
+        .lean(),
+      WithdrawRequest.find()
+        .populate("partner", "name email phone walletBalance")
+        .sort({ createdAt: -1 })
+        .limit(5)
+        .lean(),
 
-      const [
+      // 1. LINE & AREA GRAPH DATA: Monthly Progress Metrics (Trailing 6 Months)
+      Order.aggregate([
+        { $match: { createdAt: { $gte: sixMonthsAgo } } },
+        {
+          $group: {
+            _id: { $dateToString: { format: "%Y-%m", date: "$createdAt" } },
+            revenue: { $sum: "$totalAmount" },
+            orderCount: { $sum: 1 },
+            payouts: { $sum: { $ifNull: ["$partnerEarning", 0] } }
+          }
+        },
+        { $sort: { "_id": 1 } }
+      ]),
+
+      // 2. BAR GRAPH DATA: Order Processing Distribution Pipeline
+      Order.aggregate([
+        {
+          $group: {
+            _id: "$deliveryStatus",
+            count: { $sum: 1 }
+          }
+        }
+      ]),
+
+      // 3. PIE CHART DATA: Payment Gateway Performance Matrix 
+      Order.aggregate([
+        {
+          $group: {
+            _id: { $ifNull: ["$paymentMethod", "Digital Wallet"] },
+            value: { $sum: "$totalAmount" },
+            count: { $sum: 1 }
+          }
+        }
+      ]),
+
+      // 4. DONUT / PIE CHART DATA: Active Fleet Profiles
+      DeliveryPartner.aggregate([
+        {
+          $group: {
+            _id: { $ifNull: ["$vehicleType", "Bicycle"] },
+            count: { $sum: 1 }
+          }
+        }
+      ]),
+
+      // 5. HISTOGRAM DATA: Order Financial Bracket Frequency Distribution
+      Order.aggregate([
+        {
+          $bucket: {
+            groupBy: "$totalAmount",
+            boundaries: [0, 300, 1000, 2500, 100000],
+            default: "Enterprise Bulk",
+            output: { count: { $sum: 1 } }
+          }
+        }
+      ]),
+
+      // 6. SCATTER PLOT DATA: Driver Order Volume vs Lifetime Financial Payout Performance
+      DeliveryPartner.aggregate([
+        {
+          $project: {
+            x: { $ifNull: ["$totalAcceptedOrders", 0] }, 
+            y: { $ifNull: ["$totalEarnings", 0] },
+            z: { $add: [{ $ifNull: ["$totalAcceptedOrders", 0] }, { $ifNull: ["$totalRejectedOrders", 0] }] }
+          }
+        },
+        { $sort: { y: -1 } },
+        { $limit: 30 } // Keep the scatter plot clean and performant
+      ]),
+
+      // 7. DOT PLOT DATA: Hourly Order Load Concentration Analysis
+      Order.aggregate([
+        {
+          $project: {
+            hour: { $hour: { date: "$createdAt", timezone: "+05:30" } } // Localized Indian Standard Time Offset
+          }
+        },
+        {
+          $group: {
+            _id: "$hour",
+            weight: { $sum: 1 }
+          }
+        },
+        { $sort: { "_id": 1 } }
+      ])
+    ]);
+
+    const summary = totals[0] || { totalEarnings: 0, walletBalance: 0, withdrawnAmount: 0 };
+
+    // Format human-readable Hour Strings for Dot Plot
+    const formattedDotPlot = hourlyTrafficLoad.map(item => {
+      const h = item._id;
+      const period = h >= 12 ? "PM" : "AM";
+      const displayHour = h % 12 === 0 ? 12 : h % 12;
+      return {
+        hour: `${displayHour.toString().padStart(2, '0')}:00 ${period}`,
+        weight: item.weight
+      };
+    });
+
+    // Formatting Histogram Bucket Output Strings
+    const formattedHistogram = orderValueBands.map(bucket => {
+      let label = "₹2500+";
+      if (bucket._id === 0) label = "₹0-300";
+      if (bucket._id === 300) label = "₹301-1000";
+      if (bucket._id === 1000) label = "₹1001-2500";
+      return { range: label, frequency: bucket.count };
+    });
+
+    res.status(200).json({
+      success: true,
+      dashboard: {
         totalPartners,
         availablePartners,
-        totals,
-        totalOrders,
+        busyPartners: totalPartners - availablePartners,
+        totalEarnings: summary.totalEarnings || 0,
+        walletBalance: summary.walletBalance || 0,
+        withdrawnAmount: summary.withdrawnAmount || 0,
         activeDeliveries,
         completedDeliveries,
+        totalOrders,
         assignedOrders,
         pendingOrders,
         topPartners,
         recentWithdrawRequests,
-      ] = await Promise.all([
-        DeliveryPartner.countDocuments(),
-        DeliveryPartner.countDocuments({
-          isAvailable: true,
-        }),
-        DeliveryPartner.aggregate([
-          {
-            $group: {
-              _id: null,
-              totalEarnings: {
-                $sum: "$totalEarnings",
-              },
-              walletBalance: {
-                $sum: "$walletBalance",
-              },
-              withdrawnAmount: {
-                $sum: "$withdrawnAmount",
-              },
-            },
-          },
-        ]),
-        Order.countDocuments({
-          deliveryPartner: {
-            $ne: null,
-          },
-        }),
-        Order.countDocuments({
-          deliveryStatus: {
-            $in: [
-              "Assigned",
-              "Accepted",
-              "Picked",
-              "Out for Delivery",
-            ],
-          },
-        }),
-        Order.countDocuments({
-          deliveryStatus: "Delivered",
-        }),
-        Order.countDocuments({
-          deliveryStatus: "Assigned",
-        }),
-        Order.countDocuments({
-          deliveryStatus: "Pending",
-        }),
-        DeliveryPartner.find()
-          .select(
-            "name phone vehicleType isAvailable totalEarnings walletBalance withdrawnAmount totalAcceptedOrders totalRejectedOrders"
-          )
-          .sort({ totalEarnings: -1 })
-          .limit(5)
-          .lean(),
-        WithdrawRequest.find()
-          .populate(
-            "partner",
-            "name email phone walletBalance"
-          )
-          .sort({ createdAt: -1 })
-          .limit(5)
-          .lean(),
-      ]);
+        
+        // CONSOLIDATED GRAPH PAYLOAD READY FOR RECHARTS
+        graphs: {
+          monthlyTrends: monthlyRevenueTrend.map(item => ({
+            month: item._id,
+            revenue: item.revenue,
+            orders: item.orderCount,
+            payouts: item.payouts
+          })),
+          orderDistribution: orderStatusDistribution.map(item => ({
+            status: item._id || "Unassigned",
+            count: item.count
+          })),
+          paymentShare: paymentMethodShare.map(item => ({
+            name: item._id,
+            value: item.value,
+            orders: item.count
+          })),
+          fleetDistribution: vehicleTypeDistribution.map(item => ({
+            vehicle: item._id,
+            count: item.count
+          })),
+          valueHistogram: formattedHistogram,
+          driverScatter: engagementScatterPoints,
+          hourlyLoadDotPlot: formattedDotPlot
+        }
+      },
+    });
 
-      const summary =
-        totals[0] || {
-          totalEarnings: 0,
-          walletBalance: 0,
-          withdrawnAmount: 0,
-        };
+  } catch (error) {
+    console.error("ADMIN LEDGER ANALYTICS CRASH:", error);
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
 
-      res.status(200).json({
-        success: true,
-        dashboard: {
-          totalPartners,
-          availablePartners,
-          busyPartners:
-            totalPartners -
-            availablePartners,
-          totalEarnings:
-            summary.totalEarnings || 0,
-          walletBalance:
-            summary.walletBalance || 0,
-          withdrawnAmount:
-            summary.withdrawnAmount || 0,
-          activeDeliveries,
-          completedDeliveries,
-          totalOrders,
-          assignedOrders,
-          pendingOrders,
-          topPartners,
-          recentWithdrawRequests,
-        },
-      });
 
-    } catch (error) {
 
-      console.log(error);
-
-      res.status(500).json({
-        success: false,
-        message: error.message,
-      });
+// =======================================
+// GET GLOBAL SYSTEM SETTINGS
+// =======================================
+export const getSystemSettings = async (req, res) => {
+  try {
+    // Look for existing document or create an initial fallback document if empty
+    let settings = await Setting.findOne();
+    if (!settings) {
+      settings = await Setting.create({});
     }
-  };
+    res.status(200).json({ success: true, settings });
+  } catch (error) {
+    console.error("GET SETTINGS ERROR:", error);
+    res.status(500).json({ success: false, message: "Failed to load system configs" });
+  }
+};
 
+// =======================================
+// UPDATE GLOBAL SYSTEM SETTINGS
+// =======================================
+export const updateSystemSettings = async (req, res) => {
+  try {
+    let settings = await Setting.findOne();
+    if (!settings) {
+      settings = new Setting();
+    }
+
+    // Map properties explicitly onto the found document object instance
+    Object.assign(settings, req.body);
+    await settings.save();
+
+    res.status(200).json({ success: true, message: "Settings updated", settings });
+  } catch (error) {
+    console.error("UPDATE SETTINGS ERROR:", error);
+    res.status(500).json({ success: false, message: "Failed to save system configs" });
+  }
+};
 // =======================================
 // ADMIN DELIVERY EARNINGS
 // =======================================

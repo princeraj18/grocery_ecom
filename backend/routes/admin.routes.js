@@ -11,6 +11,7 @@ import {
   getDeliveryDashboard,
   getDeliveryEarnings,
   getDeliveryPartnerDetails,
+  getSystemSettings, updateSystemSettings
 
 } from "../controllers/admin.controller.js";
 
@@ -58,6 +59,7 @@ router.post(
 // PROFILE
 router.get(
   "/profile",
+    adminAuth,
   getAdminProfile
 );
 
@@ -109,4 +111,7 @@ router.get(
   adminAuth,
   getDeliveryPartnerDetails
 );
+// SYSTEM CONFIGURATIONS
+router.get("/settings", adminAuth, getSystemSettings);
+router.put("/settings", adminAuth, updateSystemSettings);
 export default router;
