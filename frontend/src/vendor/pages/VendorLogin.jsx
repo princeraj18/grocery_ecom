@@ -3,6 +3,7 @@ import React, { useState } from "react";
 import axios from "axios";
 
 import { useNavigate, Link } from "react-router-dom";
+import ThemeToggle from "../components/ThemeToggle";
 
 export default function VendorLogin() {
 
@@ -85,10 +86,11 @@ export default function VendorLogin() {
 
     <div className="min-h-screen flex items-center justify-center bg-gray-100 relative">
 
-      <div className="absolute top-6 right-6">
+      <div className="absolute top-6 right-6 flex items-center gap-3">
+        <ThemeToggle />
         <Link
           to="/login"
-          className="bg-gray-200 px-3 py-2 rounded hover:bg-gray-300 text-sm font-medium"
+          className="bg-gray-200 dark:bg-slate-800 dark:text-white px-3 py-2 rounded hover:bg-gray-300 dark:hover:bg-slate-700 text-sm font-medium"
         >
           Back to user login
         </Link>

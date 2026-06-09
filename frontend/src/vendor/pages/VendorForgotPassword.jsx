@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import axios from "axios";
+import ThemeToggle from "../components/ThemeToggle";
 
 export default function VendorForgotPassword() {
   const [email, setEmail] = useState("");
@@ -27,7 +28,10 @@ export default function VendorForgotPassword() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100 px-6">
+    <div className="min-h-screen flex items-center justify-center bg-gray-100 dark:bg-slate-950 px-6 relative">
+      <div className="absolute top-4 right-4">
+        <ThemeToggle />
+      </div>
       <div className="bg-white p-8 rounded-2xl shadow-lg w-full max-w-md">
         <h1 className="text-3xl font-bold text-center mb-4 text-gray-800">Vendor Forgot Password</h1>
         <p className="text-sm text-gray-500 text-center mb-6">Enter your store email registration.</p>

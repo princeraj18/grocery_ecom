@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import api from "../services/api";
 import { useAuth } from "../context/AuthContext";
+import ThemeToggle from "../components/ThemeToggle";
 
 export default function Register() {
 
@@ -93,7 +94,10 @@ export default function Register() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100">
+    <div className="min-h-screen flex items-center justify-center bg-gray-100 dark:bg-slate-950 relative">
+      <div className="absolute top-4 right-4">
+        <ThemeToggle />
+      </div>
 
       <form
         onSubmit={handleSubmit}

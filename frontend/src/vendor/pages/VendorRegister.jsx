@@ -8,6 +8,7 @@ import {
   useNavigate,
   Link,
 } from "react-router-dom";
+import ThemeToggle from "../components/ThemeToggle";
 
 export default function VendorRegister() {
 
@@ -91,7 +92,10 @@ window.location.href =
 
   return (
 
-    <div className="min-h-screen flex items-center justify-center bg-gray-100 py-10">
+    <div className="min-h-screen flex items-center justify-center bg-gray-100 dark:bg-slate-950 py-10 relative">
+      <div className="absolute top-6 right-6">
+        <ThemeToggle />
+      </div>
 
       <div className="bg-white p-8 rounded-2xl shadow-lg w-full max-w-2xl">
 

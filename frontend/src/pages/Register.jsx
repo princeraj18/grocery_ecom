@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 import api from "../api/Axios";
+import ThemeToggle from "../components/ThemeToggle";
 const Register = () => {
   const navigate = useNavigate();
 const [formData, setFormData] = useState({
@@ -55,7 +56,10 @@ const [formData, setFormData] = useState({
 
 
   return (
-    <div className="min-h-screen flex">
+    <div className="min-h-screen flex relative">
+      <div className="absolute top-4 right-4 z-10">
+        <ThemeToggle />
+      </div>
       {/* Left Section */}
       <div className="hidden lg:flex w-1/2 bg-gradient-to-r from-indigo-600 to-purple-700 items-center justify-center p-12">
         <div className="text-white max-w-md">

@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import api from "../api/Axios";
+import ThemeToggle from "../components/ThemeToggle";
 
 const ResetPassword = () => {
   const { token } = useParams(); // Retrieves the token string injected into the path URL
@@ -49,7 +50,10 @@ const ResetPassword = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 px-6">
+    <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-slate-950 px-6 relative">
+      <div className="absolute top-4 right-4">
+        <ThemeToggle />
+      </div>
       <div className="w-full max-w-md bg-white p-8 rounded-2xl shadow-lg">
         <h2 className="text-3xl font-bold text-center text-gray-800">Create New Password</h2>
         <p className="text-center text-gray-500 mt-2">Enter your strong new security password below.</p>

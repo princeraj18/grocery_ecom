@@ -1,5 +1,4 @@
 import express from "express";
-
 import {
   registerDeliveryPartner,
   loginDeliveryPartner,
@@ -11,106 +10,53 @@ import {
   getEarningsHistory,
   updateProfile,
   getProfile,
-    getSingleDeliveryPartner,
+  getSingleDeliveryPartner,
   createWithdrawRequest,
-
-  
+  getExtendedAnalytics // Imported for data analytics charts
 } from "../controllers/deliveryPartner.controller.js";
 
-import {
-  protectDeliveryPartner,
-} from "../middleware/deliveryPartner.middleware.js";
-
+import { protectDeliveryPartner } from "../middleware/deliveryPartner.middleware.js";
 import vendorAuth from "../middleware/vendorAuth.js";
-
 import upload from "../middleware/upload.js";
-// import { createWithdrawRequest } from "../controllers/withdraw.controller.js";
 
 const router = express.Router();
 
 // =======================================
 // AUTH ROUTES
 // =======================================
-
-router.post(
-  "/register",
-  registerDeliveryPartner
-);
-
-router.post(
-  "/login",
-  loginDeliveryPartner
-);
+router.post("/register", registerDeliveryPartner);
+router.post("/login", loginDeliveryPartner);
 
 // =======================================
 // VENDOR ROUTES
 // =======================================
-
-router.get(
-  "/all",
-  
-  getDeliveryPartners
-);
+router.get("/all", getDeliveryPartners);
 
 // =======================================
-// DELIVERY PARTNER ROUTES
+// DELIVERY PARTNER DATA & ANALYTICS
 // =======================================
-
-router.get(
-  "/my-orders",
-  protectDeliveryPartner,
-  getMyOrders
-);
-
-router.get(
-  "/dashboard",
-  protectDeliveryPartner,
-  getDashboardData
-);
-
-router.put(
-  "/respond-order",
-  protectDeliveryPartner,
-  respondToOrder
-);
-
-router.put(
-  "/update-status",
-  protectDeliveryPartner,
-  updateDeliveryStatus
-);
-
-router.get(
-  "/earnings",
-  protectDeliveryPartner,
-  getEarningsHistory
-);
-
-router.put(
-  "/update-profile",
-  protectDeliveryPartner,
-  upload.single("profileImage"),
-  updateProfile
-);
-
-router.get(
-  "/profile",
-  protectDeliveryPartner,
-  getProfile
-);
+router.get("/dashboard", protectDeliveryPartner, getDashboardData);
+router.get("/analytics/extended", protectDeliveryPartner, getExtendedAnalytics); // Added analytical route
+router.get("/earnings", protectDeliveryPartner, getEarningsHistory);
 
 // =======================================
-// WITHDRAW REQUEST
+// SYSTEM PROFILE & ORDERS OPERATIONS
 // =======================================
+router.get("/my-orders", protectDeliveryPartner, getMyOrders);
+router.get("/profile", protectDeliveryPartner, getProfile);
+router.put("/respond-order", protectDeliveryPartner, respondToOrder);
+router.put("/update-status", protectDeliveryPartner, updateDeliveryStatus);
+router.put("/update-profile", protectDeliveryPartner, upload.single("profileImage"), updateProfile);
 
-router.get(
-  "/:id",
-  getSingleDeliveryPartner
-);
-router.post(
-  "/withdraw-request",
-  protectDeliveryPartner,
-  createWithdrawRequest
-);
+// =======================================
+// FINANCIAL ACTIONS
+// =======================================
+// Safe: Defined BEFORE the dynamic /:id parameter matching block
+router.post("/withdraw-request", protectDeliveryPartner, createWithdrawRequest);
+
+// =======================================
+// DYNAMIC LOOKUP QUERY BY ID (Must Be Last)
+// =======================================
+router.get("/:id", getSingleDeliveryPartner);
 
 export default router;

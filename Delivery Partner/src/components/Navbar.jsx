@@ -1,117 +1,68 @@
-import React, { useState } from 'react';
+import React from 'react';
+import { Circle, Bike } from 'lucide-react';
+import ThemeToggle from './ThemeToggle';
 
 export default function Navbar() {
-  const [isOpen, setIsOpen] = useState(false);
+  // Get delivery partner data
+  const deliveryPartner = JSON.parse(localStorage.getItem('deliveryPartner'));
 
-  // Get delivery partner data from localStorage
-  const deliveryPartner = JSON.parse(
-    localStorage.getItem('deliveryPartner')
-  );
-
-  // Generate initials
   const getInitials = (name) => {
-    if (!name) return 'DP';
-
+    if (!name) return 'GP';
     const nameParts = name.trim().split(' ');
-
-    if (nameParts.length === 1) {
-      return nameParts[0][0].toUpperCase();
-    }
-
-    return (
-      nameParts[0][0] +
-      nameParts[nameParts.length - 1][0]
-    ).toUpperCase();
+    if (nameParts.length === 1) return nameParts[0][0].toUpperCase();
+    return (nameParts[0][0] + nameParts[nameParts.length - 1][0]).toUpperCase();
   };
 
   const initials = getInitials(deliveryPartner?.name);
 
   return (
-    <nav className="bg-slate-900 text-white sticky top-0 z-50 shadow-md">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-16">
-          
-          {/* Logo */}
-          <div className="flex items-center gap-2">
-            <span className="text-xl font-bold tracking-wider text-orange-500">
+    <nav className="bg-white border-b border-gray-200 dark:border-slate-800 dark:bg-slate-900 dark:text-white h-16 sticky top-0 z-30 flex items-center justify-between px-4 sm:px-6 lg:px-8 font-poppins">
+      
+      {/* LEFT: Grocify Branding & Status Indicator */}
+      <div className="flex items-center gap-6">
+        {/* Grocify Partner Brand Logo */}
+        <div className="flex items-center gap-2">
+          <div className="p-1.5 bg-emerald-600 rounded-lg text-white">
+            <Bike size={18} className="-scale-x-100" />
+          </div>
+          <div className="leading-none">
+            <span className="text-sm font-black uppercase tracking-wider text-slate-900 dark:text-white">
               Grocify
             </span>
-
-            <span className="text-xs bg-orange-500/20 text-orange-400 px-2 py-0.5 rounded-full font-medium">
+            <span className="block text-[9px] font-bold uppercase tracking-widest text-emerald-600">
               Partner
             </span>
           </div>
+        </div>
 
-          {/* Desktop Right Actions */}
-          <div className="hidden md:flex items-center space-x-4">
-
-            <div className="flex items-center gap-2 text-sm text-emerald-400 bg-emerald-500/10 px-3 py-1 rounded-full">
-              <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-              Online
-            </div>
-
-            {/* Profile Circle */}
-            <div
-              className="h-10 w-10 rounded-full bg-orange-500 flex items-center justify-center font-bold text-white cursor-pointer uppercase shadow-md"
-              title={deliveryPartner?.name}
-            >
-              {initials}
-            </div>
-          </div>
-
-          {/* Mobile Menu Button */}
-          <div className="md:hidden">
-            <button
-              onClick={() => setIsOpen(!isOpen)}
-              className="inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-white hover:bg-slate-800 focus:outline-none"
-            >
-              <svg
-                className="h-6 w-6"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                {isOpen ? (
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth="2"
-                    d="M6 18L18 6M6 6l12 12"
-                  />
-                ) : (
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth="2"
-                    d="M4 6h16M4 12h16M4 18h16"
-                  />
-                )}
-              </svg>
-            </button>
-          </div>
+        {/* Vertical Separator for Desktop */}
+        <div className="hidden sm:block h-6 w-px bg-gray-200" />
+        
+        {/* Online Status Indicator */}
+        <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-wider text-emerald-700 bg-emerald-50 px-2.5 py-1.5 rounded-lg border border-emerald-200/40">
+          <Circle size={8} className="fill-emerald-500 text-emerald-500 animate-pulse" />
+          <span>Online</span>
         </div>
       </div>
 
-      {/* Mobile Menu */}
-      {isOpen && (
-        <div className="md:hidden bg-slate-800 px-4 pt-2 pb-4 space-y-3">
+      {/* RIGHT: User Profile Configuration */}
+      <div className="flex items-center gap-3.5">
+        <ThemeToggle />
 
-          <div className="flex items-center justify-between pt-2 border-t border-slate-700">
-
-            <span className="text-sm text-emerald-400">
-              Status: Online
-            </span>
-
-            <div
-              className="h-10 w-10 rounded-full bg-orange-500 flex items-center justify-center font-bold text-white uppercase"
-              title={deliveryPartner?.name}
-            >
-              {initials}
-            </div>
-
-          </div>
+        <div className="text-right hidden sm:block">
+          <p className="text-xs font-bold text-gray-900 dark:text-white uppercase tracking-wide">
+            {deliveryPartner?.name || "Grocify Driver"}
+          </p>
+          <p className="text-[9px] text-gray-400 font-bold uppercase tracking-widest mt-0.5">
+            ID: {deliveryPartner?.id || deliveryPartner?._id?.slice(-6).toUpperCase() || "ACTIVE"}
+          </p>
         </div>
-      )}
+        
+        {/* Initials Avatar Badge */}
+        <div className="h-9 w-9 rounded-xl bg-slate-950 flex items-center justify-center font-bold text-white shadow-md shadow-slate-950/10 uppercase text-xs tracking-wider">
+          {initials}
+        </div>
+      </div>
     </nav>
   );
 }

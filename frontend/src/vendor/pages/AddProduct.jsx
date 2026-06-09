@@ -218,7 +218,7 @@ export default function AddProduct() {
                     name="name"
                     value={formData.name}
                     onChange={handleChange}
-                    placeholder="e.g. Vintage Denim Trucker Jacket"
+                    placeholder="e.g. Kurkure , Soap , cake , veggies or fruits"
                     className="w-full bg-slate-50/50 focus:bg-white border border-slate-200 focus:border-indigo-500 rounded-xl px-4 py-3 text-sm font-medium outline-none transition"
                     required
                   />
@@ -260,7 +260,7 @@ export default function AddProduct() {
                   value={formData.description}
                   onChange={handleChange}
                   rows="4"
-                  placeholder="Elaborate on styling points, design material composition, fit guides, etc..."
+                  placeholder="Elaborate the Products, Product Quality , etc..."
                   className="w-full bg-slate-50/50 focus:bg-white border border-slate-200 focus:border-indigo-500 rounded-xl px-4 py-3 text-sm font-medium outline-none transition resize-none"
                   required
                 />

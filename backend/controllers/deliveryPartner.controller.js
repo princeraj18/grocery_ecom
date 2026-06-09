@@ -939,3 +939,96 @@ export const createWithdrawRequest = async (req, res) => {
     });
   }
 };
+
+
+// ====================================================================
+// GET EXTENDED ANALYTICS (Aggregated Pipeline for Chart Visualization)
+// ====================================================================
+export const getExtendedAnalytics = async (req, res) => {
+  try {
+    const partnerId = req.deliveryPartner._id;
+
+    // 1. Line Chart Data: Accumulate earnings for the last 7 days dynamically
+    const sevenDaysAgo = new Date();
+    sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+
+    const earningsTrendPipeline = [
+      {
+        $match: {
+          deliveryPartner: partnerId,
+          deliveryStatus: "Delivered",
+          deliveredAt: { $gte: sevenDaysAgo }
+        }
+      },
+      {
+        $group: {
+          _id: { $dateToString: { format: "%Y-%m-%d", date: "$deliveredAt" } },
+          dailyEarnings: { $sum: { $toDouble: "$partnerEarning" } },
+          tripsCompleted: { $sum: 1 }
+        }
+      },
+      { $sort: { "_id": 1 } } // Keep linear progression order intact
+    ];
+
+    // 2. Histogram (Bar) Data: Distribution of trips sorted by days of the week
+    const weekdayDistributionPipeline = [
+      {
+        $match: {
+          deliveryPartner: partnerId,
+          deliveryStatus: "Delivered"
+        }
+      },
+      {
+        $group: {
+          _id: { $dayOfWeek: "$deliveredAt" }, // Returns integers 1 (Sunday) to 7 (Saturday)
+          tripCount: { $sum: 1 }
+        }
+      },
+      { $sort: { "_id": 1 } }
+    ];
+
+    // Execute heavy calculations concurrently using Promise.all
+    const [dbPartner, earningsTrend, weekdayDistribution] = await Promise.all([
+      DeliveryPartner.findById(partnerId).select("totalAcceptedOrders totalRejectedOrders"),
+      Order.aggregate(earningsTrendPipeline),
+      Order.aggregate(weekdayDistributionPipeline)
+    ]);
+
+    // Format Weekday output mapping integers back into readable tags
+    const daysMap = ["", "Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+    const formattedHistogram = weekdayDistribution.map(item => ({
+      day: daysMap[item._id] || "Unknown",
+      trips: item.tripCount
+    }));
+
+    // Format Pie chart proportions
+    const pieChartData = [
+      { name: "Accepted", value: dbPartner.totalAcceptedOrders || 0 },
+      { name: "Rejected", value: dbPartner.totalRejectedOrders || 0 }
+    ];
+
+    // Normalize empty entries in the chronological line series data array
+    const lineChartData = earningsTrend.map(item => ({
+      date: item._id,
+      earnings: item.dailyEarnings,
+      trips: item.tripsCompleted
+    }));
+
+    res.status(200).json({
+      success: true,
+      analytics: {
+        lineChartData,       // Growth metrics over time
+        pieChartData,        // Ratio metrics split
+        histogramData: formattedHistogram  // Trip frequency index distribution
+      }
+    });
+
+  } catch (error) {
+    console.error("ANALYTICS ENGINE COMPILATION ERROR:", error);
+    res.status(500).json({
+      success: false,
+      message: "Failed to generate analytical records context",
+      error: error.message
+    });
+  }
+};

@@ -12,6 +12,7 @@ import api from "../api/Axios";
 
 import { ShopContext }
   from "../context/ShopContext";
+import ThemeToggle from "../components/ThemeToggle";
 
 const Login = () => {
 
@@ -124,7 +125,10 @@ const Login = () => {
 
   return (
 
-    <div className="min-h-screen flex">
+    <div className="min-h-screen flex relative">
+      <div className="absolute top-4 right-4 z-10">
+        <ThemeToggle />
+      </div>
 
       {/* LEFT SECTION */}
       <div className="hidden lg:flex w-1/2 bg-gradient-to-r from-indigo-600 to-purple-700 items-center justify-center p-12">

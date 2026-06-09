@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import api from "../services/api";
+import ThemeToggle from "../components/ThemeToggle";
 
 export default function AdminForgotPassword() {
   const [email, setEmail] = useState("");
@@ -28,7 +29,10 @@ export default function AdminForgotPassword() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100 px-6">
+    <div className="min-h-screen flex items-center justify-center bg-gray-100 dark:bg-slate-950 px-6 relative">
+      <div className="absolute top-4 right-4">
+        <ThemeToggle />
+      </div>
       <div className="bg-white p-8 rounded-2xl shadow-lg w-full max-w-md">
         <h1 className="text-3xl font-bold text-center mb-2">Admin Recovery</h1>
         <p className="text-sm text-gray-500 text-center mb-6">Enter verified administrative credentials.</p>
