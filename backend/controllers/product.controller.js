@@ -1,5 +1,5 @@
-import Product from "../models/Product.model.js";
-import Category from "../models/Category.model.js";
+import Product from "../models/product.model.js";
+import Category from "../models/category.model.js";
 import Variant from "../models/Variant.model.js";
 import mongoose from "mongoose";
 import { cloudinary, isCloudAvailable } from "../config/cloudinary.js";
