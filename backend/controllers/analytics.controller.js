@@ -2,7 +2,7 @@ import User from "../models/User.model.js";
 
 import Vendor from "../models/Vendor.model.js";
 
-import Product from "../models/Product.model.js";
+import Product from "../models/product.model.js";
 
 import Order from "../models/Order.model.js";
 
