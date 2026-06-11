@@ -1,7 +1,7 @@
 import mongoose from "mongoose";
 
 import Order from "../models/Order.model.js";
-import Product from "../models/Product.model.js";
+import Product from "../models/product.model.js";
 import DeliveryPartner from "../models/DeliveryPartner.model.js";
 import notificationModel from "../models/notification.model.js";
 
