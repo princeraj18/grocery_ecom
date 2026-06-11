@@ -1,6 +1,6 @@
 import { stripe } from "../config/stripe.js";
 
-import Payment from "../models/payment.model.js";
+import Payment from "../models/Payment.model.js";
 
 import Order from "../models/Order.model.js";
 
