@@ -4,7 +4,7 @@ import vendorAuth from "../middleware/vendorAuth.js";
 
 import {
   getVendorAnalytics,
-} from "../controllers/vendoranalytics.controller.js";
+} from "../controllers/vendorAnalytics.controller.js";
 
 const router = express.Router();
 
