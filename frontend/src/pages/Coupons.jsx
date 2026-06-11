@@ -81,14 +81,14 @@ const Coupons = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 p-10 text-2xl font-bold">
+      <div className="min-h-screen bg-gray-50 dark:bg-slate-900 p-10 text-2xl font-bold">
         Loading Coupons...
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-[#f6f7f1] px-4 py-6 sm:px-6 lg:px-8">
+    <div className="min-h-screen dark:bg-slate-950 px-4 py-6 sm:px-6 lg:px-8">
       <div className="mx-auto max-w-7xl">
         <div className="mb-5 rounded-[8px] bg-[#172337] p-5 text-white">
           <p className="text-sm font-bold text-[#f7d851]">
@@ -110,7 +110,7 @@ const Coupons = () => {
               onClick={() =>
                 navigate("/products")
               }
-              className="w-fit rounded bg-white px-4 py-3 text-sm font-black text-[#172337]"
+              className="w-fit rounded bg-white dark:bg-slate-900 px-4 py-3 text-sm font-black text-[#172337]"
             >
               Browse Products
             </button>
@@ -124,12 +124,12 @@ const Coupons = () => {
         )}
 
         {activeCoupons.length === 0 ? (
-          <div className="rounded-[8px] bg-white py-20 text-center shadow-sm">
-            <h2 className="text-2xl font-black text-slate-700">
+          <div className="rounded-[8px] bg-white dark:bg-slate-900 py-20 text-center shadow-sm">
+            <h2 className="text-2xl font-black text-slate-700 dark:text-slate-300">
               No coupons available
             </h2>
 
-            <p className="mt-2 text-slate-500">
+            <p className="mt-2 text-slate-500 dark:text-slate-400">
               Check back later for new offers.
             </p>
           </div>
@@ -143,17 +143,17 @@ const Coupons = () => {
                 return (
                   <div
                     key={coupon._id}
-                    className="rounded-[8px] border border-slate-200 bg-white p-4 shadow-sm"
+                    className="rounded-[8px] border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-4 shadow-sm"
                   >
                     <div className="flex items-start justify-between gap-3">
                       <div>
-                        <p className="text-xs font-black uppercase text-slate-500">
+                        <p className="text-xs font-black uppercase text-slate-500 dark:text-slate-400">
                           {coupon.vendor
                             ?.shopName ||
                             "Vendor"}
                         </p>
 
-                        <h2 className="mt-1 text-2xl font-black text-slate-900">
+                        <h2 className="mt-1 text-2xl font-black text-slate-900 dark:text-white">
                           {formatDiscount(
                             coupon
                           )}
@@ -165,10 +165,10 @@ const Coupons = () => {
                       </span>
                     </div>
 
-                    <div className="mt-4 grid grid-cols-2 gap-2 text-sm text-slate-600">
+                    <div className="mt-4 grid grid-cols-2 gap-2 text-sm text-slate-600 dark:text-slate-400">
                       <p>
                         Min order:
-                        <span className="ml-1 font-bold text-slate-900">
+                        <span className="ml-1 font-bold text-slate-900 dark:text-white">
                           Rs.{" "}
                           {
                             coupon.minOrderAmount ||
@@ -179,7 +179,7 @@ const Coupons = () => {
 
                       <p>
                         Max off:
-                        <span className="ml-1 font-bold text-slate-900">
+                        <span className="ml-1 font-bold text-slate-900 dark:text-white">
                           Rs.{" "}
                           {
                             coupon.maxDiscount ||
@@ -189,7 +189,7 @@ const Coupons = () => {
                       </p>
                     </div>
 
-                    <p className="mt-2 text-sm text-slate-500">
+                    <p className="mt-2 text-sm text-slate-500 dark:text-slate-400">
                       Valid till{" "}
                       {new Date(
                         coupon.expiryDate
@@ -198,7 +198,7 @@ const Coupons = () => {
 
                     {products.length > 0 && (
                       <div className="mt-4">
-                        <p className="mb-2 text-xs font-black uppercase text-slate-500">
+                        <p className="mb-2 text-xs font-black uppercase text-slate-500 dark:text-slate-400">
                           Eligible products
                         </p>
 
@@ -225,7 +225,7 @@ const Coupons = () => {
                                         `/products/${product._id}`
                                       )
                                     }
-                                    className="rounded border border-slate-100 bg-slate-50 p-2 text-left"
+                                    className="rounded border border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-900 p-2 text-left"
                                   >
                                     <img
                                       src={image}
@@ -235,7 +235,7 @@ const Coupons = () => {
                                       className="h-16 w-full object-contain"
                                     />
 
-                                    <p className="mt-1 truncate text-xs font-bold text-slate-700">
+                                    <p className="mt-1 truncate text-xs font-bold text-slate-700 dark:text-slate-300">
                                       {
                                         product.name
                                       }

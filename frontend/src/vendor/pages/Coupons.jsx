@@ -100,7 +100,7 @@ export default function Coupon() {
   };
 
   return (
-    <div className="flex h-screen w-screen bg-gray-100 overflow-hidden relative">
+    <div className="flex h-screen w-screen bg-gray-100 dark:bg-slate-950 overflow-hidden relative">
       {/* MOBILE OVERLAY */}
       {sidebarOpen && (
         <div
@@ -111,9 +111,7 @@ export default function Coupon() {
 
       {/* SIDEBAR CONTAINER */}
       <div
-        className={`fixed lg:static top-0 bottom-0 left-0 z-50 w-64 bg-white h-full shadow-lg lg:shadow-none transition-transform duration-300 ease-in-out ${
-          sidebarOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"
-        }`}
+        className={`fixed lg:static top-0 bottom-0 left-0 z-50 w-64 bg-white dark:bg-slate-900 h-full shadow-lg lg:shadow-none transition-transform duration-300 ease-in-out ${ sidebarOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0" }`}
       >
         <Sidebar />
       </div>
@@ -121,10 +119,10 @@ export default function Coupon() {
       {/* MAIN CONTENT AREA */}
       <div className="flex-1 flex flex-col h-full min-w-0 overflow-hidden">
         {/* TOP NAV */}
-        <div className="sticky top-0 z-30 bg-white shadow-sm flex items-center h-16 px-2 lg:px-4">
+        <div className="sticky top-0 z-30 bg-white dark:bg-slate-900 shadow-sm flex items-center h-16 px-2 lg:px-4">
           <button
             onClick={() => setSidebarOpen(!sidebarOpen)}
-            className="lg:hidden p-2 text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
+            className="lg:hidden p-2 text-gray-600 dark:text-slate-400 hover:bg-gray-100 dark:bg-slate-950 rounded-lg transition-colors"
             aria-label="Toggle Menu"
           >
             {sidebarOpen ? <X size={24} /> : <Menu size={24} />}
@@ -138,20 +136,20 @@ export default function Coupon() {
         <div className="flex-1 overflow-y-auto p-4 sm:p-6 md:p-8">
           {/* HEADER */}
           <div className="mb-6">
-            <h1 className="text-2xl md:text-3xl font-bold text-gray-900">Coupons</h1>
-            <p className="text-gray-500 mt-1 text-sm md:text-base">
+            <h1 className="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white">Coupons</h1>
+            <p className="text-gray-500 dark:text-slate-400 mt-1 text-sm md:text-base">
               Create and manage discount coupons
             </p>
           </div>
 
           {/* CREATE COUPON FORM */}
-          <div className="bg-white rounded-2xl p-5 md:p-6 border border-gray-100 shadow-sm mb-6">
-            <h2 className="text-xl font-bold text-gray-800 mb-4">Create Coupon</h2>
+          <div className="bg-white dark:bg-slate-900 rounded-2xl p-5 md:p-6 border border-gray-100 shadow-sm mb-6">
+            <h2 className="text-xl font-bold text-gray-800 dark:text-slate-100 mb-4">Create Coupon</h2>
 
             <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {/* COUPON CODE */}
               <div>
-                <label className="block mb-1.5 text-sm font-semibold text-gray-700">
+                <label className="block mb-1.5 text-sm font-semibold text-gray-700 dark:text-slate-300">
                   Coupon Code
                 </label>
                 <input
@@ -160,21 +158,21 @@ export default function Coupon() {
                   placeholder="SAVE20"
                   value={formData.code}
                   onChange={handleChange}
-                  className="border border-gray-300 px-4 py-2.5 rounded-xl w-full focus:outline-none focus:ring-2 focus:ring-black/5 focus:border-black text-gray-900 transition text-sm"
+                  className="border border-gray-300 dark:border-slate-700 px-4 py-2.5 rounded-xl w-full focus:outline-none focus:ring-2 focus:ring-black/5 focus:border-black text-gray-900 dark:text-white transition text-sm"
                   required
                 />
               </div>
 
               {/* DISCOUNT TYPE */}
               <div>
-                <label className="block mb-1.5 text-sm font-semibold text-gray-700">
+                <label className="block mb-1.5 text-sm font-semibold text-gray-700 dark:text-slate-300">
                   Discount Type
                 </label>
                 <select
                   name="discountType"
                   value={formData.discountType}
                   onChange={handleChange}
-                  className="border border-gray-300 px-4 py-2.5 rounded-xl w-full focus:outline-none focus:ring-2 focus:ring-black/5 focus:border-black text-gray-900 transition text-sm bg-white"
+                  className="border border-gray-300 dark:border-slate-700 px-4 py-2.5 rounded-xl w-full focus:outline-none focus:ring-2 focus:ring-black/5 focus:border-black text-gray-900 dark:text-white transition text-sm bg-white dark:bg-slate-900"
                 >
                   <option value="percentage">Percentage (%)</option>
                   <option value="fixed">Fixed Amount (₹)</option>
@@ -183,7 +181,7 @@ export default function Coupon() {
 
               {/* DISCOUNT VALUE */}
               <div>
-                <label className="block mb-1.5 text-sm font-semibold text-gray-700">
+                <label className="block mb-1.5 text-sm font-semibold text-gray-700 dark:text-slate-300">
                   Discount Value
                 </label>
                 <input
@@ -193,14 +191,14 @@ export default function Coupon() {
                   min="1"
                   value={formData.discountValue}
                   onChange={handleChange}
-                  className="border border-gray-300 px-4 py-2.5 rounded-xl w-full focus:outline-none focus:ring-2 focus:ring-black/5 focus:border-black text-gray-900 transition text-sm"
+                  className="border border-gray-300 dark:border-slate-700 px-4 py-2.5 rounded-xl w-full focus:outline-none focus:ring-2 focus:ring-black/5 focus:border-black text-gray-900 dark:text-white transition text-sm"
                   required
                 />
               </div>
 
               {/* MIN ORDER */}
               <div>
-                <label className="block mb-1.5 text-sm font-semibold text-gray-700">
+                <label className="block mb-1.5 text-sm font-semibold text-gray-700 dark:text-slate-300">
                   Minimum Order Amount
                 </label>
                 <input
@@ -210,13 +208,13 @@ export default function Coupon() {
                   min="0"
                   value={formData.minOrderAmount}
                   onChange={handleChange}
-                  className="border border-gray-300 px-4 py-2.5 rounded-xl w-full focus:outline-none focus:ring-2 focus:ring-black/5 focus:border-black text-gray-900 transition text-sm"
+                  className="border border-gray-300 dark:border-slate-700 px-4 py-2.5 rounded-xl w-full focus:outline-none focus:ring-2 focus:ring-black/5 focus:border-black text-gray-900 dark:text-white transition text-sm"
                 />
               </div>
 
               {/* MAX DISCOUNT */}
               <div>
-                <label className="block mb-1.5 text-sm font-semibold text-gray-700">
+                <label className="block mb-1.5 text-sm font-semibold text-gray-700 dark:text-slate-300">
                   Maximum Discount
                 </label>
                 <input
@@ -226,14 +224,14 @@ export default function Coupon() {
                   min="0"
                   value={formData.maxDiscount}
                   onChange={handleChange}
-                  className="border border-gray-300 px-4 py-2.5 rounded-xl w-full focus:outline-none focus:ring-2 focus:ring-black/5 focus:border-black text-gray-900 transition text-sm"
+                  className="border border-gray-300 dark:border-slate-700 px-4 py-2.5 rounded-xl w-full focus:outline-none focus:ring-2 focus:ring-black/5 focus:border-black text-gray-900 dark:text-white transition text-sm"
                   disabled={formData.discountType === "fixed"}
                 />
               </div>
 
               {/* EXPIRY DATE */}
               <div>
-                <label className="block mb-1.5 text-sm font-semibold text-gray-700">
+                <label className="block mb-1.5 text-sm font-semibold text-gray-700 dark:text-slate-300">
                   Expiry Date
                 </label>
                 <input
@@ -241,7 +239,7 @@ export default function Coupon() {
                   name="expiryDate"
                   value={formData.expiryDate}
                   onChange={handleChange}
-                  className="border border-gray-300 px-4 py-2.5 rounded-xl w-full focus:outline-none focus:ring-2 focus:ring-black/5 focus:border-black text-gray-900 transition text-sm"
+                  className="border border-gray-300 dark:border-slate-700 px-4 py-2.5 rounded-xl w-full focus:outline-none focus:ring-2 focus:ring-black/5 focus:border-black text-gray-900 dark:text-white transition text-sm"
                   required
                 />
               </div>
@@ -259,10 +257,10 @@ export default function Coupon() {
           </div>
 
           {/* COUPON LIST */}
-          <div className="bg-white rounded-2xl p-5 md:p-6 border border-gray-100 shadow-sm">
+          <div className="bg-white dark:bg-slate-900 rounded-2xl p-5 md:p-6 border border-gray-100 shadow-sm">
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-6">
-              <h2 className="text-xl font-bold text-gray-800">All Coupons</h2>
-              <span className="bg-gray-100 px-3 py-1.5 rounded-full text-xs sm:text-sm font-medium text-gray-600 w-fit border border-gray-200/50">
+              <h2 className="text-xl font-bold text-gray-800 dark:text-slate-100">All Coupons</h2>
+              <span className="bg-gray-100 dark:bg-slate-950 px-3 py-1.5 rounded-full text-xs sm:text-sm font-medium text-gray-600 dark:text-slate-400 w-fit border border-gray-200 dark:border-slate-800/50">
                 {coupons.length} Coupons Available
               </span>
             </div>
@@ -271,7 +269,7 @@ export default function Coupon() {
             <div className="hidden lg:block overflow-x-auto">
               <table className="w-full border-collapse">
                 <thead>
-                  <tr className="bg-gray-50 border-b border-gray-200 text-gray-600 text-sm">
+                  <tr className="bg-gray-50 dark:bg-slate-900 border-b border-gray-200 dark:border-slate-800 text-gray-600 dark:text-slate-400 text-sm">
                     <th className="p-4 text-left font-semibold rounded-l-xl">Code</th>
                     <th className="p-4 text-left font-semibold">Type</th>
                     <th className="p-4 text-left font-semibold">Discount</th>
@@ -280,10 +278,10 @@ export default function Coupon() {
                     <th className="p-4 text-left font-semibold rounded-r-xl">Action</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-gray-100 text-sm text-gray-700">
+                <tbody className="divide-y divide-gray-100 text-sm text-gray-700 dark:text-slate-300">
                   {coupons.map((coupon) => (
-                    <tr key={coupon._id} className="hover:bg-gray-50/50 transition-colors">
-                      <td className="p-4 font-bold text-gray-900">{coupon.code}</td>
+                    <tr key={coupon._id} className="hover:bg-gray-50 dark:hover:bg-slate-800/50 transition-colors">
+                      <td className="p-4 font-bold text-gray-900 dark:text-white">{coupon.code}</td>
                       <td className="p-4 capitalize">{coupon.discountType}</td>
                       <td className="p-4 font-medium">
                         {coupon.discountType === "percentage"
@@ -299,11 +297,7 @@ export default function Coupon() {
                       </td>
                       <td className="p-4">
                         <span
-                          className={`px-2.5 py-1 rounded-full text-xs font-medium border ${
-                            coupon.isActive
-                              ? "bg-green-50 text-green-700 border-green-100"
-                              : "bg-red-50 text-red-700 border-red-100"
-                          }`}
+                          className={`px-2.5 py-1 rounded-full text-xs font-medium border ${ coupon.isActive ? "bg-green-50 text-green-700 border-green-100" : "bg-red-50 text-red-700 border-red-100" }`}
                         >
                           {coupon.isActive ? "Active" : "Inactive"}
                         </span>
@@ -321,7 +315,7 @@ export default function Coupon() {
                   ))}
                   {coupons.length === 0 && (
                     <tr>
-                      <td colSpan="6" className="text-center p-8 text-gray-500">
+                      <td colSpan="6" className="text-center p-8 text-gray-500 dark:text-slate-400">
                         No coupons found. Create your first discount code above!
                       </td>
                     </tr>
@@ -335,37 +329,33 @@ export default function Coupon() {
               {coupons.map((coupon) => (
                 <div
                   key={coupon._id}
-                  className="border border-gray-200 rounded-xl p-4 bg-gray-50/30 flex flex-col justify-between"
+                  className="border border-gray-200 dark:border-slate-800 rounded-xl p-4 bg-gray-50/30 flex flex-col justify-between"
                 >
                   <div>
                     <div className="flex items-start justify-between gap-2 mb-3">
-                      <h3 className="text-lg font-bold text-gray-900">{coupon.code}</h3>
+                      <h3 className="text-lg font-bold text-gray-900 dark:text-white">{coupon.code}</h3>
                       <span
-                        className={`px-2.5 py-0.5 rounded-full text-xs font-medium border ${
-                          coupon.isActive
-                            ? "bg-green-50 text-green-700 border-green-100"
-                            : "bg-red-50 text-red-700 border-red-100"
-                        }`}
+                        className={`px-2.5 py-0.5 rounded-full text-xs font-medium border ${ coupon.isActive ? "bg-green-50 text-green-700 border-green-100" : "bg-red-50 text-red-700 border-red-100" }`}
                       >
                         {coupon.isActive ? "Active" : "Inactive"}
                       </span>
                     </div>
 
-                    <div className="space-y-1.5 text-sm text-gray-600">
+                    <div className="space-y-1.5 text-sm text-gray-600 dark:text-slate-400">
                       <p>
-                        <span className="text-gray-400 font-medium">Type:</span>{" "}
+                        <span className="text-gray-400 dark:text-slate-500 dark:text-slate-400 font-medium">Type:</span>{" "}
                         <span className="capitalize">{coupon.discountType}</span>
                       </p>
                       <p>
-                        <span className="text-gray-400 font-medium">Discount:</span>{" "}
-                        <span className="font-semibold text-gray-800">
+                        <span className="text-gray-400 dark:text-slate-500 dark:text-slate-400 font-medium">Discount:</span>{" "}
+                        <span className="font-semibold text-gray-800 dark:text-slate-100">
                           {coupon.discountType === "percentage"
                             ? `${coupon.discountValue}%`
                             : `₹${coupon.discountValue}`}
                         </span>
                       </p>
                       <p>
-                        <span className="text-gray-400 font-medium">Expires:</span>{" "}
+                        <span className="text-gray-400 dark:text-slate-500 dark:text-slate-400 font-medium">Expires:</span>{" "}
                         {new Date(coupon.expiryDate).toLocaleDateString("en-IN", {
                           day: "numeric",
                           month: "short",
@@ -385,7 +375,7 @@ export default function Coupon() {
                 </div>
               ))}
               {coupons.length === 0 && (
-                <div className="text-center p-6 text-gray-500 sm:col-span-2">
+                <div className="text-center p-6 text-gray-500 dark:text-slate-400 sm:col-span-2">
                   No coupons found. Create your first discount code above!
                 </div>
               )}

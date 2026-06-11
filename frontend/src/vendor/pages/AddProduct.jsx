@@ -19,7 +19,7 @@ import Navbar from "../components/Navbar";
 
 export default function AddProduct() {
   // =========================
-  // SIDEBAR STATE
+  // SIDEBAR & DATA STATE
   // =========================
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [variantOptions, setVariantOptions] = useState([]);
@@ -153,7 +153,7 @@ export default function AddProduct() {
   };
 
   return (
-    <div className="flex min-h-screen bg-slate-50 text-slate-800 font-sans overflow-hidden">
+    <div className="flex min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-800 dark:text-slate-100 font-sans overflow-hidden">
       
       {/* MOBILE BACKDROP OVERLAY */}
       {sidebarOpen && (
@@ -165,10 +165,9 @@ export default function AddProduct() {
 
       {/* SIDEBAR CONTEXT WRAPPER */}
       <div
-        className={`
-          fixed lg:static top-0 left-0 z-50 h-full transition-transform duration-300 ease-in-out
-          ${sidebarOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"}
-        `}
+        className={`fixed lg:static top-0 left-0 z-50 h-full transition-transform duration-300 ease-in-out ${
+          sidebarOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"
+        }`}
       >
         <Sidebar />
       </div>
@@ -177,10 +176,10 @@ export default function AddProduct() {
       <div className="flex-1 flex flex-col min-w-0 h-screen overflow-y-auto">
         
         {/* UPPER APPLICATION GLOBAL NAV */}
-        <div className="sticky top-0 z-30 bg-white border-b border-slate-100 shadow-sm flex items-center">
+        <div className="sticky top-0 z-30 bg-white dark:bg-slate-900 border-b border-slate-100 dark:border-slate-800 shadow-sm flex items-center">
           <button
             onClick={() => setSidebarOpen(!sidebarOpen)}
-            className="lg:hidden p-4 text-slate-500 hover:text-slate-900 transition-colors"
+            className="lg:hidden p-4 text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors"
           >
             {sidebarOpen ? <X size={24} /> : <Menu size={24} />}
           </button>
@@ -194,85 +193,96 @@ export default function AddProduct() {
           
           {/* ACTION HEADER */}
           <div className="mb-6 hidden lg:block">
-            <h1 className="text-2xl md:text-3xl font-bold tracking-tight text-slate-900">
+            <h1 className="text-2xl md:text-3xl font-bold tracking-tight text-slate-900 dark:text-white">
               Create Dynamic Listing
             </h1>
-            <p className="text-slate-500 text-sm mt-0.5">
+            <p className="text-slate-500 dark:text-slate-400 text-sm mt-0.5">
               Deploy a new retail inventory master entry, append variations, and map asset galleries.
             </p>
           </div>
 
           {/* MAIN DATA FORM BLOCK */}
-          <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-5 sm:p-6 md:p-8">
+          <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-100 dark:border-slate-800/80 shadow-sm p-5 sm:p-6 md:p-8">
             <form onSubmit={handleSubmit} className="space-y-6">
               
               {/* LAYOUT GRID: NAME & CATEGORY */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                
                 {/* PRODUCT NAME */}
                 <div className="space-y-2">
-                  <label className="text-xs font-bold uppercase tracking-wider text-slate-500 flex items-center gap-2">
-                    <PackagePlus size={14} className="text-slate-400" /> Product Name
+                  <label className="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 flex items-center gap-2">
+                    <PackagePlus size={14} className="text-slate-400 dark:text-slate-500" /> Product Name
                   </label>
                   <input
                     type="text"
                     name="name"
                     value={formData.name}
                     onChange={handleChange}
-                    placeholder="e.g. Kurkure , Soap , cake , veggies or fruits"
-                    className="w-full bg-slate-50/50 focus:bg-white border border-slate-200 focus:border-indigo-500 rounded-xl px-4 py-3 text-sm font-medium outline-none transition"
+                    placeholder="e.g. Kurkure, Soap, cake, veggies or fruits"
+                    className="w-full bg-slate-50 focus:bg-white dark:bg-slate-950 dark:focus:bg-slate-950/40 border border-slate-200 dark:border-slate-800 focus:border-indigo-500 dark:focus:border-indigo-500 rounded-xl px-4 py-3 text-sm font-medium text-slate-900 dark:text-white outline-none transition placeholder-slate-400 dark:placeholder-slate-500"
                     required
                   />
                 </div>
 
                 {/* CATEGORY MAPPING */}
                 <div className="space-y-2">
-                  <label className="text-xs font-bold uppercase tracking-wider text-slate-500 flex items-center gap-2">
-                    <Layers size={14} className="text-slate-400" /> Catalog Category
+                  <label className="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 flex items-center gap-2">
+                    <Layers size={14} className="text-slate-400 dark:text-slate-500" /> Catalog Category
                   </label>
                   <div className="relative">
                     <select
                       name="category"
                       value={formData.category}
                       onChange={handleChange}
-                      className="w-full bg-slate-50/50 focus:bg-white border border-slate-200 focus:border-indigo-500 rounded-xl px-4 py-3 text-sm font-medium outline-none transition cursor-pointer appearance-none"
+                      className="w-full bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-white border border-slate-200 dark:border-slate-800 focus:border-indigo-500 dark:focus:border-indigo-500 rounded-xl px-4 py-3 text-sm font-medium outline-none transition cursor-pointer appearance-none pr-10"
                       required
                     >
-                      <option value="">
+                      <option value="" className="bg-white dark:bg-slate-900 text-slate-400">
                         {loadingCategories ? "Loading options ledger..." : "Select structural category..."}
                       </option>
                       {categories.map((cat) => (
-                        <option key={cat._id} value={cat._id}>
+                        <option 
+                          key={cat._id} 
+                          value={cat._id} 
+                          className="bg-white dark:bg-slate-900 text-slate-900 dark:text-white"
+                        >
                           {cat.text || cat.name}
                         </option>
                       ))}
                     </select>
+                    {/* Dark-mode safe dropdown chevron arrow wrapper */}
+                    <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-slate-400 dark:text-slate-500">
+                      <svg className="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
+                        <path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z"/>
+                      </svg>
+                    </div>
                   </div>
                 </div>
               </div>
 
               {/* NARRATIVE DESCRIPTION */}
               <div className="space-y-2">
-                <label className="text-xs font-bold uppercase tracking-wider text-slate-500 flex items-center gap-2">
-                  <FileText size={14} className="text-slate-400" /> Description / Content Copy
+                <label className="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 flex items-center gap-2">
+                  <FileText size={14} className="text-slate-400 dark:text-slate-500" /> Description / Content Copy
                 </label>
                 <textarea
                   name="description"
                   value={formData.description}
                   onChange={handleChange}
                   rows="4"
-                  placeholder="Elaborate the Products, Product Quality , etc..."
-                  className="w-full bg-slate-50/50 focus:bg-white border border-slate-200 focus:border-indigo-500 rounded-xl px-4 py-3 text-sm font-medium outline-none transition resize-none"
+                  placeholder="Elaborate the Products, Product Quality, etc..."
+                  className="w-full bg-slate-50  dark:bg-slate-950 border border-slate-200 dark:border-slate-800 focus:border-indigo-500 dark:focus:border-indigo-500 rounded-xl px-4 py-3 text-sm font-medium text-slate-900 dark:text-white outline-none transition resize-none placeholder-slate-400 "
                   required
                 />
               </div>
 
               {/* VARIANTS ARCHITECTURE */}
-              <div className="space-y-4 pt-4 border-t border-slate-100">
+              <div className="space-y-4 pt-4 border-t border-slate-100 dark:border-slate-800">
                 <div>
-                  <h3 className="text-sm font-bold uppercase tracking-wider text-slate-900">
+                  <h3 className="text-sm font-bold uppercase tracking-wider text-slate-900 dark:text-white">
                     Product Variants
                   </h3>
-                  <p className="text-slate-400 text-xs mt-0.5">
+                  <p className="text-slate-400 dark:text-slate-500 text-xs mt-0.5">
                     Map individual item matrices like size parameters, specific pricing updates, and active warehouse stock counts.
                   </p>
                 </div>
@@ -281,31 +291,42 @@ export default function AddProduct() {
                   {variants.map((variant, index) => (
                     <div
                       key={index}
-                      className="grid grid-cols-2 md:grid-cols-5 items-end gap-3 bg-slate-50/50 p-4 border border-slate-100 rounded-xl relative"
+                      className="grid grid-cols-2 md:grid-cols-5 items-end gap-3 bg-slate-50 dark:bg-slate-950/40 p-4 border border-slate-100 dark:border-slate-800/80 rounded-xl relative"
                     >
                       {/* SIZE ASSIGNMENT */}
                       <div className="space-y-1.5 col-span-2 md:col-span-1">
-                        <label className="text-[11px] font-bold text-slate-500 uppercase tracking-wide">
+                        <label className="text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wide">
                           Variant Scale
                         </label>
-                        <select
-                          value={variant.size}
-                          onChange={(e) => handleVariantChange(index, "size", e.target.value)}
-                          className="w-full bg-white border border-slate-200 rounded-lg px-3 py-2 text-xs font-semibold outline-none focus:border-indigo-500 transition cursor-pointer"
-                          required
-                        >
-                          <option value="">Select Scale</option>
-                          {variantOptions.map((item) => (
-                            <option key={item._id} value={item.size}>
-                              {item.size}
-                            </option>
-                          ))}
-                        </select>
+                        <div className="relative">
+                          <select
+                            value={variant.size}
+                            onChange={(e) => handleVariantChange(index, "size", e.target.value)}
+                            className="w-full bg-white dark:bg-slate-900 text-slate-900 dark:text-white border border-slate-200 dark:border-slate-800 rounded-lg px-3 py-2 text-xs font-semibold outline-none focus:border-indigo-500 transition cursor-pointer appearance-none pr-8"
+                            required
+                          >
+                            <option value="" className="bg-white dark:bg-slate-900 text-slate-400">Select Scale</option>
+                            {variantOptions.map((item) => (
+                              <option 
+                                key={item._id} 
+                                value={item.size} 
+                                className="bg-white dark:bg-slate-900 text-slate-900 dark:text-white"
+                              >
+                                {item.size}
+                              </option>
+                            ))}
+                          </select>
+                          <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-slate-400 dark:text-slate-500">
+                            <svg className="fill-current h-3 w-3" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
+                              <path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z"/>
+                            </svg>
+                          </div>
+                        </div>
                       </div>
 
                       {/* RETAIL BASE PRICE */}
                       <div className="space-y-1.5">
-                        <label className="text-[11px] font-bold text-slate-500 uppercase tracking-wide">
+                        <label className="text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wide">
                           Retail Base (₹)
                         </label>
                         <input
@@ -313,14 +334,14 @@ export default function AddProduct() {
                           placeholder="0.00"
                           value={variant.price}
                           onChange={(e) => handleVariantChange(index, "price", e.target.value)}
-                          className="w-full bg-white border border-slate-200 rounded-lg px-3 py-2 text-xs font-semibold outline-none focus:border-indigo-500 transition"
+                          className="w-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-lg px-3 py-2 text-xs font-semibold text-slate-900 dark:text-white outline-none focus:border-indigo-500 transition placeholder-slate-400 dark:placeholder-slate-500"
                           required
                         />
                       </div>
 
                       {/* SPECIAL OFFER PRICE */}
                       <div className="space-y-1.5">
-                        <label className="text-[11px] font-bold text-emerald-600 uppercase tracking-wide">
+                        <label className="text-[11px] font-bold text-emerald-600 dark:text-emerald-500 uppercase tracking-wide">
                           Offer Value (₹)
                         </label>
                         <input
@@ -328,14 +349,14 @@ export default function AddProduct() {
                           placeholder="0.00"
                           value={variant.offerPrice}
                           onChange={(e) => handleVariantChange(index, "offerPrice", e.target.value)}
-                          className="w-full bg-white border border-slate-200 text-emerald-600 rounded-lg px-3 py-2 text-xs font-semibold outline-none focus:border-indigo-500 transition"
+                          className="w-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-emerald-600 dark:text-emerald-400 rounded-lg px-3 py-2 text-xs font-semibold outline-none focus:border-indigo-500 transition placeholder-emerald-700/50 dark:placeholder-emerald-500/30"
                           required
                         />
                       </div>
 
                       {/* PHYSICAL STOCK UNITS */}
                       <div className="space-y-1.5">
-                        <label className="text-[11px] font-bold text-slate-500 uppercase tracking-wide">
+                        <label className="text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wide">
                           Stock Vault
                         </label>
                         <input
@@ -343,17 +364,17 @@ export default function AddProduct() {
                           placeholder="Units"
                           value={variant.stockQuantity}
                           onChange={(e) => handleVariantChange(index, "stockQuantity", e.target.value)}
-                          className="w-full bg-white border border-slate-200 rounded-lg px-3 py-2 text-xs font-semibold outline-none focus:border-indigo-500 transition"
+                          className="w-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-lg px-3 py-2 text-xs font-semibold text-slate-900 dark:text-white outline-none focus:border-indigo-500 transition placeholder-slate-400 dark:placeholder-slate-500"
                           required
                         />
                       </div>
 
-                      {/* EXTRACT VARIANT ENTRY */}
+                      {/* REMOVE VARIANT BUTTON */}
                       <button
                         type="button"
                         onClick={() => removeVariant(index)}
                         disabled={variants.length === 1}
-                        className="h-[38px] flex items-center justify-center bg-white border border-slate-200 hover:border-rose-200 text-slate-400 hover:text-rose-600 disabled:opacity-40 disabled:hover:text-slate-400 disabled:hover:border-slate-200 rounded-lg transition px-2 col-span-2 md:col-span-1"
+                        className="h-[34px] flex items-center justify-center bg-white hover:bg-rose-50 dark:bg-slate-900 dark:hover:bg-rose-950/20 border border-slate-200 dark:border-slate-800 hover:border-rose-200 dark:hover:border-rose-900/60 text-slate-400 hover:text-rose-600 dark:text-slate-500 dark:hover:text-rose-400 disabled:opacity-30 disabled:hover:bg-white disabled:dark:hover:bg-slate-900 disabled:hover:text-slate-400 disabled:hover:border-slate-200 rounded-lg transition px-2 col-span-2 md:col-span-1"
                       >
                         <Trash2 size={15} />
                         <span className="md:hidden text-xs font-medium ml-1.5">Delete Variation Matrix</span>
@@ -365,19 +386,19 @@ export default function AddProduct() {
                 <button
                   type="button"
                   onClick={addVariant}
-                  className="inline-flex items-center gap-1.5 text-xs font-bold text-indigo-600 hover:text-indigo-700 bg-indigo-50 hover:bg-indigo-100/80 px-3 py-2 rounded-lg transition"
+                  className="inline-flex items-center gap-1.5 text-xs font-bold text-indigo-600 dark:text-indigo-400 hover:text-indigo-700 dark:hover:text-indigo-300 bg-indigo-50 dark:bg-indigo-950/30 hover:bg-indigo-100/80 dark:hover:bg-indigo-950/60 px-3 py-2 rounded-lg transition"
                 >
                   <Plus size={14} /> Append Variations Model
                 </button>
               </div>
 
               {/* MEDIA DRAG AND OVERVIEW COMPONENT */}
-              <div className="space-y-4 pt-4 border-t border-slate-100">
-                <label className="text-xs font-bold uppercase tracking-wider text-slate-500 flex items-center gap-2">
-                  <Upload size={14} className="text-slate-400" /> Digital Showcase Media Assets
+              <div className="space-y-4 pt-4 border-t border-slate-100 dark:border-slate-800">
+                <label className="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 flex items-center gap-2">
+                  <Upload size={14} className="text-slate-400 dark:text-slate-500" /> Digital Showcase Media Assets
                 </label>
 
-                <div className="border-2 border-dashed border-slate-200 hover:border-indigo-400 rounded-2xl bg-slate-50/40 p-6 text-center relative group transition-colors">
+                <div className="border-2 border-dashed border-slate-200 dark:border-slate-800 hover:border-indigo-400 dark:hover:border-indigo-500 rounded-2xl bg-slate-50 dark:bg-slate-950/30 p-6 text-center relative group transition-colors">
                   <input
                     id="product-images"
                     type="file"
@@ -388,23 +409,22 @@ export default function AddProduct() {
                     required
                   />
                   <ImageIcon size={24} className="mx-auto text-slate-400 group-hover:text-indigo-500 mb-2 transition-colors" />
-                  <span className="block text-xs font-semibold text-slate-700">
+                  <span className="block text-xs font-semibold text-slate-700 dark:text-slate-300">
                     {images.length > 0 ? `Captured ${images.length} item files` : "Click here or slide files to anchor photography frames"}
                   </span>
-                  <span className="block text-[10px] text-slate-400 mt-0.5">PNG, JPEG, and WEBP formats supported</span>
+                  <span className="block text-[10px] text-slate-400 dark:text-slate-500 mt-0.5">PNG, JPEG, and WEBP formats supported</span>
                 </div>
               </div>
 
               {/* LIVE IMAGE PREVIEWS */}
               {images.length > 0 && (
-                <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-6 gap-3 bg-slate-50 p-3 rounded-xl border border-slate-100">
+                <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-6 gap-3 bg-slate-50 dark:bg-slate-950/50 p-3 rounded-xl border border-slate-100 dark:border-slate-800/60">
                   {images.map((img, index) => (
-                    <div key={index} className="relative aspect-square bg-white rounded-lg overflow-hidden border border-slate-200 p-1">
+                    <div key={index} className="relative aspect-square bg-white dark:bg-slate-900 rounded-lg overflow-hidden border border-slate-200 dark:border-slate-800 p-1">
                       <img
                         src={URL.createObjectURL(img)}
                         alt="Upload Asset Frame Preview"
                         className="w-full h-full object-cover rounded-md"
-                        onLoad={(e) => URL.revokeObjectURL(e.target.src)} // Avoid active object cache leaks
                       />
                     </div>
                   ))}
@@ -412,7 +432,7 @@ export default function AddProduct() {
               )}
 
               {/* ACTION TRIGGER BUTTONS */}
-              <div className="pt-5 border-t border-slate-100">
+              <div className="pt-5 border-t border-slate-100 dark:border-slate-800">
                 <button
                   type="submit"
                   disabled={isSubmitting}

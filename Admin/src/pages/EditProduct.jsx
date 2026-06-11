@@ -236,7 +236,7 @@ export default function EditProduct() {
 
       <form
         onSubmit={handleSubmit}
-        className="space-y-6 bg-white p-8 rounded-2xl shadow"
+        className="space-y-6 bg-white dark:bg-slate-900 p-8 rounded-2xl shadow"
       >
 
         {/* PRODUCT NAME */}
@@ -346,7 +346,7 @@ export default function EditProduct() {
             className="w-full border p-3 rounded-lg mt-2"
           />
 
-          <p className="text-sm text-gray-500 mt-1">
+          <p className="text-sm text-gray-500 dark:text-slate-400 mt-1">
             Separate using commas
           </p>
 

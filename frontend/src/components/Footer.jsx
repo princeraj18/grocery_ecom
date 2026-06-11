@@ -4,17 +4,15 @@ import { useNavigate } from "react-router-dom";
  function Footer() {
   const navigate = useNavigate();
   return (
-    <footer className="bg-gray-900 text-white mt-10">
-
-      {/* Top Section */}
-      <div className="max-w-6xl mx-auto px-4 py-10 grid grid-cols-1 md:grid-cols-4 gap-8">
+    <footer className="bg-gray-900 dark:bg-slate-950 text-white mt-10">
+  <div className="max-w-6xl mx-auto px-4 py-10 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
 
         {/* Brand */}
         <div>
           <h2 className="text-2xl font-bold flex items-center gap-2">
             <FaShoppingBag /> Grocify
           </h2>
-          <p className="text-gray-400 mt-3 text-sm">
+          <p className="text-gray-400 dark:text-slate-500 dark:text-slate-400 mt-3 text-sm">
             Your one-stop destination for all shopping needs. Best deals, best prices.
           </p>
         </div>
@@ -22,7 +20,7 @@ import { useNavigate } from "react-router-dom";
         {/* Links */}
         <div>
           <h3 className="text-lg font-semibold mb-3">Quick Links</h3>
-          <ul className="space-y-2 text-gray-400">
+          <ul className="space-y-2 text-gray-400 dark:text-slate-500 dark:text-slate-400">
             <li
             onClick={()=>{
               navigate("/")
@@ -49,7 +47,7 @@ import { useNavigate } from "react-router-dom";
         {/* Customer */}
         <div>
           <h3 className="text-lg font-semibold mb-3">Customer Care</h3>
-          <ul className="space-y-2 text-gray-400">
+          <ul className="space-y-2 text-gray-400 dark:text-slate-500 dark:text-slate-400">
             <li className="hover:text-white cursor-pointer">FAQ</li>
             <li className="hover:text-white cursor-pointer">Shipping</li>
             <li className="hover:text-white cursor-pointer">Returns</li>
@@ -69,7 +67,7 @@ import { useNavigate } from "react-router-dom";
       </div>
 
       {/* Bottom Section */}
-      <div className="border-t border-gray-700 text-center py-4 text-gray-500 text-sm">
+      <div className="border-t border-gray-700 text-center py-4 text-gray-500 dark:text-slate-400 text-sm">
         © {new Date().getFullYear()} Grocify. All rights reserved.
       </div>
 

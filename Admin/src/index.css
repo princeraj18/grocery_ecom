@@ -1,2 +1,27 @@
 @import "tailwindcss";
 @custom-variant dark (&:where(.dark, .dark *));
+
+@layer base {
+  html {
+    @apply bg-white text-slate-900 antialiased;
+  }
+
+  html.dark {
+    @apply bg-slate-950 text-slate-100;
+  }
+
+  body,
+  #root {
+    @apply min-h-screen bg-inherit text-inherit;
+  }
+}
+
+@layer components {
+  .page-shell {
+    @apply min-h-screen bg-gray-50 text-slate-900 dark:bg-slate-950 dark:text-slate-100;
+  }
+
+  .panel-surface {
+    @apply rounded-xl border border-slate-200 bg-white shadow-sm dark:border-slate-800 dark:bg-slate-900;
+  }
+}

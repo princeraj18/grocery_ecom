@@ -73,7 +73,7 @@ export default function Navbar() {
 
   return (
 
-    <div className="bg-white shadow px-6 py-4 flex items-center justify-between dark:bg-slate-900 dark:text-white">
+    <div className="bg-white dark:bg-slate-900 shadow px-6 py-4 flex items-center justify-between dark:text-white">
 
       {/* TITLE */}
       <h1 className="text-2xl font-bold">
@@ -94,7 +94,7 @@ export default function Navbar() {
                 : "https://i.pravatar.cc/150"
             }
             alt="Vendor"
-            className="w-11 h-11 rounded-full object-cover border-2 border-gray-300"
+            className="w-11 h-11 rounded-full object-cover border-2 border-gray-300 dark:border-slate-700"
           />
 
           {/* NAME */}
@@ -106,7 +106,7 @@ export default function Navbar() {
               }
             </h3>
 
-            <p className="text-xs text-gray-500">
+            <p className="text-xs text-gray-500 dark:text-slate-400">
               {
                 vendor?.ownerName
               }

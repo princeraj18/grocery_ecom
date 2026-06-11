@@ -32,13 +32,13 @@ export default function VendorForgotPassword() {
       <div className="absolute top-4 right-4">
         <ThemeToggle />
       </div>
-      <div className="bg-white p-8 rounded-2xl shadow-lg w-full max-w-md">
-        <h1 className="text-3xl font-bold text-center mb-4 text-gray-800">Vendor Forgot Password</h1>
-        <p className="text-sm text-gray-500 text-center mb-6">Enter your store email registration.</p>
+      <div className="bg-white dark:bg-slate-900 p-8 rounded-2xl shadow-lg w-full max-w-md">
+        <h1 className="text-3xl font-bold text-center mb-4 text-gray-800 dark:text-slate-100">Vendor Forgot Password</h1>
+        <p className="text-sm text-gray-500 dark:text-slate-400 text-center mb-6">Enter your store email registration.</p>
 
         <form onSubmit={handleSubmit} className="space-y-5">
           <div>
-            <label className="font-semibold text-sm text-gray-700 block mb-2">Store Email Address</label>
+            <label className="font-semibold text-sm text-gray-700 dark:text-slate-300 block mb-2">Store Email Address</label>
             <input
               type="email"
               value={email}

@@ -33,9 +33,9 @@ export default function UserDetails() {
      ======================================================== */
   if (loading || !user) {
     return (
-      <div className="min-h-full bg-slate-50 text-slate-800 p-6 flex flex-col items-center justify-center gap-3">
+      <div className="min-h-full bg-slate-50 dark:bg-slate-900 text-slate-800 dark:text-slate-100 p-6 flex flex-col items-center justify-center gap-3">
         <Loader2 className="animate-spin text-indigo-600" size={32} />
-        <h2 className="text-sm font-bold uppercase tracking-widest text-slate-500">
+        <h2 className="text-sm font-bold uppercase tracking-widest text-slate-500 dark:text-slate-400">
           Retrieving Profile Records...
         </h2>
       </div>
@@ -43,25 +43,25 @@ export default function UserDetails() {
   }
 
   return (
-    <div className="min-h-full bg-slate-50 text-slate-800 p-6 space-y-6">
+    <div className="min-h-full bg-slate-50 dark:bg-slate-900 text-slate-800 dark:text-slate-100 p-6 space-y-6">
 
       {/* ========================================================
           HEADER WITH BACK INTERACTION
          ======================================================== */}
-      <div className="flex items-center gap-4 border-b border-slate-200 pb-6">
+      <div className="flex items-center gap-4 border-b border-slate-200 dark:border-slate-800 pb-6">
         <button
           onClick={() => navigate("/admin/users")}
-          className="p-2 bg-white hover:bg-slate-100 border border-slate-200 text-slate-600 hover:text-slate-900 rounded-xl transition shadow-sm"
+          className="p-2 bg-white dark:bg-slate-900 hover:bg-slate-100 border border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:text-white rounded-xl transition shadow-sm"
           title="Back to Users"
         >
           <ArrowLeft size={18} />
         </button>
 
         <div>
-          <h1 className="text-2xl md:text-3xl font-extrabold uppercase tracking-wide text-slate-900">
+          <h1 className="text-2xl md:text-3xl font-extrabold uppercase tracking-wide text-slate-900 dark:text-white">
             Account Dossier
           </h1>
-          <p className="text-xs text-slate-500 mt-1 uppercase font-bold tracking-widest">
+          <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 uppercase font-bold tracking-widest">
             Managing profile configurations for: <span className="text-indigo-600 font-black">{user.name}</span>
           </p>
         </div>
@@ -70,7 +70,7 @@ export default function UserDetails() {
       {/* ========================================================
           PROFILE INTERFACE CARD
          ======================================================== */}
-      <div className="bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden max-w-4xl">
+      <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-sm overflow-hidden max-w-4xl">
         
         {/* Decorative Top Banner */}
         <div className="h-24 bg-gradient-to-r from-indigo-600 to-violet-500 w-full" />
@@ -90,25 +90,25 @@ export default function UserDetails() {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-4">
             
             {/* Field: Full Name */}
-            <div className="flex items-start gap-3.5 p-4 bg-slate-50/60 border border-slate-100 rounded-xl">
+            <div className="flex items-start gap-3.5 p-4 bg-slate-50 dark:bg-slate-900/60 border border-slate-100 dark:border-slate-800 rounded-xl">
               <User size={20} className="text-slate-400 mt-0.5 shrink-0" />
               <div>
                 <span className="block text-[10px] font-black uppercase tracking-widest text-slate-400 mb-0.5">Full Name</span>
-                <span className="text-sm font-semibold text-slate-900">{user.name}</span>
+                <span className="text-sm font-semibold text-slate-900 dark:text-white">{user.name}</span>
               </div>
             </div>
 
             {/* Field: Email Address */}
-            <div className="flex items-start gap-3.5 p-4 bg-slate-50/60 border border-slate-100 rounded-xl">
+            <div className="flex items-start gap-3.5 p-4 bg-slate-50 dark:bg-slate-900/60 border border-slate-100 dark:border-slate-800 rounded-xl">
               <Mail size={20} className="text-slate-400 mt-0.5 shrink-0" />
               <div className="overflow-hidden">
                 <span className="block text-[10px] font-black uppercase tracking-widest text-slate-400 mb-0.5">Email Address</span>
-                <span className="text-sm font-medium text-slate-800 font-mono break-all">{user.email}</span>
+                <span className="text-sm font-medium text-slate-800 dark:text-slate-100 font-mono break-all">{user.email}</span>
               </div>
             </div>
 
             {/* Field: Access Clearance (Role) */}
-            <div className="flex items-start gap-3.5 p-4 bg-slate-50/60 border border-slate-100 rounded-xl">
+            <div className="flex items-start gap-3.5 p-4 bg-slate-50 dark:bg-slate-900/60 border border-slate-100 dark:border-slate-800 rounded-xl">
               {user.isAdmin ? (
                 <ShieldAlert size={20} className="text-purple-500 mt-0.5 shrink-0" />
               ) : (
@@ -117,11 +117,7 @@ export default function UserDetails() {
               <div>
                 <span className="block text-[10px] font-black uppercase tracking-widest text-slate-400 mb-0.5">Access Authorization</span>
                 <span
-                  className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-md text-xs font-bold uppercase tracking-wider border mt-1 ${
-                    user.isAdmin
-                      ? "bg-purple-50 text-purple-700 border-purple-200"
-                      : "bg-indigo-50 text-indigo-700 border-indigo-200"
-                  }`}
+                  className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-md text-xs font-bold uppercase tracking-wider border mt-1 ${ user.isAdmin ? "bg-purple-50 text-purple-700 border-purple-200" : "bg-indigo-50 text-indigo-700 border-indigo-200" }`}
                 >
                   {user.isAdmin ? "System Admin" : "Standard User"}
                 </span>
@@ -129,20 +125,20 @@ export default function UserDetails() {
             </div>
 
             {/* Field: Internal Record Identifier */}
-            <div className="flex items-start gap-3.5 p-4 bg-slate-50/60 border border-slate-100 rounded-xl">
+            <div className="flex items-start gap-3.5 p-4 bg-slate-50 dark:bg-slate-900/60 border border-slate-100 dark:border-slate-800 rounded-xl">
               <Hash size={20} className="text-slate-400 mt-0.5 shrink-0" />
               <div>
                 <span className="block text-[10px] font-black uppercase tracking-widest text-slate-400 mb-0.5">System Identifier (ID)</span>
-                <span className="text-sm font-mono text-slate-600 select-all">{user._id}</span>
+                <span className="text-sm font-mono text-slate-600 dark:text-slate-400 select-all">{user._id}</span>
               </div>
             </div>
 
             {/* Field: Creation Stamp */}
-            <div className="flex items-start gap-3.5 p-4 bg-slate-50/60 border border-slate-100 rounded-xl md:col-span-2">
+            <div className="flex items-start gap-3.5 p-4 bg-slate-50 dark:bg-slate-900/60 border border-slate-100 dark:border-slate-800 rounded-xl md:col-span-2">
               <Calendar size={20} className="text-slate-400 mt-0.5 shrink-0" />
               <div>
                 <span className="block text-[10px] font-black uppercase tracking-widest text-slate-400 mb-0.5">Registration Timestamp</span>
-                <span className="text-sm font-medium text-slate-800">
+                <span className="text-sm font-medium text-slate-800 dark:text-slate-100">
                   {new Date(user.createdAt).toLocaleDateString("en-US", {
                     weekday: "long",
                     year: "numeric",

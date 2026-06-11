@@ -77,7 +77,7 @@ const AddCategory = () => {
   };
 
   return (
-    <div className="flex min-h-screen bg-slate-50 text-slate-800 font-poppins overflow-hidden">
+    <div className="flex min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-800 dark:text-slate-100 font-poppins overflow-hidden">
       
       {/* MOBILE OVERLAY */}
       {sidebarOpen && (
@@ -98,17 +98,17 @@ const AddCategory = () => {
 
         {/* PAGE CONTENT SCROLL WRAPPER */}
         <div className="flex-1 overflow-y-auto p-4 md:p-6 lg:p-8">
-          <div className="max-w-3xl mx-auto bg-white rounded-2xl border border-slate-200 shadow-sm p-5 md:p-8 space-y-6">
+          <div className="max-w-3xl mx-auto bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm p-5 md:p-8 space-y-6">
             
             {/* COMPONENT HEADER */}
-            <div className="border-b border-slate-100 pb-5">
+            <div className="border-b border-slate-100 dark:border-slate-800 pb-5">
               <div className="flex items-center gap-2.5">
-                <FolderPlus className="text-indigo-600" size={26} />
-                <h1 className="text-2xl md:text-3xl font-extrabold text-slate-900 tracking-wide uppercase">
+                <FolderPlus className="text-indigo-600 dark:text-indigo-400" size={26} />
+                <h1 className="text-2xl md:text-3xl font-extrabold text-slate-900 dark:text-white tracking-wide uppercase">
                   Add Category
                 </h1>
               </div>
-              <p className="text-xs font-semibold text-slate-400 uppercase tracking-widest mt-1">
+              <p className="text-xs font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-widest mt-1">
                 Establish primary catalog taxonomies and layout routing parameters
               </p>
             </div>
@@ -118,7 +118,7 @@ const AddCategory = () => {
               
               {/* CATEGORY NAME */}
               <div className="space-y-1.5">
-                <label className="block text-xs font-extrabold uppercase tracking-wider text-slate-500">
+                <label className="block text-xs font-extrabold uppercase tracking-wider text-slate-500 dark:text-slate-400">
                   Category Display Title
                 </label>
                 <input
@@ -127,14 +127,14 @@ const AddCategory = () => {
                   value={formData.text}
                   onChange={handleChange}
                   placeholder="Ex: Organic Veggies, Fresh Fruits"
-                  className="w-full border border-slate-200 bg-slate-50/50 rounded-xl p-3 text-sm font-semibold outline-none focus:border-indigo-600 focus:bg-white transition"
+                  className="w-full border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 rounded-xl p-3 text-sm font-semibold text-slate-900 dark:text-slate-100 outline-none focus:border-indigo-600 dark:focus:border-indigo-500 transition"
                   required
                 />
               </div>
 
               {/* CATEGORY PATH */}
               <div className="space-y-1.5">
-                <label className="block text-xs font-extrabold uppercase tracking-wider text-slate-500">
+                <label className="block text-xs font-extrabold uppercase tracking-wider text-slate-500 dark:text-slate-400">
                   System URL Endpoint Route Path
                 </label>
                 <input
@@ -143,7 +143,7 @@ const AddCategory = () => {
                   value={formData.path}
                   onChange={handleChange}
                   placeholder="Ex: organic-vegetables"
-                  className="w-full border border-slate-200 bg-slate-50/50 rounded-xl p-3 text-sm font-semibold outline-none focus:border-indigo-600 focus:bg-white transition"
+                  className="w-full border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 rounded-xl p-3 text-sm font-semibold text-slate-900 dark:text-slate-100 outline-none focus:border-indigo-600 dark:focus:border-indigo-500 transition"
                   required
                 />
               </div>
@@ -153,7 +153,7 @@ const AddCategory = () => {
                 
                 {/* CATEGORY IMAGE FIELD */}
                 <div className="space-y-1.5">
-                  <label className="block text-xs font-extrabold uppercase tracking-wider text-slate-500 flex items-center gap-1.5">
+                  <label className="block text-xs font-extrabold uppercase tracking-wider text-slate-500 dark:text-slate-400 flex items-center gap-1.5">
                     <ImageIcon size={14} />
                     Category Core Asset Image
                   </label>
@@ -161,15 +161,15 @@ const AddCategory = () => {
                     type="file"
                     accept="image/*"
                     onChange={handleImageChange}
-                    className="w-full border border-slate-200 bg-slate-50/50 text-slate-500 file:mr-4 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-bold file:bg-slate-200 file:text-slate-700 hover:file:bg-slate-300 rounded-xl p-2 text-sm font-medium focus:outline-none transition"
+                    className="w-full border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 text-slate-500 dark:text-slate-400 file:mr-4 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-bold file:bg-slate-200 file:text-slate-700 dark:file:bg-slate-800 dark:file:text-slate-200 hover:file:bg-slate-300 dark:hover:file:bg-slate-700 rounded-xl p-2 text-sm font-medium focus:outline-none transition"
                     required={!image}
                   />
                   {preview && (
-                    <div className="mt-3 relative inline-block group">
+                    <div className="mt-3 relative inline-block">
                       <img
                         src={preview}
                         alt="Preview"
-                        className="w-40 h-28 object-cover rounded-xl border border-slate-200 shadow-xs"
+                        className="w-40 h-28 object-cover rounded-xl border border-slate-200 dark:border-slate-800 shadow-xs"
                       />
                     </div>
                   )}
@@ -177,7 +177,7 @@ const AddCategory = () => {
 
                 {/* BACKGROUND COLOR ACCENT FIELD */}
                 <div className="space-y-1.5">
-                  <label className="block text-xs font-extrabold uppercase tracking-wider text-slate-500 flex items-center gap-1.5">
+                  <label className="block text-xs font-extrabold uppercase tracking-wider text-slate-500 dark:text-slate-400 flex items-center gap-1.5">
                     <Palette size={14} />
                     Accent Background Tint Color
                   </label>
@@ -187,13 +187,13 @@ const AddCategory = () => {
                       name="bgColor"
                       value={formData.bgColor}
                       onChange={handleChange}
-                      className="w-16 h-12 border border-slate-200 rounded-xl cursor-pointer p-1 bg-white"
+                      className="w-16 h-12 border border-slate-200 dark:border-slate-800 rounded-xl cursor-pointer p-1 bg-slate-50 dark:bg-slate-950"
                     />
                     <input
                       type="text"
                       value={formData.bgColor}
                       disabled
-                      className="border border-slate-200 bg-slate-100 rounded-xl p-3 text-xs font-mono font-bold text-slate-500 flex-1 uppercase tracking-wider"
+                      className="border border-slate-200 dark:border-slate-800 bg-slate-100 dark:bg-slate-950 rounded-xl p-3 text-xs font-mono font-bold text-slate-500 dark:text-slate-400 flex-1 uppercase tracking-wider"
                     />
                   </div>
                 </div>
@@ -201,33 +201,37 @@ const AddCategory = () => {
               </div>
 
               {/* REALTIME VISUAL CARD PREVIEW CONTEXT */}
-              <div className="border border-slate-200 bg-slate-50/50 rounded-2xl p-4 md:p-5">
-                <h3 className="text-xs font-black uppercase tracking-wider text-slate-400 mb-3 flex items-center gap-1.5">
+              <div className="border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950/60 rounded-2xl p-4 md:p-5">
+                <h3 className="text-xs font-black uppercase tracking-wider text-slate-400 dark:text-slate-500 mb-3 flex items-center gap-1.5">
                   <Eye size={14} />
                   Live Front-End Display Preview
                 </h3>
 
                 <div
-                  className="rounded-xl p-4 flex items-center gap-4 border border-slate-200/40 shadow-xs max-w-sm transition-all duration-300"
+                  className="rounded-xl p-4 flex items-center gap-4 border border-slate-200 dark:border-slate-800/40 shadow-xs max-w-sm transition-all duration-300 relative overflow-hidden"
                   style={{ backgroundColor: formData.bgColor }}
                 >
+                  {/* Dynamic Blend Mask Container to protect text readability on extreme backgrounds */}
+                  <div className="absolute inset-0 bg-slate-950/5 opacity-0 dark:opacity-20 pointer-events-none" />
+
                   {preview ? (
                     <img
                       src={preview}
                       alt="Category Visual Asset"
-                      className="w-14 h-14 md:w-16 md:h-16 object-cover rounded-xl border border-white bg-white/20 shadow-xs shrink-0"
+                      className="w-14 h-14 md:w-16 md:h-16 object-cover rounded-xl border border-white dark:border-slate-800 bg-white dark:bg-slate-900 shadow-xs shrink-0 z-10"
                     />
                   ) : (
-                    <div className="w-14 h-14 md:w-16 md:h-16 bg-slate-200/50 border border-dashed border-slate-300 rounded-xl flex items-center justify-center text-slate-400 shrink-0">
+                    <div className="w-14 h-14 md:w-16 md:h-16 bg-slate-200/60 dark:bg-slate-800/60 border border-dashed border-slate-300 dark:border-slate-700 rounded-xl flex items-center justify-center text-slate-400 dark:text-slate-500 shrink-0 z-10">
                       <ImageIcon size={20} />
                     </div>
                   )}
 
-                  <div className="truncate">
-                    <h4 className="font-extrabold text-base text-slate-900 truncate">
+                  <div className="truncate z-10 mix-blend-difference inverse-text-filter">
+                    {/* Note: In absolute dark preview colors, 'mix-blend-difference' cleanly forces white values */}
+                    <h4 className="font-extrabold text-base text-slate-900 dark:text-white truncate">
                       {formData.text || "New Category Title"}
                     </h4>
-                    <p className="text-xs font-semibold text-slate-500 tracking-wide font-mono truncate mt-0.5">
+                    <p className="text-xs font-semibold text-slate-600 dark:text-slate-300 tracking-wide font-mono truncate mt-0.5 opacity-90">
                       /{formData.path || "unassigned-route"}
                     </p>
                   </div>
@@ -239,7 +243,7 @@ const AddCategory = () => {
                 <button
                   type="submit"
                   disabled={loading}
-                  className="w-full sm:w-auto bg-indigo-600 hover:bg-indigo-700 text-white px-8 py-3 rounded-xl text-sm font-bold transition shadow-md shadow-indigo-600/10 flex items-center justify-center gap-2 disabled:opacity-50"
+                  className="w-full sm:w-auto bg-indigo-600 hover:bg-indigo-700 dark:bg-indigo-600 dark:hover:bg-indigo-500 text-white px-8 py-3 rounded-xl text-sm font-bold transition shadow-md shadow-indigo-600/10 flex items-center justify-center gap-2 disabled:opacity-50"
                 >
                   {loading ? (
                     <>

@@ -1,4 +1,5 @@
 import Navbar from "./components/Navbar";
+import LayoutWrapper from "./components/LayoutWrapper";
 import Footer from "./components/Footer";
 
 import AppRoutes from "./routes/AppRoutes";
@@ -27,14 +28,14 @@ function App() {
 
   // CHECK IF NAVBAR SHOULD HIDE
   const hideLayout =
-    hiddenRoutes.includes(location.pathname) ||
+    hiddenRoutes.some(route => location.pathname === route || location.pathname.startsWith(route + "/")) ||
     isVendorRoute;
 
   return (
-    <>
+    <LayoutWrapper>
 
       {/* NAVBAR */}
-      {/* {!hideLayout && <Navbar />} */}
+      {!hideLayout && <Navbar />}
 
       {/* ROUTES */}
       <AppRoutes />
@@ -42,7 +43,7 @@ function App() {
       {/* FOOTER */}
       {!hideLayout && <Footer />}
 
-    </>
+    </LayoutWrapper>
   );
 }
 

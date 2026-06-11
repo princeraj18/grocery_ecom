@@ -84,7 +84,7 @@ export default function VendorLogin() {
 
   return (
 
-    <div className="min-h-screen flex items-center justify-center bg-gray-100 relative">
+    <div className="min-h-screen flex items-center justify-center bg-gray-100 dark:bg-slate-950 relative">
 
       <div className="absolute top-6 right-6 flex items-center gap-3">
         <ThemeToggle />
@@ -96,7 +96,7 @@ export default function VendorLogin() {
         </Link>
       </div>
 
-      <div className="bg-white p-8 rounded-2xl shadow-lg w-full max-w-md">
+      <div className="bg-white dark:bg-slate-900 p-8 rounded-2xl shadow-lg w-full max-w-md">
 
         <h1 className="text-3xl font-bold text-center mb-8">
           Vendor Login

@@ -81,20 +81,20 @@ const [formData, setFormData] = useState({
       </div>
 
       {/* Right Section */}
-      <div className="w-full lg:w-1/2 flex items-center justify-center bg-gray-50 px-6 py-10">
-        <div className="w-full max-w-md bg-white p-8 rounded-2xl shadow-lg">
-          <h2 className="text-3xl font-bold text-center text-gray-800">
+      <div className="w-full lg:w-1/2 flex items-center justify-center bg-gray-50 dark:bg-slate-900 px-6 py-10">
+        <div className="w-full max-w-md bg-white dark:bg-slate-900 p-8 rounded-2xl shadow-lg">
+          <h2 className="text-3xl font-bold text-center text-gray-800 dark:text-slate-100">
             Create Account
           </h2>
 
-          <p className="text-center text-gray-500 mt-2">
+          <p className="text-center text-gray-500 dark:text-slate-400 mt-2">
             Fill in your details to get started
           </p>
 
           <form onSubmit={handleSubmit} className="mt-8 space-y-4">
             {/* Full Name */}
             <div>
-              <label className="block mb-2 text-sm font-medium text-gray-700">
+              <label className="block mb-2 text-sm font-medium text-gray-700 dark:text-slate-300">
                 Full Name
               </label>
 
@@ -105,13 +105,13 @@ const [formData, setFormData] = useState({
         value={formData.name}
         onChange={handleChange}
         className="w-full border p-3 rounded-lg"
-                className="w-full border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                className="w-full border border-gray-300 dark:border-slate-700 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-indigo-500"
               />
             </div>
 
             {/* Email */}
             <div>
-              <label className="block mb-2 text-sm font-medium text-gray-700">
+              <label className="block mb-2 text-sm font-medium text-gray-700 dark:text-slate-300">
                 Email Address
               </label>
 
@@ -121,7 +121,7 @@ const [formData, setFormData] = useState({
   placeholder="Enter your email"
   value={formData.email}
   onChange={handleChange}
-  className="w-full border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+  className="w-full border border-gray-300 dark:border-slate-700 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-indigo-500"
 />
             </div>
 
@@ -129,7 +129,7 @@ const [formData, setFormData] = useState({
 
             {/* Password */}
             <div>
-              <label className="block mb-2 text-sm font-medium text-gray-700">
+              <label className="block mb-2 text-sm font-medium text-gray-700 dark:text-slate-300">
                 Password
               </label>
 
@@ -139,7 +139,7 @@ const [formData, setFormData] = useState({
         placeholder="Password"
         value={formData.password}
         onChange={handleChange}
-                className="w-full border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                className="w-full border border-gray-300 dark:border-slate-700 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-indigo-500"
               />
             </div>
 
@@ -160,7 +160,7 @@ const [formData, setFormData] = useState({
          
 
           {/* Login Link */}
-          <p className="text-center text-gray-600 mt-6">
+          <p className="text-center text-gray-600 dark:text-slate-400 mt-6">
             Already have an account?{" "}
             <Link
               to="/login"

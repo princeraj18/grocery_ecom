@@ -36,22 +36,22 @@ const ForgotPassword = () => {
       <div className="absolute top-4 right-4">
         <ThemeToggle />
       </div>
-      <div className="w-full max-w-md bg-white p-8 rounded-2xl shadow-lg">
-        <h2 className="text-3xl font-bold text-center text-gray-800">Forgot Password</h2>
-        <p className="text-center text-gray-500 mt-2">
+      <div className="w-full max-w-md bg-white dark:bg-slate-900 p-8 rounded-2xl shadow-lg">
+        <h2 className="text-3xl font-bold text-center text-gray-800 dark:text-slate-100">Forgot Password</h2>
+        <p className="text-center text-gray-500 dark:text-slate-400 mt-2">
           Enter your email to receive a secure recovery link.
         </p>
 
         <form onSubmit={handleSubmit} className="mt-8 space-y-5">
           <div>
-            <label className="block mb-2 text-sm font-medium text-gray-700">Email Address</label>
+            <label className="block mb-2 text-sm font-medium text-gray-700 dark:text-slate-300">Email Address</label>
             <input
               type="email"
               placeholder="name@example.com"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
-              className="w-full border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              className="w-full border border-gray-300 dark:border-slate-700 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-indigo-500"
             />
           </div>
 
@@ -76,7 +76,7 @@ const ForgotPassword = () => {
           </div>
         )}
 
-        <p className="text-center text-gray-600 mt-6">
+        <p className="text-center text-gray-600 dark:text-slate-400 mt-6">
           Back to <Link to="/login" className="text-indigo-600 font-semibold hover:text-indigo-800">Login</Link>
         </p>
       </div>

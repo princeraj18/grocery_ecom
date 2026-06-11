@@ -51,16 +51,16 @@ export default function Order() {
   };
 
   return (
-    <div className="p-4 md:p-8 bg-slate-50 min-h-screen text-slate-800 font-poppins space-y-6">
+    <div className="p-4 md:p-8 bg-slate-50 dark:bg-slate-900 min-h-screen text-slate-800 dark:text-slate-100 font-poppins space-y-6">
       
       {/* ========================================================
           HEADER HERO SECTION
          ======================================================== */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 border-b border-slate-200 pb-5">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 border-b border-slate-200 dark:border-slate-800 pb-5">
         <div>
           <div className="flex items-center gap-2.5">
             <ShoppingBag className="text-indigo-600" size={26} />
-            <h1 className="text-2xl md:text-3xl font-extrabold text-slate-900 tracking-wide uppercase">
+            <h1 className="text-2xl md:text-3xl font-extrabold text-slate-900 dark:text-white tracking-wide uppercase">
               Order Ledger
             </h1>
           </div>
@@ -70,13 +70,13 @@ export default function Order() {
         </div>
 
         {/* Dynamic Metric Display Badge Counter */}
-        <div className="bg-white border border-slate-200 px-5 py-3 rounded-2xl shadow-sm flex items-center gap-4 self-start sm:self-auto">
+        <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 px-5 py-3 rounded-2xl shadow-sm flex items-center gap-4 self-start sm:self-auto">
           <div className="h-10 w-10 rounded-xl bg-indigo-50 flex items-center justify-center text-indigo-600 shrink-0">
             <Package size={20} />
           </div>
           <div>
             <span className="block text-[10px] font-black tracking-widest uppercase text-slate-400">Total Pipeline</span>
-            <span className="text-2xl font-black text-slate-900 leading-none">{orders.length}</span>
+            <span className="text-2xl font-black text-slate-900 dark:text-white leading-none">{orders.length}</span>
           </div>
         </div>
       </div>
@@ -85,15 +85,15 @@ export default function Order() {
           DESKTOP MANAGEMENT MATRIX TABLE VIEW
          ======================================================== */}
       {loading ? (
-        <div className="bg-white border border-slate-200 p-12 rounded-2xl text-center shadow-sm flex flex-col items-center justify-center gap-3">
+        <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-12 rounded-2xl text-center shadow-sm flex flex-col items-center justify-center gap-3">
           <div className="animate-spin text-indigo-600 rounded-full h-8 w-8 border-2 border-indigo-600 border-t-transparent" />
           <span className="text-xs font-extrabold uppercase tracking-widest text-slate-400">Fetching System Invoices...</span>
         </div>
       ) : (
-        <div className="hidden lg:block bg-white border border-slate-200 shadow-sm rounded-2xl overflow-hidden">
+        <div className="hidden lg:block bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm rounded-2xl overflow-hidden">
           <table className="w-full border-collapse text-left">
             <thead>
-              <tr className="bg-slate-50/70 border-b border-slate-200 text-slate-400 text-[11px] font-black uppercase tracking-widest">
+              <tr className="bg-slate-50 dark:bg-slate-900/70 border-b border-slate-200 dark:border-slate-800 text-slate-400 text-[11px] font-black uppercase tracking-widest">
                 <th className="p-4 pl-6">Order Identity</th>
                 <th className="p-4">Customer Credentials</th>
                 <th className="p-4 w-1/3">Products Catalog Summary</th>
@@ -102,17 +102,17 @@ export default function Order() {
                 <th className="p-4 pr-6 text-center">Fulfillment Status</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-100 text-sm font-semibold text-slate-700">
+            <tbody className="divide-y divide-slate-100 text-sm font-semibold text-slate-700 dark:text-slate-300">
               {orders.length === 0 ? (
                 <tr>
-                  <td colSpan="6" className="p-12 text-center text-slate-400 uppercase tracking-widest font-bold text-xs bg-white">
+                  <td colSpan="6" className="p-12 text-center text-slate-400 uppercase tracking-widest font-bold text-xs bg-white dark:bg-slate-900">
                     <Inbox className="mx-auto text-slate-300 mb-2" size={32} />
                     No orders documented inside the ecosystem.
                   </td>
                 </tr>
               ) : (
                 orders.map((order) => (
-                  <tr key={order._id} className="hover:bg-slate-50/50 transition-colors group">
+                  <tr key={order._id} className="hover:bg-slate-700 dark:bg-slate-900/50 transition-colors group">
                     
                     {/* Order ID & Meta Timestamp Data */}
                     <td className="p-4 pl-6">
@@ -129,7 +129,7 @@ export default function Order() {
 
                     {/* Customer Account Target */}
                     <td className="p-4 space-y-0.5">
-                      <div className="flex items-center gap-1.5 text-slate-900 font-bold text-sm">
+                      <div className="flex items-center gap-1.5 text-slate-900 dark:text-white font-bold text-sm">
                         <User size={14} className="text-slate-400" />
                         <span>{order.shippingAddress?.firstName} {order.shippingAddress?.lastName}</span>
                       </div>
@@ -147,16 +147,16 @@ export default function Order() {
                     <td className="p-4">
                       <div className="space-y-2">
                         {order.items?.slice(0, 2).map((item, index) => (
-                          <div key={index} className="flex items-center gap-3 bg-slate-50/80 p-1.5 rounded-xl border border-slate-100">
+                          <div key={index} className="flex items-center gap-3 bg-slate-50 dark:bg-slate-900/80 p-1.5 rounded-xl border border-slate-100 dark:border-slate-800">
                             <img
                               src={item.image || "https://images.unsplash.com/photo-1546069901-ba9599a7e63c"}
                               alt={item.name}
-                              className="w-10 h-10 rounded-lg object-cover border bg-white"
+                              className="w-10 h-10 rounded-lg object-cover border bg-white dark:bg-slate-900"
                             />
                             <div className="min-w-0 flex-1">
-                              <p className="font-bold text-xs text-slate-900 truncate">{item.name}</p>
+                              <p className="font-bold text-xs text-slate-900 dark:text-white truncate">{item.name}</p>
                               <p className="text-[10px] text-slate-400 uppercase tracking-wider font-extrabold mt-0.5">
-                                Unit Count: <span className="text-slate-700">{item.quantity}</span>
+                                Unit Count: <span className="text-slate-700 dark:text-slate-300">{item.quantity}</span>
                               </p>
                             </div>
                           </div>
@@ -171,19 +171,17 @@ export default function Order() {
                     </td>
 
                     {/* Financial Summary */}
-                    <td className="p-4 font-extrabold text-base text-slate-900">
+                    <td className="p-4 font-extrabold text-base text-slate-900 dark:text-white">
                       ₹{order.totalAmount?.toLocaleString("en-IN")}
                     </td>
 
                     {/* Payment Operations State */}
                     <td className="p-4 space-y-1">
-                      <div className="flex items-center gap-1 text-xs text-slate-500 font-medium">
+                      <div className="flex items-center gap-1 text-xs text-slate-500 dark:text-slate-400 font-medium">
                         <CreditCard size={12} className="text-slate-400" />
                         <span>{order.paymentMethod}</span>
                       </div>
-                      <span className={`inline-flex items-center gap-1 text-[10px] font-black uppercase tracking-wider ${
-                        order.paymentStatus === "Paid" ? "text-emerald-600" : "text-rose-600"
-                      }`}>
+                      <span className={`inline-flex items-center gap-1 text-[10px] font-black uppercase tracking-wider ${ order.paymentStatus === "Paid" ? "text-emerald-600" : "text-rose-600" }`}>
                         <span className={`h-1.5 w-1.5 rounded-full ${order.paymentStatus === "Paid" ? "bg-emerald-500" : "bg-rose-500"}`} />
                         {order.paymentStatus}
                       </span>
@@ -210,20 +208,20 @@ export default function Order() {
       {!loading && (
         <div className="lg:hidden space-y-4">
           {orders.length === 0 ? (
-            <div className="bg-white border border-slate-200 rounded-2xl p-8 text-center text-slate-400 font-bold uppercase tracking-widest text-xs">
+            <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-8 text-center text-slate-400 font-bold uppercase tracking-widest text-xs">
               No orders documented inside the ecosystem.
             </div>
           ) : (
             orders.map((order) => (
-              <div key={order._id} className="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm space-y-4">
+              <div key={order._id} className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-5 shadow-sm space-y-4">
                 
                 {/* Header Metadata Section */}
-                <div className="flex justify-between items-start border-b border-slate-100 pb-3">
+                <div className="flex justify-between items-start border-b border-slate-100 dark:border-slate-800 pb-3">
                   <div>
                     <span className="font-mono text-xs font-bold text-indigo-600 bg-indigo-50 px-2 py-0.5 rounded">
                       #{order._id.slice(-6).toUpperCase()}
                     </span>
-                    <p className="text-slate-900 font-extrabold text-base mt-1.5">
+                    <p className="text-slate-900 dark:text-white font-extrabold text-base mt-1.5">
                       {order.shippingAddress?.firstName} {order.shippingAddress?.lastName}
                     </p>
                   </div>
@@ -239,10 +237,10 @@ export default function Order() {
                       <img
                         src={item.image || "https://images.unsplash.com/photo-1546069901-ba9599a7e63c"}
                         alt={item.name}
-                        className="w-12 h-12 rounded-xl object-cover border shrink-0 bg-slate-50"
+                        className="w-12 h-12 rounded-xl object-cover border shrink-0 bg-slate-50 dark:bg-slate-900"
                       />
                       <div className="min-w-0 flex-1">
-                        <p className="font-semibold text-slate-900 text-sm truncate">{item.name}</p>
+                        <p className="font-semibold text-slate-900 dark:text-white text-sm truncate">{item.name}</p>
                         <p className="text-xs text-slate-400 font-medium mt-0.5">Quantity Order: {item.quantity}</p>
                       </div>
                     </div>
@@ -250,14 +248,14 @@ export default function Order() {
                 </div>
 
                 {/* Footer Dynamic Matrix Metrics Block */}
-                <div className="border-t border-slate-100 pt-3 flex items-center justify-between bg-slate-50/70 -mx-5 -mb-5 p-4 rounded-b-2xl">
+                <div className="border-t border-slate-100 dark:border-slate-800 pt-3 flex items-center justify-between bg-slate-50 dark:bg-slate-900/70 -mx-5 -mb-5 p-4 rounded-b-2xl">
                   <div>
                     <span className="block text-[9px] font-black tracking-widest uppercase text-slate-400">Total Remittance</span>
-                    <span className="text-lg font-black text-slate-900">₹{order.totalAmount?.toLocaleString("en-IN")}</span>
+                    <span className="text-lg font-black text-slate-900 dark:text-white">₹{order.totalAmount?.toLocaleString("en-IN")}</span>
                   </div>
                   <div className="text-right">
                     <span className="block text-[9px] font-black tracking-widest uppercase text-slate-400">Method & Settlement</span>
-                    <p className="text-xs font-bold text-slate-700 mt-0.5">
+                    <p className="text-xs font-bold text-slate-700 dark:text-slate-300 mt-0.5">
                       {order.paymentMethod} • <span className={order.paymentStatus === "Paid" ? "text-emerald-600" : "text-rose-500"}>{order.paymentStatus}</span>
                     </p>
                   </div>

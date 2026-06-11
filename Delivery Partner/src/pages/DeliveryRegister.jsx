@@ -4,7 +4,7 @@ import axios from 'axios';
 import ThemeToggle from '../components/ThemeToggle';
 
 const inputClassName =
-  'w-full px-4 py-3 rounded-xl bg-white border border-gray-300 text-gray-900 placeholder-gray-400 focus:outline-none focus:border-orange-500 dark:bg-slate-800 dark:border-slate-700 dark:text-white dark:placeholder-slate-500';
+  'w-full px-4 py-3 rounded-xl bg-white dark:bg-slate-900 border border-gray-300 dark:border-slate-700 text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:border-orange-500 dark:bg-slate-800 dark:border-slate-700 dark:text-white dark:placeholder-slate-500';
 
 export default function DeliveryRegister() {
   const [formData, setFormData] = useState({

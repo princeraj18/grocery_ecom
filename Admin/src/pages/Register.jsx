@@ -101,7 +101,7 @@ export default function Register() {
 
       <form
         onSubmit={handleSubmit}
-        className="bg-white p-8 rounded-2xl shadow-lg w-full max-w-md"
+        className="bg-white dark:bg-slate-900 p-8 rounded-2xl shadow-lg w-full max-w-md"
       >
 
         <h1 className="text-3xl font-bold mb-6 text-center">
@@ -155,7 +155,7 @@ export default function Register() {
         </button>
 
         {/* LOGIN OPTION */}
-        <p className="text-center mt-5 text-gray-600">
+        <p className="text-center mt-5 text-gray-600 dark:text-slate-400">
           Already have an account?
         </p>
 

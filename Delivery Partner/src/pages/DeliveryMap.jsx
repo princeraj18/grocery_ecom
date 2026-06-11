@@ -110,9 +110,9 @@ export default function DeliveryMap() {
   if (!order) {
     return (
       <div className="max-w-4xl mx-auto p-4 sm:p-6 space-y-6 animate-pulse">
-        <div className="h-6 bg-gray-200 rounded-md w-1/4" />
-        <div className="h-[450px] bg-gray-200 rounded-2xl" />
-        <div className="h-32 bg-gray-200 rounded-2xl" />
+        <div className="h-6 bg-gray-200 dark:bg-slate-800 rounded-md w-1/4" />
+        <div className="h-[450px] bg-gray-200 dark:bg-slate-800 rounded-2xl" />
+        <div className="h-32 bg-gray-200 dark:bg-slate-800 rounded-2xl" />
       </div>
     );
   }
@@ -130,28 +130,28 @@ export default function DeliveryMap() {
         <div className="space-y-1">
           <button
             onClick={() => navigate("/orders")}
-            className="inline-flex items-center gap-1 text-[11px] font-bold text-gray-400 hover:text-gray-900 uppercase tracking-wider mb-1 transition-colors"
+            className="inline-flex items-center gap-1 text-[11px] font-bold text-gray-400 dark:text-slate-500 dark:text-slate-400 hover:text-gray-900 dark:text-white uppercase tracking-wider mb-1 transition-colors"
           >
             <ChevronLeft size={14} /> Back to active orders
           </button>
-          <h1 className="text-xl font-bold text-gray-900 uppercase tracking-wider flex items-center gap-2">
+          <h1 className="text-xl font-bold text-gray-900 dark:text-white uppercase tracking-wider flex items-center gap-2">
             <Navigation size={18} className="text-orange-500" /> Transit Map
           </h1>
-          <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest">
+          <p className="text-[10px] text-gray-400 dark:text-slate-500 dark:text-slate-400 font-bold uppercase tracking-widest">
             Order Reference: #{order._id.slice(-6).toUpperCase()}
           </p>
         </div>
 
         {/* CURRENT LIVE LOG STATUS INSIGNIA BADGE */}
         <div className="self-start sm:self-center">
-          <span className="text-[10px] font-bold uppercase tracking-wider px-3 py-1.5 rounded-lg bg-gray-100 border border-gray-200 text-gray-700">
+          <span className="text-[10px] font-bold uppercase tracking-wider px-3 py-1.5 rounded-lg bg-gray-100 dark:bg-slate-950 border border-gray-200 dark:border-slate-800 text-gray-700 dark:text-slate-300">
             Status: {order.deliveryStatus}
           </span>
         </div>
       </div>
 
       {/* EMBEDDED MAP VIEWPORT COMPONENT */}
-      <div className="bg-white rounded-2xl overflow-hidden border border-gray-200/80 shadow-sm">
+      <div className="bg-white dark:bg-slate-900 rounded-2xl overflow-hidden border border-gray-200 dark:border-slate-800/80 shadow-sm">
         <iframe
           title="Google Map Navigation Embed"
           width="100%"
@@ -164,22 +164,22 @@ export default function DeliveryMap() {
       </div>
 
       {/* CUSTOMER PROFILE ADDRESS DETAIL BLOCK */}
-      <div className="bg-white border border-gray-200/70 shadow-sm rounded-2xl p-6 space-y-4">
+      <div className="bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-800/70 shadow-sm rounded-2xl p-6 space-y-4">
         <div className="flex items-center gap-2 border-b border-gray-100 pb-3">
-          <MapPin size={15} className="text-gray-400" />
-          <h2 className="text-sm font-bold text-gray-900 uppercase tracking-wider">
+          <MapPin size={15} className="text-gray-400 dark:text-slate-500 dark:text-slate-400" />
+          <h2 className="text-sm font-bold text-gray-900 dark:text-white uppercase tracking-wider">
             Consignee Delivery Hub Address
           </h2>
         </div>
 
         <div className="space-y-1">
-          <p className="text-xs font-bold text-gray-900">
+          <p className="text-xs font-bold text-gray-900 dark:text-white">
             {order.shippingAddress?.firstName} {order.shippingAddress?.lastName}
           </p>
-          <p className="text-xs font-medium text-gray-500">
+          <p className="text-xs font-medium text-gray-500 dark:text-slate-400">
             {order.shippingAddress?.street}
           </p>
-          <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide text-[11px]">
+          <p className="text-xs font-semibold text-gray-400 dark:text-slate-500 dark:text-slate-400 uppercase tracking-wide text-[11px]">
             {order.shippingAddress?.city}
           </p>
         </div>
@@ -187,10 +187,10 @@ export default function DeliveryMap() {
         {order.shippingAddress?.phone && (
           <div className="pt-4 border-t border-gray-100 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div>
-              <span className="text-[10px] text-gray-400 font-bold uppercase tracking-wider block">
+              <span className="text-[10px] text-gray-400 dark:text-slate-500 dark:text-slate-400 font-bold uppercase tracking-wider block">
                 Comms Channel Link
               </span>
-              <span className="text-xs font-bold text-gray-800 mt-0.5 block">
+              <span className="text-xs font-bold text-gray-800 dark:text-slate-100 mt-0.5 block">
                 +91 {order.shippingAddress.phone}
               </span>
             </div>

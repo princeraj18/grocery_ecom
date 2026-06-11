@@ -84,13 +84,13 @@ export default function AdminVariant() {
   };
 
   return (
-    <div className="p-4 md:p-8 bg-slate-50 min-h-screen text-slate-800 font-poppins space-y-6">
+    <div className="p-4 md:p-8 bg-slate-50 dark:bg-slate-900 min-h-screen text-slate-800 dark:text-slate-100 font-poppins space-y-6">
       
       {/* HEADER SECTION */}
-      <div className="border-b border-slate-200 pb-5">
+      <div className="border-b border-slate-200 dark:border-slate-800 pb-5">
         <div className="flex items-center gap-2.5">
           <Layers className="text-indigo-600" size={26} />
-          <h1 className="text-2xl md:text-3xl font-extrabold text-slate-900 tracking-wide uppercase">
+          <h1 className="text-2xl md:text-3xl font-extrabold text-slate-900 dark:text-white tracking-wide uppercase">
             Manage Variants
           </h1>
         </div>
@@ -100,8 +100,8 @@ export default function AdminVariant() {
       </div>
 
       {/* STREAMLINED FORM SECTION */}
-      <div className="bg-white border border-slate-200 shadow-sm rounded-2xl p-5 md:p-6 max-w-2xl">
-        <h2 className="text-sm font-black text-slate-900 uppercase tracking-wider mb-4 flex items-center gap-2">
+      <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm rounded-2xl p-5 md:p-6 max-w-2xl">
+        <h2 className="text-sm font-black text-slate-900 dark:text-white uppercase tracking-wider mb-4 flex items-center gap-2">
           <PlusCircle size={16} className="text-indigo-600" />
           Add New Variant Name
         </h2>
@@ -109,7 +109,7 @@ export default function AdminVariant() {
         <form onSubmit={handleSubmit} className="flex flex-col sm:flex-row gap-4 items-end">
           {/* VARIANT NAME INPUT */}
           <div className="space-y-1.5 flex-1 w-full">
-            <label className="block text-xs font-extrabold uppercase tracking-wider text-slate-500">
+            <label className="block text-xs font-extrabold uppercase tracking-wider text-slate-500 dark:text-slate-400">
               Variant Name / Size
             </label>
             <input
@@ -118,7 +118,7 @@ export default function AdminVariant() {
               placeholder="Ex: 1kg, 500ml, XL, Red"
               value={size}
               onChange={(e) => setSize(e.target.value)}
-              className="border border-slate-200 bg-slate-50/50 p-2.5 rounded-xl w-full text-sm font-semibold outline-none focus:border-indigo-600 focus:bg-white transition"
+              className="border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-100/50 p-2.5 rounded-xl w-full text-sm font-semibold outline-none focus:border-indigo-600 focus:border-indigo-300 dark:bg-slate-900 transition"
               required
             />
           </div>
@@ -150,12 +150,12 @@ export default function AdminVariant() {
         </h2>
 
         {fetchLoading ? (
-          <div className="bg-white border border-slate-200 p-12 rounded-2xl text-center shadow-sm flex flex-col items-center justify-center gap-3 max-w-2xl">
+          <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-12 rounded-2xl text-center shadow-sm flex flex-col items-center justify-center gap-3 max-w-2xl">
             <Loader2 className="animate-spin text-indigo-600" size={28} />
             <span className="text-xs font-extrabold uppercase tracking-widest text-slate-400">Syncing Matrix...</span>
           </div>
         ) : variants.length === 0 ? (
-          <div className="bg-white border border-slate-200 rounded-2xl p-12 text-center text-slate-400 max-w-2xl">
+          <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-12 text-center text-slate-400 max-w-2xl">
             <Inbox className="mx-auto text-slate-300 mb-2" size={36} />
             <p className="text-xs font-extrabold uppercase tracking-widest">No Active Variants Configured</p>
           </div>
@@ -164,10 +164,10 @@ export default function AdminVariant() {
             {variants.map((variant) => (
               <div
                 key={variant._id}
-                className="bg-white rounded-2xl shadow-sm border border-slate-200 p-4 flex items-center justify-between hover:border-slate-300 transition-all"
+                className="bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-800 p-4 flex items-center justify-between hover:border-slate-300 transition-all"
               >
                 {/* Variant Label Metric */}
-                <span className="text-sm font-extrabold text-slate-900 bg-slate-50 px-3 py-1.5 rounded-xl border border-slate-100 truncate max-w-[70%]">
+                <span className="text-sm font-extrabold text-slate-900 dark:text-white bg-slate-50 dark:bg-slate-900 px-3 py-1.5 rounded-xl border border-slate-100 dark:border-slate-800 truncate max-w-[70%]">
                   {variant.size}
                 </span>
 
@@ -175,7 +175,7 @@ export default function AdminVariant() {
                 <button
                   onClick={() => deleteVariant(variant._id)}
                   title="Delete Variant"
-                  className="h-8 w-8 rounded-xl bg-slate-50 hover:bg-rose-50 text-slate-400 hover:text-rose-600 flex items-center justify-center transition border border-slate-100 hover:border-rose-100 shrink-0"
+                  className="h-8 w-8 rounded-xl bg-slate-50 dark:bg-slate-900 hover:bg-rose-50 text-slate-400 hover:text-rose-600 flex items-center justify-center transition border border-slate-100 dark:border-slate-800 hover:border-rose-100 shrink-0"
                 >
                   <Trash2 size={15} />
                 </button>

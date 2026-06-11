@@ -49,7 +49,7 @@ export default function AdminResetPassword() {
       <div className="absolute top-4 right-4">
         <ThemeToggle />
       </div>
-      <div className="bg-white p-8 rounded-2xl shadow-lg w-full max-w-md">
+      <div className="bg-white dark:bg-slate-900 p-8 rounded-2xl shadow-lg w-full max-w-md">
         <h1 className="text-3xl font-bold text-center mb-6">Modify Admin Password</h1>
 
         <form onSubmit={handleSubmit} className="space-y-4">

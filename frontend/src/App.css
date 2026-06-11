@@ -37,6 +37,22 @@
   .vite {
     position: absolute;
   }
+  @media (max-width: 1024px) {
+    .base {
+      width: 120px;
+    }
+    .framework {
+      top: 20px;
+      height: 20px;
+    }
+    .vite {
+      top: 70px;
+      height: 18px;
+    }
+    .counter {
+      font-size: 14px;
+    }
+  }
 
   .framework {
     z-index: 1;

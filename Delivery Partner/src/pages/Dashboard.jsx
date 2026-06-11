@@ -68,15 +68,15 @@ export default function Dashboard() {
   if (loading) {
     return (
       <div className="space-y-6 animate-pulse p-4 sm:p-6 lg:p-8 max-w-7xl mx-auto">
-        <div className="h-7 bg-gray-200 rounded-lg w-1/4 mb-2"></div>
+        <div className="h-7 bg-gray-200 dark:bg-slate-800 rounded-lg w-1/4 mb-2"></div>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-5">
           {[...Array(5)].map((_, i) => (
-            <div key={i} className="h-28 bg-gray-200 rounded-2xl"></div>
+            <div key={i} className="h-28 bg-gray-200 dark:bg-slate-800 rounded-2xl"></div>
           ))}
         </div>
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          <div className="h-64 bg-gray-200 rounded-2xl lg:col-span-2"></div>
-          <div className="h-64 bg-gray-200 rounded-2xl"></div>
+          <div className="h-64 bg-gray-200 dark:bg-slate-800 rounded-2xl lg:col-span-2"></div>
+          <div className="h-64 bg-gray-200 dark:bg-slate-800 rounded-2xl"></div>
         </div>
       </div>
     );
@@ -86,8 +86,8 @@ export default function Dashboard() {
     return (
       <div className="flex flex-col items-center justify-center min-h-[50vh] p-6 text-center">
         <AlertCircle className="text-red-500 mb-2" size={36} />
-        <h3 className="text-xs font-bold text-gray-900 uppercase tracking-wider">Failed to load dashboard</h3>
-        <p className="text-[11px] text-gray-500 mt-1">Please try refreshing the page or check your authentication status.</p>
+        <h3 className="text-xs font-bold text-gray-900 dark:text-white uppercase tracking-wider">Failed to load dashboard</h3>
+        <p className="text-[11px] text-gray-500 dark:text-slate-400 mt-1">Please try refreshing the page or check your authentication status.</p>
       </div>
     );
   }
@@ -105,58 +105,58 @@ export default function Dashboard() {
   ];
 
   return (
-    <div className="p-4 sm:p-6 lg:p-8 max-w-7xl mx-auto space-y-8 font-sans bg-gray-50/20 min-h-screen pb-24 md:pb-8">
+    <div className="p-4 sm:p-6 dark:bg-slate-900/20 lg:p-8 max-w-7xl mx-auto space-y-8 font-sans bg-gray-50/20 min-h-screen pb-24 md:pb-8">
       
       {/* Welcome Heading */}
       <div>
-        <h1 className="text-lg sm:text-xl font-bold text-gray-900 uppercase tracking-wider">
+        <h1 className="text-lg sm:text-xl font-bold text-gray-900 dark:text-white uppercase tracking-wider">
           Welcome back, {dashboard.partnerName || "Partner"}!
         </h1>
-        <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest mt-1">
+        <p className="text-[10px] text-gray-400 dark:text-slate-500 dark:text-slate-400 font-bold uppercase tracking-widest mt-1">
           Partner Hub / Performance Snapshot
         </p>
       </div>
 
       {/* Stats Cards Grid Layout */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-5">
-        <div className="bg-white p-5 rounded-2xl border border-gray-200/60 shadow-sm flex flex-col justify-between transition-all hover:shadow-md">
-          <div className="flex items-center justify-between text-gray-400">
+        <div className="bg-white dark:bg-slate-900 p-5 rounded-2xl border border-gray-200 dark:border-slate-800/60 shadow-sm flex flex-col justify-between transition-all hover:shadow-md">
+          <div className="flex items-center justify-between text-gray-400 dark:text-slate-500 dark:text-slate-400">
             <span className="text-[10px] font-bold uppercase tracking-wider">Today's Earnings</span>
             <div className="p-1.5 bg-emerald-50 rounded-lg text-emerald-600"><DollarSign size={14} /></div>
           </div>
-          <p className="text-2xl font-bold text-gray-900 mt-4">₹{Number(stats.todayEarnings || 0).toLocaleString("en-IN")}</p>
+          <p className="text-2xl font-bold text-gray-900 dark:text-white mt-4">₹{Number(stats.todayEarnings || 0).toLocaleString("en-IN")}</p>
         </div>
 
-        <div className="bg-white p-5 rounded-2xl border border-gray-200/60 shadow-sm flex flex-col justify-between transition-all hover:shadow-md">
-          <div className="flex items-center justify-between text-gray-400">
+        <div className="bg-white dark:bg-slate-900 p-5 rounded-2xl border border-gray-200 dark:border-slate-800/60 shadow-sm flex flex-col justify-between transition-all hover:shadow-md">
+          <div className="flex items-center justify-between text-gray-400 dark:text-slate-500 dark:text-slate-400">
             <span className="text-[10px] font-bold uppercase tracking-wider">Wallet Balance</span>
             <div className="p-1.5 bg-blue-50 rounded-lg text-blue-600"><Wallet size={14} /></div>
           </div>
-          <p className="text-2xl font-bold text-gray-900 mt-4">₹{Number(stats.walletBalance || 0).toLocaleString("en-IN")}</p>
+          <p className="text-2xl font-bold text-gray-900 dark:text-white mt-4">₹{Number(stats.walletBalance || 0).toLocaleString("en-IN")}</p>
         </div>
 
-        <div className="bg-white p-5 rounded-2xl border border-gray-200/60 shadow-sm flex flex-col justify-between transition-all hover:shadow-md">
-          <div className="flex items-center justify-between text-gray-400">
+        <div className="bg-white dark:bg-slate-900 p-5 rounded-2xl border border-gray-200 dark:border-slate-800/60 shadow-sm flex flex-col justify-between transition-all hover:shadow-md">
+          <div className="flex items-center justify-between text-gray-400 dark:text-slate-500 dark:text-slate-400">
             <span className="text-[10px] font-bold uppercase tracking-wider">Total Earnings</span>
             <div className="p-1.5 bg-indigo-50 rounded-lg text-indigo-600"><TrendingUp size={14} /></div>
           </div>
-          <p className="text-2xl font-bold text-gray-900 mt-4">₹{Number(stats.totalEarnings || 0).toLocaleString("en-IN")}</p>
+          <p className="text-2xl font-bold text-gray-900 dark:text-white mt-4">₹{Number(stats.totalEarnings || 0).toLocaleString("en-IN")}</p>
         </div>
 
-        <div className="bg-white p-5 rounded-2xl border border-gray-200/60 shadow-sm flex flex-col justify-between transition-all hover:shadow-md">
-          <div className="flex items-center justify-between text-gray-400">
+        <div className="bg-white dark:bg-slate-900 p-5 rounded-2xl border border-gray-200 dark:border-slate-800/60 shadow-sm flex flex-col justify-between transition-all hover:shadow-md">
+          <div className="flex items-center justify-between text-gray-400 dark:text-slate-500 dark:text-slate-400">
             <span className="text-[10px] font-bold uppercase tracking-wider">Completed Trips</span>
-            <div className="p-1.5 bg-gray-50 rounded-lg text-gray-600"><Bike size={14} /></div>
+            <div className="p-1.5 bg-gray-50 dark:bg-slate-900 rounded-lg text-gray-600 dark:text-slate-400"><Bike size={14} /></div>
           </div>
-          <p className="text-2xl font-bold text-gray-900 mt-4">{stats.completedTrips || 0}</p>
+          <p className="text-2xl font-bold text-gray-900 dark:text-white mt-4">{stats.completedTrips || 0}</p>
         </div>
 
-        <div className="bg-white p-5 rounded-2xl border border-gray-200/60 shadow-sm flex flex-col justify-between transition-all hover:shadow-md">
-          <div className="flex items-center justify-between text-gray-400">
+        <div className="bg-white dark:bg-slate-900 p-5 rounded-2xl border border-gray-200 dark:border-slate-800/60 shadow-sm flex flex-col justify-between transition-all hover:shadow-md">
+          <div className="flex items-center justify-between text-gray-400 dark:text-slate-500 dark:text-slate-400">
             <span className="text-[10px] font-bold uppercase tracking-wider">Acceptance Rate</span>
             <div className="p-1.5 bg-orange-50 rounded-lg text-orange-600"><Percent size={14} /></div>
           </div>
-          <p className="text-2xl font-bold text-gray-900 mt-4">{stats.acceptanceRate || 0}%</p>
+          <p className="text-2xl font-bold text-gray-900 dark:text-white mt-4">{stats.acceptanceRate || 0}%</p>
         </div>
       </div>
 
@@ -166,9 +166,9 @@ export default function Dashboard() {
         {/* Active Assignment Route Logistics Wrapper (Left Block) */}
         <div className="lg:col-span-5 space-y-6">
           {activeOrder ? (
-            <div className="bg-white p-6 rounded-2xl border border-gray-200/60 shadow-sm">
+            <div className="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-gray-200 dark:border-slate-800/60 shadow-sm">
               <div className="flex items-center justify-between mb-5">
-                <h2 className="text-xs font-bold text-gray-900 uppercase tracking-widest">Active Assignment</h2>
+                <h2 className="text-xs font-bold text-gray-900 dark:text-white uppercase tracking-widest">Active Assignment</h2>
                 <span className="px-3 py-1 bg-amber-50 text-amber-700 text-[10px] font-bold uppercase tracking-wider border border-amber-200/60 rounded-lg">
                   {activeOrder.orderStatus}
                 </span>
@@ -178,45 +178,45 @@ export default function Dashboard() {
                 <div className="flex items-start gap-4">
                   <div className="p-2 bg-emerald-50 rounded-lg text-emerald-600 border border-emerald-100"><Store size={16} /></div>
                   <div>
-                    <p className="text-[9px] font-bold text-gray-400 uppercase tracking-wider">Pickup From</p>
-                    <p className="text-xs font-semibold text-gray-800 mt-0.5">{activeOrder.pickupAddress || "Central Hub Kitchen"}</p>
+                    <p className="text-[9px] font-bold text-gray-400 dark:text-slate-500 dark:text-slate-400 uppercase tracking-wider">Pickup From</p>
+                    <p className="text-xs font-semibold text-gray-800 dark:text-slate-100 mt-0.5">{activeOrder.pickupAddress || "Central Hub Kitchen"}</p>
                   </div>
                 </div>
 
-                <div className="w-[2px] h-5 bg-gray-200 ml-[15px] -my-2"></div>
+                <div className="w-[2px] h-5 bg-gray-200 dark:bg-slate-800 ml-[15px] -my-2"></div>
 
                 <div className="flex items-start gap-4">
                   <div className="p-2 bg-blue-50 rounded-lg text-blue-600 border border-blue-100"><MapPin size={16} /></div>
                   <div>
-                    <p className="text-[9px] font-bold text-gray-400 uppercase tracking-wider">Drop Location</p>
-                    <p className="text-xs font-semibold text-gray-800 mt-0.5">{activeOrder.deliveryAddress}</p>
+                    <p className="text-[9px] font-bold text-gray-400 dark:text-slate-500 dark:text-slate-400 uppercase tracking-wider">Drop Location</p>
+                    <p className="text-xs font-semibold text-gray-800 dark:text-slate-100 mt-0.5">{activeOrder.deliveryAddress}</p>
                   </div>
                 </div>
               </div>
             </div>
           ) : (
-            <div className="bg-white py-12 px-6 rounded-2xl border border-gray-200/60 shadow-sm text-center">
+            <div className="bg-white dark:bg-slate-900 py-12 px-6 rounded-2xl border border-gray-200 dark:border-slate-800/60 shadow-sm text-center">
               <Bike className="mx-auto text-gray-300 mb-3 stroke-1" size={32} />
-              <p className="text-xs font-bold text-gray-400 uppercase tracking-wider">No active assignment available</p>
-              <p className="text-[11px] text-gray-400 mt-1">New incoming orders will pop up here instantly when assigned.</p>
+              <p className="text-xs font-bold text-gray-400 dark:text-slate-500 dark:text-slate-400 uppercase tracking-wider">No active assignment available</p>
+              <p className="text-[11px] text-gray-400 dark:text-slate-500 dark:text-slate-400 mt-1">New incoming orders will pop up here instantly when assigned.</p>
             </div>
           )}
         </div>
 
         {/* Dynamic Route Mapping Deck (Right Block) */}
         <div className="lg:col-span-7">
-          <div className="bg-white rounded-2xl border border-gray-200/60 shadow-sm overflow-hidden flex flex-col">
-            <div className="p-5 border-b border-gray-100 flex flex-col sm:flex-row sm:items-center justify-between gap-2 bg-white">
+          <div className="bg-white dark:bg-slate-900 rounded-2xl border border-gray-200 dark:border-slate-800/60 shadow-sm overflow-hidden flex flex-col">
+            <div className="p-5 border-b border-gray-100 flex flex-col sm:flex-row sm:items-center justify-between gap-2 bg-white dark:bg-slate-900">
               <div className="flex items-center gap-2">
                 <Navigation size={15} className="text-orange-500" />
-                <h3 className="text-xs font-bold text-gray-900 uppercase tracking-wider">Spatial Intelligence Layer</h3>
+                <h3 className="text-xs font-bold text-gray-900 dark:text-white uppercase tracking-wider">Spatial Intelligence Layer</h3>
               </div>
-              <span className="text-[9px] font-bold uppercase tracking-wider px-2 py-0.5 bg-gray-100 rounded text-gray-500 flex items-center gap-1">
+              <span className="text-[9px] font-bold uppercase tracking-wider px-2 py-0.5 bg-gray-100 dark:bg-slate-950 rounded text-gray-500 dark:text-slate-400 flex items-center gap-1">
                 <Activity size={10} className="text-emerald-500 animate-pulse" /> Live Telemetry
               </span>
             </div>
 
-            <div className="w-full h-56 bg-gray-100 relative border-b border-gray-100">
+            <div className="w-full h-56 bg-gray-100 dark:bg-slate-950 relative border-b border-gray-100">
               {activeOrder ? (
                 <iframe
                   title="Operational Route Engine"
@@ -228,7 +228,7 @@ export default function Dashboard() {
                   src={`https://maps.google.com/maps?q=$${encodeURIComponent(activeOrder.deliveryAddress || "")}&t=&z=14&ie=UTF8&iwloc=&output=embed`}
                 />
               ) : (
-                <div className="w-full h-full flex flex-col items-center justify-center bg-gray-50 text-gray-400 text-center px-4">
+                <div className="w-full h-full flex flex-col items-center justify-center bg-gray-50 dark:bg-slate-900 text-gray-400 dark:text-slate-500 dark:text-slate-400 text-center px-4">
                   <MapPin size={24} className="text-gray-300 mb-1" />
                   <p className="text-[11px] font-semibold uppercase tracking-wider">Map Idle</p>
                 </div>
@@ -236,9 +236,9 @@ export default function Dashboard() {
             </div>
 
             {activeOrder && (
-              <div className="p-5 bg-white grid grid-cols-1 md:grid-cols-12 gap-5 items-center">
+              <div className="p-5 bg-white dark:bg-slate-900 grid grid-cols-1 md:grid-cols-12 gap-5 items-center">
                 <div className="md:col-span-7 space-y-2">
-                  <p className="text-[9px] font-bold text-gray-400 uppercase tracking-wider flex items-center gap-1">
+                  <p className="text-[9px] font-bold text-gray-400 dark:text-slate-500 dark:text-slate-400 uppercase tracking-wider flex items-center gap-1">
                     <Gauge size={11} className="text-orange-500" /> Velocity Vectors
                   </p>
                   <div className="w-full h-20">
@@ -255,16 +255,16 @@ export default function Dashboard() {
 
                 <div className="md:col-span-5 grid grid-cols-2 gap-3 pt-4 md:pt-0 md:pl-4 md:border-l border-gray-100">
                   <div>
-                    <span className="text-[9px] font-bold text-gray-400 uppercase tracking-wider flex items-center gap-1"><Clock size={10} /> ETA Window</span>
-                    <p className="text-sm font-black text-gray-800">22-26 Mins</p>
+                    <span className="text-[9px] font-bold text-gray-400 dark:text-slate-500 dark:text-slate-400 uppercase tracking-wider flex items-center gap-1"><Clock size={10} /> ETA Window</span>
+                    <p className="text-sm font-black text-gray-800 dark:text-slate-100">22-26 Mins</p>
                   </div>
                   <div>
-                    <span className="text-[9px] font-bold text-gray-400 uppercase tracking-wider flex items-center gap-1"><Fuel size={10} /> Fuel Target</span>
-                    <p className="text-sm font-black text-gray-800">~0.32 Ltrs</p>
+                    <span className="text-[9px] font-bold text-gray-400 dark:text-slate-500 dark:text-slate-400 uppercase tracking-wider flex items-center gap-1"><Fuel size={10} /> Fuel Target</span>
+                    <p className="text-sm font-black text-gray-800 dark:text-slate-100">~0.32 Ltrs</p>
                   </div>
                   <div className="col-span-2 pt-1">
-                    <span className="text-[9px] font-bold text-gray-400 uppercase tracking-wider block">Yield Multiplier</span>
-                    <p className="text-base font-black text-emerald-600">₹{((activeOrder.partnerEarning || 45) / 8).toFixed(1)}/km <span className="text-[10px] text-gray-400 font-medium">(Total: ₹{activeOrder.partnerEarning || 45})</span></p>
+                    <span className="text-[9px] font-bold text-gray-400 dark:text-slate-500 dark:text-slate-400 uppercase tracking-wider block">Yield Multiplier</span>
+                    <p className="text-base font-black text-emerald-600">₹{((activeOrder.partnerEarning || 45) / 8).toFixed(1)}/km <span className="text-[10px] text-gray-400 dark:text-slate-500 dark:text-slate-400 font-medium">(Total: ₹{activeOrder.partnerEarning || 45})</span></p>
                   </div>
                 </div>
               </div>
@@ -280,10 +280,10 @@ export default function Dashboard() {
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
           
           {/* 1. Line Area Chart: Earnings Trend */}
-          <div className="lg:col-span-7 bg-white p-6 rounded-2xl border border-gray-200/60 shadow-sm space-y-4">
+          <div className="lg:col-span-7 bg-white dark:bg-slate-900 p-6 rounded-2xl border border-gray-200 dark:border-slate-800/60 shadow-sm space-y-4">
             <div className="flex items-center gap-2 border-b border-gray-50 pb-3">
               <TrendingUp size={16} className="text-indigo-600" />
-              <h3 className="text-xs font-bold text-gray-900 uppercase tracking-wider">7-Day Earning Growth Trend</h3>
+              <h3 className="text-xs font-bold text-gray-900 dark:text-white uppercase tracking-wider">7-Day Earning Growth Trend</h3>
             </div>
             <div className="w-full h-64">
               <ResponsiveContainer width="100%" height="100%">
@@ -305,10 +305,10 @@ export default function Dashboard() {
           </div>
 
           {/* 2. Pie Chart: Performance Ratios */}
-          <div className="lg:col-span-5 bg-white p-6 rounded-2xl border border-gray-200/60 shadow-sm space-y-4 flex flex-col justify-between">
+          <div className="lg:col-span-5 bg-white dark:bg-slate-900 p-6 rounded-2xl border border-gray-200 dark:border-slate-800/60 shadow-sm space-y-4 flex flex-col justify-between">
             <div className="flex items-center gap-2 border-b border-gray-50 pb-3">
               <PieIcon size={16} className="text-emerald-600" />
-              <h3 className="text-xs font-bold text-gray-900 uppercase tracking-wider">Historical Task Acceptance Split</h3>
+              <h3 className="text-xs font-bold text-gray-900 dark:text-white uppercase tracking-wider">Historical Task Acceptance Split</h3>
             </div>
             <div className="w-full h-48 flex items-center justify-center">
               <ResponsiveContainer width="100%" height="100%">
@@ -334,10 +334,10 @@ export default function Dashboard() {
           </div>
 
           {/* 3. Histogram: Weekly Trip Volume Distribution */}
-          <div className="lg:col-span-12 bg-white p-6 rounded-2xl border border-gray-200/60 shadow-sm space-y-4">
+          <div className="lg:col-span-12 bg-white dark:bg-slate-900 p-6 rounded-2xl border border-gray-200 dark:border-slate-800/60 shadow-sm space-y-4">
             <div className="flex items-center gap-2 border-b border-gray-50 pb-3">
               <BarChart3 size={16} className="text-blue-600" />
-              <h3 className="text-xs font-bold text-gray-900 uppercase tracking-wider">Trip Load Distribution by Weekday</h3>
+              <h3 className="text-xs font-bold text-gray-900 dark:text-white uppercase tracking-wider">Trip Load Distribution by Weekday</h3>
             </div>
             <div className="w-full h-60">
               <ResponsiveContainer width="100%" height="100%">
@@ -353,8 +353,8 @@ export default function Dashboard() {
 
         </div>
       ) : (
-        <div className="p-8 text-center bg-gray-50 rounded-2xl border border-dashed border-gray-200">
-          <p className="text-xs font-bold text-gray-400 uppercase tracking-wider">No Analytical logs registered yet</p>
+        <div className="p-8 text-center bg-gray-50 dark:bg-slate-900 rounded-2xl border border-dashed border-gray-200 dark:border-slate-800">
+          <p className="text-xs font-bold text-gray-400 dark:text-slate-500 dark:text-slate-400 uppercase tracking-wider">No Analytical logs registered yet</p>
         </div>
       )}
 

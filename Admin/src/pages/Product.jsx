@@ -95,7 +95,7 @@ export default function Product() {
 
               <div
                 key={product._id}
-                className="border rounded-xl p-4 shadow hover:shadow-lg transition bg-white"
+                className="border rounded-xl p-4 shadow hover:shadow-lg transition bg-white dark:bg-slate-900"
               >
 
                 {/* PRODUCT IMAGE */}
@@ -111,7 +111,7 @@ export default function Product() {
                 </h2>
 
                 {/* CATEGORY */}
-                <p className="text-gray-500 text-sm mt-1">
+                <p className="text-gray-500 dark:text-slate-400 text-sm mt-1">
                   {product.category}
                 </p>
 
@@ -122,7 +122,7 @@ export default function Product() {
                     ₹{product.offerPrice}
                   </p>
 
-                  <p className="line-through text-gray-400">
+                  <p className="line-through text-gray-400 dark:text-slate-500 dark:text-slate-400">
                     ₹{product.price}
                   </p>
 
@@ -138,11 +138,7 @@ export default function Product() {
 
                 {/* STATUS */}
                 <p
-                  className={`mt-2 text-sm font-semibold ${
-                    product.inStock
-                      ? "text-green-600"
-                      : "text-red-500"
-                  }`}
+                  className={`mt-2 text-sm font-semibold ${ product.inStock ? "text-green-600" : "text-red-500" }`}
                 >
                   {
                     product.inStock
@@ -179,7 +175,7 @@ export default function Product() {
 
           ) : (
 
-            <div className="col-span-full text-center text-gray-500 text-lg">
+            <div className="col-span-full text-center text-gray-500 dark:text-slate-400 text-lg">
               No Products Found
             </div>
           )

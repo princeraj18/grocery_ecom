@@ -136,7 +136,7 @@ export default function VendorDetails() {
 
   return (
 
-    <div className="p-10 bg-gray-100 min-h-screen">
+    <div className="p-10 bg-gray-100 dark:bg-slate-950 min-h-screen">
 
       {/* ================================= */}
       {/* VENDOR DETAILS */}
@@ -145,7 +145,7 @@ export default function VendorDetails() {
         Vendor Details
       </h1>
 
-      <div className="bg-white p-6 rounded-xl shadow max-w-4xl">
+      <div className="bg-white dark:bg-slate-900 p-6 rounded-xl shadow max-w-4xl">
 
         <div className="flex items-center gap-6">
 
@@ -166,32 +166,32 @@ export default function VendorDetails() {
             </h2>
 
             {vendor.ownerName && (
-            <p className="text-gray-500 mt-1">
+            <p className="text-gray-500 dark:text-slate-400 mt-1">
               Owner :
               {" "}
               {vendor.ownerName}
             </p>
             )}
 
-            <p className="text-gray-500">
+            <p className="text-gray-500 dark:text-slate-400">
               Email :
               {" "}
               {vendor.email}
             </p>
 
-            <p className="text-gray-500">
+            <p className="text-gray-500 dark:text-slate-400">
               Phone :
               {" "}
               {vendor.phone}
             </p>
 
-            <p className="text-gray-500">
+            <p className="text-gray-500 dark:text-slate-400">
               Address :
               {" "}
               {vendor.address}
             </p>
 
-            <p className="text-gray-500 mt-2">
+            <p className="text-gray-500 dark:text-slate-400 mt-2">
               Joined :
               {" "}
               {
@@ -219,7 +219,7 @@ export default function VendorDetails() {
 
         {products.length === 0 ? (
 
-          <div className="bg-white p-8 rounded-xl shadow text-gray-500">
+          <div className="bg-white dark:bg-slate-900 p-8 rounded-xl shadow text-gray-500 dark:text-slate-400">
             No products found
           </div>
 
@@ -232,7 +232,7 @@ export default function VendorDetails() {
 
                 <div
                   key={product._id}
-                  className="bg-white rounded-xl shadow overflow-hidden hover:shadow-lg transition"
+                  className="bg-white dark:bg-slate-900 rounded-xl shadow overflow-hidden hover:shadow-lg transition"
                 >
 
                   {/* IMAGE */}
@@ -253,7 +253,7 @@ export default function VendorDetails() {
                       {product.name}
                     </h3>
 
-                    <p className="text-gray-500 text-sm mb-3">
+                    <p className="text-gray-500 dark:text-slate-400 text-sm mb-3">
                       {
                         product.category?.text || product.category?.name || "Uncategorized"
                       }
@@ -263,7 +263,7 @@ export default function VendorDetails() {
 
                      <div>
 
-  <p className="text-gray-400 line-through">
+  <p className="text-gray-400 dark:text-slate-500 dark:text-slate-400 line-through">
     ₹
     {
       product.variants?.[0]?.price || 0
@@ -279,7 +279,7 @@ export default function VendorDetails() {
 
 </div>
 
-                      <div className="text-sm text-gray-500">
+                      <div className="text-sm text-gray-500 dark:text-slate-400">
                         Stock :
                         {" "}
                         {

@@ -17,11 +17,11 @@ from "../pages/DeliveryMap";
 // A Layout Wrapper component for pages that need the Navbar and Sidebar
 const ProtectedLayout = ({ children }) => {
   return (
-    <div className="min-h-screen  flex flex-col font-sans">
+    <div className="min-h-screen flex flex-col font-sans bg-gray-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100">
       <Navbar />
       <div className="flex flex-1">
         <Sidebar />
-        <main className="flex-1 p-4 sm:p-6 lg:p-8 max-w-7xl mx-auto w-full pb-24 md:pb-8">
+        <main className="flex-1 p-4 sm:p-6 lg:p-8 max-w-7xl mx-auto w-full pb-24 md:pb-8 bg-inherit">
           {children}
         </main>
       </div>

@@ -17,7 +17,7 @@ export default function Navbar() {
   };
 
   return (
-    <div className="bg-white shadow px-6 py-4 flex items-center justify-between dark:bg-slate-900 dark:text-white">
+    <div className="bg-white dark:bg-slate-900 shadow px-6 py-4 flex items-center justify-between dark:text-white">
 
       <h2 className="text-2xl font-semibold">
         Admin Dashboard

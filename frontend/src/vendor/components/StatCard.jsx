@@ -7,13 +7,13 @@ export default function StatCard({
 
   return (
 
-    <div className="bg-white rounded-xl shadow p-6">
+    <div className="panel-surface p-6">
 
-      <h2 className="text-gray-500 text-lg">
+      <h2 className="text-gray-500 dark:text-slate-400 text-lg">
         {title}
       </h2>
 
-      <p className="text-3xl font-bold mt-3">
+      <p className="text-3xl font-bold mt-3 text-slate-900 dark:text-white">
         {value}
       </p>
 

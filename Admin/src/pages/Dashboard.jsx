@@ -192,30 +192,30 @@ export default function Dashboard() {
 
   const COLORS = ["#4f46e5", "#10b981", "#f59e0b", "#ef4444", "#8b5cf6"];
 
-  if (loading) return <div className="text-center py-32 font-bold text-gray-400 animate-pulse text-lg tracking-wide">Syncing Global Enterprise Master Ledger...</div>;
+  if (loading) return <div className="text-center py-32 font-bold text-gray-400 dark:text-slate-500 dark:text-slate-400 animate-pulse text-lg tracking-wide">Syncing Global Enterprise Master Ledger...</div>;
   if (error) return <div className="p-6 text-center text-red-500 bg-red-50 border border-red-100 rounded-3xl max-w-lg mx-auto my-20 font-medium shadow-sm">{error}</div>;
 
   return (
-    <div className="p-4 md:p-6 bg-gray-50 min-h-screen max-w-7xl mx-auto space-y-8">
+    <div className="p-4 md:p-6 bg-gray-50 dark:bg-slate-900 min-h-screen max-w-7xl mx-auto space-y-8">
       
       {/* BRANDING HEADER FRAME */}
-      <div className="flex flex-col md:flex-row md:items-center md:justify-between border-b border-gray-200 pb-5 gap-4">
+      <div className="flex flex-col md:flex-row md:items-center md:justify-between border-b border-gray-200 dark:border-slate-800 pb-5 gap-4">
         <div>
-          <h1 className="text-2xl md:text-3xl font-black text-gray-900 tracking-tight">System Infrastructure Operational Control Center</h1>
-          <p className="text-xs text-gray-400 mt-1">Cross-database synchronization for platform monitoring.</p>
+          <h1 className="text-2xl md:text-3xl font-black text-gray-900 dark:text-white tracking-tight">System Infrastructure Operational Control Center</h1>
+          <p className="text-xs text-gray-400 dark:text-slate-500 dark:text-slate-400 mt-1">Cross-database synchronization for platform monitoring.</p>
         </div>
         
         {/* VIEW NAVIGATION TOGGLES */}
-        <div className="inline-flex bg-gray-200/70 p-1.5 rounded-2xl border border-gray-200">
+        <div className="inline-flex bg-gray-200 dark:bg-slate-800/70 p-1.5 rounded-2xl border border-gray-200 dark:border-slate-800">
           <button
             onClick={() => setActiveTab("marketplace")}
-            className={`px-4 py-2 text-xs font-black uppercase tracking-wider rounded-xl transition duration-150 ${activeTab === "marketplace" ? "bg-white text-indigo-600 shadow-sm" : "text-gray-500 hover:text-gray-800"}`}
+            className={`px-4 py-2 text-xs font-black uppercase tracking-wider rounded-xl transition duration-150 ${activeTab === "marketplace" ? "bg-white dark:bg-slate-900 text-indigo-600 shadow-sm" : "text-gray-500 dark:text-slate-400 hover:text-gray-800 dark:text-slate-100"}`}
           >
             🏢 Marketplace Analytics
           </button>
           <button
             onClick={() => setActiveTab("logistics")}
-            className={`px-4 py-2 text-xs font-black uppercase tracking-wider rounded-xl transition duration-150 ${activeTab === "logistics" ? "bg-white text-indigo-600 shadow-sm" : "text-gray-500 hover:text-gray-800"}`}
+            className={`px-4 py-2 text-xs font-black uppercase tracking-wider rounded-xl transition duration-150 ${activeTab === "logistics" ? "bg-white dark:bg-slate-900 text-indigo-600 shadow-sm" : "text-gray-500 dark:text-slate-400 hover:text-gray-800 dark:text-slate-100"}`}
           >
             🚚 Logistics Fleet
           </button>
@@ -225,9 +225,9 @@ export default function Dashboard() {
       {/* RENDER DYNAMIC KPI CARDS BAR */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
         {activeStatsMatrix.map((item, index) => (
-          <div key={index} className={`bg-white p-5 rounded-2xl shadow-sm border border-gray-100 transition duration-200 hover:shadow-md ${item.highlight ? "border-l-4 border-l-indigo-600" : ""}`}>
-            <h2 className="text-xs font-extrabold text-gray-400 uppercase tracking-wider">{item.title}</h2>
-            <p className="text-2xl md:text-3xl font-black mt-1 text-gray-800 tracking-tight">{item.value}</p>
+          <div key={index} className={`bg-white dark:bg-slate-900 p-5 rounded-2xl shadow-sm border border-gray-100 transition duration-200 hover:shadow-md ${item.highlight ? "border-l-4 border-l-indigo-600" : ""}`}>
+            <h2 className="text-xs font-extrabold text-gray-400 dark:text-slate-500 dark:text-slate-400 uppercase tracking-wider">{item.title}</h2>
+            <p className="text-2xl md:text-3xl font-black mt-1 text-gray-800 dark:text-slate-100 tracking-tight">{item.value}</p>
           </div>
         ))}
       </div>
@@ -237,8 +237,8 @@ export default function Dashboard() {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           
           {/* 1. BAR CHART: Catalog Pipeline Breakdown */}
-          <div className="bg-white rounded-2xl border border-gray-100 p-4 md:p-6 shadow-sm">
-            <h2 className="text-sm font-black text-gray-800 mb-4 uppercase tracking-wider text-indigo-600">1. Bar Graph: Marketplace Pipeline Inventory</h2>
+          <div className="bg-white dark:bg-slate-900 rounded-2xl border border-gray-100 p-4 md:p-6 shadow-sm">
+            <h2 className="text-sm font-black text-gray-800 dark:text-slate-100 mb-4 uppercase tracking-wider text-indigo-600">1. Bar Graph: Marketplace Pipeline Inventory</h2>
             <ResponsiveContainer width="100%" aspect={2}>
               <BarChart data={marketplaceGraphData.orderPipeline} margin={{ left: -20, right: 10, top: 10 }}>
                 <XAxis dataKey="name" className="text-xs" stroke="#9ca3af" tickLine={false} />
@@ -250,8 +250,8 @@ export default function Dashboard() {
           </div>
 
           {/* 2. LINE CHART: Volumetric Order Speed */}
-          <div className="bg-white rounded-2xl border border-gray-100 p-4 md:p-6 shadow-sm">
-            <h2 className="text-sm font-black text-gray-800 mb-4 uppercase tracking-wider text-indigo-600">2. Line Graph: Volumetric Order Influx Speed</h2>
+          <div className="bg-white dark:bg-slate-900 rounded-2xl border border-gray-100 p-4 md:p-6 shadow-sm">
+            <h2 className="text-sm font-black text-gray-800 dark:text-slate-100 mb-4 uppercase tracking-wider text-indigo-600">2. Line Graph: Volumetric Order Influx Speed</h2>
             <ResponsiveContainer width="100%" aspect={2}>
               <LineChart data={marketplaceGraphData.marketplaceTrends} margin={{ left: -20, right: 10, top: 10 }}>
                 <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f3f4f6" />
@@ -264,8 +264,8 @@ export default function Dashboard() {
           </div>
 
           {/* 3. PIE CHART: User Base Proportions */}
-          <div className="bg-white rounded-2xl border border-gray-100 p-4 md:p-6 shadow-sm">
-            <h2 className="text-sm font-black text-gray-800 mb-4 uppercase tracking-wider text-indigo-600">3. Pie Chart: Financial Vendor Proportional Share</h2>
+          <div className="bg-white dark:bg-slate-900 rounded-2xl border border-gray-100 p-4 md:p-6 shadow-sm">
+            <h2 className="text-sm font-black text-gray-800 dark:text-slate-100 mb-4 uppercase tracking-wider text-indigo-600">3. Pie Chart: Financial Vendor Proportional Share</h2>
             <ResponsiveContainer width="100%" aspect={2}>
               <PieChart>
                 <Pie data={marketplaceGraphData.vendorShares} cx="50%" cy="50%" innerRadius={50} outerRadius={80} paddingAngle={4} dataKey="value">
@@ -278,8 +278,8 @@ export default function Dashboard() {
           </div>
 
           {/* 4. AREA CHART: Cumulative Revenue Accumulation */}
-          <div className="bg-white rounded-2xl border border-gray-100 p-4 md:p-6 shadow-sm">
-            <h2 className="text-sm font-black text-gray-800 mb-4 uppercase tracking-wider text-indigo-600">4. Area Graph: Cumulative Gross Margin Velocity</h2>
+          <div className="bg-white dark:bg-slate-900 rounded-2xl border border-gray-100 p-4 md:p-6 shadow-sm">
+            <h2 className="text-sm font-black text-gray-800 dark:text-slate-100 mb-4 uppercase tracking-wider text-indigo-600">4. Area Graph: Cumulative Gross Margin Velocity</h2>
             <ResponsiveContainer width="100%" aspect={2}>
               <AreaChart data={marketplaceGraphData.marketplaceTrends} margin={{ left: -15, right: 10, top: 10 }}>
                 <defs>
@@ -298,8 +298,8 @@ export default function Dashboard() {
           </div>
 
           {/* 5. HISTOGRAM: Value Distribution */}
-          <div className="bg-white rounded-2xl border border-gray-100 p-4 md:p-6 shadow-sm">
-            <h2 className="text-sm font-black text-gray-800 mb-4 uppercase tracking-wider text-indigo-600">5. Histogram: Transaction Value Frequency Bands</h2>
+          <div className="bg-white dark:bg-slate-900 rounded-2xl border border-gray-100 p-4 md:p-6 shadow-sm">
+            <h2 className="text-sm font-black text-gray-800 dark:text-slate-100 mb-4 uppercase tracking-wider text-indigo-600">5. Histogram: Transaction Value Frequency Bands</h2>
             <ResponsiveContainer width="100%" aspect={2}>
               <BarChart data={marketplaceGraphData.marketplaceHistogram} margin={{ left: -20, right: 10, top: 10 }} barCategoryGap={1}>
                 <XAxis dataKey="range" className="text-xs" stroke="#9ca3af" />
@@ -311,8 +311,8 @@ export default function Dashboard() {
           </div>
 
           {/* 6. SCATTER PLOT: Account Engagement Metrics */}
-          <div className="bg-white rounded-2xl border border-gray-100 p-4 md:p-6 shadow-sm">
-            <h2 className="text-sm font-black text-gray-800 mb-4 uppercase tracking-wider text-indigo-600">6. Scatter Plot: Correlative Account Engagement Metrics</h2>
+          <div className="bg-white dark:bg-slate-900 rounded-2xl border border-gray-100 p-4 md:p-6 shadow-sm">
+            <h2 className="text-sm font-black text-gray-800 dark:text-slate-100 mb-4 uppercase tracking-wider text-indigo-600">6. Scatter Plot: Correlative Account Engagement Metrics</h2>
             <ResponsiveContainer width="100%" aspect={2}>
               <ScatterChart margin={{ left: -20, right: 10, top: 10 }}>
                 <CartesianGrid strokeDasharray="3 3" stroke="#f3f4f6" />
@@ -332,8 +332,8 @@ export default function Dashboard() {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           
           {/* 1. BAR GRAPH: Fulfillment Pipelines Breakdown */}
-          <div className="bg-white rounded-2xl border border-gray-100 p-4 md:p-6 shadow-sm">
-            <h2 className="text-sm font-black text-gray-800 mb-4 uppercase tracking-wider text-emerald-600">1. Bar Graph: Fulfillment State Distribution</h2>
+          <div className="bg-white dark:bg-slate-900 rounded-2xl border border-gray-100 p-4 md:p-6 shadow-sm">
+            <h2 className="text-sm font-black text-gray-800 dark:text-slate-100 mb-4 uppercase tracking-wider text-emerald-600">1. Bar Graph: Fulfillment State Distribution</h2>
             <ResponsiveContainer width="100%" aspect={2}>
               <BarChart data={logisticsGraphData.orderDistribution} margin={{ left: -20, right: 10, top: 10 }}>
                 <XAxis dataKey="status" className="text-xs" stroke="#9ca3af" tickLine={false} />
@@ -345,8 +345,8 @@ export default function Dashboard() {
           </div>
 
           {/* 2. LINE GRAPH: Historical Cargo Orders Influx */}
-          <div className="bg-white rounded-2xl border border-gray-100 p-4 md:p-6 shadow-sm">
-            <h2 className="text-sm font-black text-gray-800 mb-4 uppercase tracking-wider text-emerald-600">2. Line Graph: Volumetric Historical Influx Trajectory</h2>
+          <div className="bg-white dark:bg-slate-900 rounded-2xl border border-gray-100 p-4 md:p-6 shadow-sm">
+            <h2 className="text-sm font-black text-gray-800 dark:text-slate-100 mb-4 uppercase tracking-wider text-emerald-600">2. Line Graph: Volumetric Historical Influx Trajectory</h2>
             <ResponsiveContainer width="100%" aspect={2}>
               <LineChart data={logisticsGraphData.logisticsTrends} margin={{ left: -20, right: 10, top: 10 }}>
                 <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f3f4f6" />
@@ -359,8 +359,8 @@ export default function Dashboard() {
           </div>
 
           {/* 3. PIE CHART: Escrow Split */}
-          <div className="bg-white rounded-2xl border border-gray-100 p-4 md:p-6 shadow-sm">
-            <h2 className="text-sm font-black text-gray-800 mb-4 uppercase tracking-wider text-emerald-600">3. Pie Chart: Monetary Gateway Value Share</h2>
+          <div className="bg-white dark:bg-slate-900 rounded-2xl border border-gray-100 p-4 md:p-6 shadow-sm">
+            <h2 className="text-sm font-black text-gray-800 dark:text-slate-100 mb-4 uppercase tracking-wider text-emerald-600">3. Pie Chart: Monetary Gateway Value Share</h2>
             <ResponsiveContainer width="100%" aspect={2}>
               <PieChart>
                 <Pie data={logisticsGraphData.paymentShare} cx="50%" cy="50%" innerRadius={50} outerRadius={80} paddingAngle={3} dataKey="value">
@@ -373,8 +373,8 @@ export default function Dashboard() {
           </div>
 
           {/* 4. AREA GRAPH: Fleet Revenue Outlays */}
-          <div className="bg-white rounded-2xl border border-gray-100 p-4 md:p-6 shadow-sm">
-            <h2 className="text-sm font-black text-gray-800 mb-4 uppercase tracking-wider text-emerald-600">4. Area Graph: Cumulative Fleet Revenue Velocity</h2>
+          <div className="bg-white dark:bg-slate-900 rounded-2xl border border-gray-100 p-4 md:p-6 shadow-sm">
+            <h2 className="text-sm font-black text-gray-800 dark:text-slate-100 mb-4 uppercase tracking-wider text-emerald-600">4. Area Graph: Cumulative Fleet Revenue Velocity</h2>
             <ResponsiveContainer width="100%" aspect={2}>
               <AreaChart data={logisticsGraphData.logisticsTrends} margin={{ left: -15, right: 10, top: 10 }}>
                 <defs>
@@ -394,8 +394,8 @@ export default function Dashboard() {
           </div>
 
           {/* 5. HISTOGRAM CHART: Route Distance Bucketing */}
-          <div className="bg-white rounded-2xl border border-gray-100 p-4 md:p-6 shadow-sm">
-            <h2 className="text-sm font-black text-gray-800 mb-4 uppercase tracking-wider text-emerald-600">5. Histogram: Delivery Bill Frequency Distribution</h2>
+          <div className="bg-white dark:bg-slate-900 rounded-2xl border border-gray-100 p-4 md:p-6 shadow-sm">
+            <h2 className="text-sm font-black text-gray-800 dark:text-slate-100 mb-4 uppercase tracking-wider text-emerald-600">5. Histogram: Delivery Bill Frequency Distribution</h2>
             <ResponsiveContainer width="100%" aspect={2}>
               <BarChart data={logisticsGraphData.valueHistogram} margin={{ left: -20, right: 10, top: 10 }} barCategoryGap={1}>
                 <XAxis dataKey="range" className="text-xs" stroke="#9ca3af" />
@@ -407,8 +407,8 @@ export default function Dashboard() {
           </div>
 
           {/* 6. SCATTER PLOT: Jobs vs Earnings Correlation */}
-          <div className="bg-white rounded-2xl border border-gray-100 p-4 md:p-6 shadow-sm">
-            <h2 className="text-sm font-black text-gray-800 mb-4 uppercase tracking-wider text-emerald-600">6. Scatter Plot: Transporter Performance Correlations</h2>
+          <div className="bg-white dark:bg-slate-900 rounded-2xl border border-gray-100 p-4 md:p-6 shadow-sm">
+            <h2 className="text-sm font-black text-gray-800 dark:text-slate-100 mb-4 uppercase tracking-wider text-emerald-600">6. Scatter Plot: Transporter Performance Correlations</h2>
             <ResponsiveContainer width="100%" aspect={2}>
               <ScatterChart margin={{ left: -20, right: 10, top: 10 }}>
                 <CartesianGrid strokeDasharray="3 3" stroke="#f3f4f6" />
@@ -422,8 +422,8 @@ export default function Dashboard() {
           </div>
 
           {/* 7. DOT PLOT CHART: Peak Hour Density */}
-          <div className="bg-white rounded-2xl border border-gray-100 p-4 md:p-6 shadow-sm lg:col-span-2">
-            <h2 className="text-sm font-black text-gray-800 mb-4 uppercase tracking-wider text-emerald-600">7. Dot Plot: Hourly Fleet Delivery Traffic Densities</h2>
+          <div className="bg-white dark:bg-slate-900 rounded-2xl border border-gray-100 p-4 md:p-6 shadow-sm lg:col-span-2">
+            <h2 className="text-sm font-black text-gray-800 dark:text-slate-100 mb-4 uppercase tracking-wider text-emerald-600">7. Dot Plot: Hourly Fleet Delivery Traffic Densities</h2>
             <ResponsiveContainer width="100%" height={160}>
               <ScatterChart margin={{ left: -20, right: 10, top: 10 }}>
                 <XAxis dataKey="hour" type="category" className="text-xs" stroke="#9ca3af" />

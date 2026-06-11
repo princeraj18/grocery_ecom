@@ -33,9 +33,9 @@ export default function AdminForgotPassword() {
       <div className="absolute top-4 right-4">
         <ThemeToggle />
       </div>
-      <div className="bg-white p-8 rounded-2xl shadow-lg w-full max-w-md">
+      <div className="bg-white dark:bg-slate-900 p-8 rounded-2xl shadow-lg w-full max-w-md">
         <h1 className="text-3xl font-bold text-center mb-2">Admin Recovery</h1>
-        <p className="text-sm text-gray-500 text-center mb-6">Enter verified administrative credentials.</p>
+        <p className="text-sm text-gray-500 dark:text-slate-400 text-center mb-6">Enter verified administrative credentials.</p>
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <input
@@ -62,7 +62,7 @@ export default function AdminForgotPassword() {
         <button
           type="button"
           onClick={() => navigate("/login")}
-          className="w-full mt-4 text-center text-sm font-semibold hover:underline text-gray-600"
+          className="w-full mt-4 text-center text-sm font-semibold hover:underline text-gray-600 dark:text-slate-400"
         >
           Return to Admin Login
         </button>

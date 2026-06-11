@@ -85,7 +85,7 @@ const AdminProfile = () => {
   // =========================================
   if (loading) {
     return (
-      <div className="flex min-h-screen flex-col items-center justify-center bg-slate-50 text-slate-500 font-poppins gap-3">
+      <div className="flex min-h-screen flex-col items-center justify-center bg-slate-50 dark:bg-slate-900 text-slate-500 dark:text-slate-400 font-poppins gap-3">
         <Loader2 className="animate-spin text-indigo-600" size={32} />
         <span className="text-xs font-extrabold uppercase tracking-widest text-slate-400">
           Syncing Cryptographic Credentials...
@@ -95,7 +95,7 @@ const AdminProfile = () => {
   }
 
   return (
-    <div className="flex min-h-screen bg-slate-50 text-slate-800 font-poppins overflow-hidden">
+    <div className="flex min-h-screen bg-slate-50 dark:bg-slate-900 text-slate-800 dark:text-slate-100 font-poppins overflow-hidden">
       
       {/* MOBILE OVERLAY */}
       {sidebarOpen && (
@@ -119,10 +119,10 @@ const AdminProfile = () => {
           <div className="max-w-3xl mx-auto space-y-6">
             
             {/* COMPONENT ACCENT TITLE BANNER */}
-            <div className="border-b border-slate-200 pb-5">
+            <div className="border-b border-slate-200 dark:border-slate-800 pb-5">
               <div className="flex items-center gap-2.5">
                 <ShieldCheck className="text-indigo-600" size={26} />
-                <h1 className="text-2xl md:text-3xl font-extrabold text-slate-900 tracking-wide uppercase">
+                <h1 className="text-2xl md:text-3xl font-extrabold text-slate-900 dark:text-white tracking-wide uppercase">
                   Security Account Context
                 </h1>
               </div>
@@ -139,7 +139,7 @@ const AdminProfile = () => {
               </div>
             ) : (
               /* CORE INFORMATION WRAPPER CARD */
-              <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+              <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden">
                 
                 {/* DECORATIVE TOP GRAPHIC COVER ST Tint */}
                 <div className="h-24 bg-linear-to-r from-indigo-600 to-indigo-800 relative flex items-end px-6 md:px-8">
@@ -152,7 +152,7 @@ const AdminProfile = () => {
                 <div className="pt-14 p-6 md:p-8 space-y-6">
                   
                   <div>
-                    <h2 className="text-xl font-black text-slate-900 tracking-tight">
+                    <h2 className="text-xl font-black text-slate-900 dark:text-white tracking-tight">
                       {adminData?.name || "System Master Admin"}
                     </h2>
                     <span className="inline-block mt-1 text-[10px] font-black uppercase tracking-widest text-indigo-700 bg-indigo-50 border border-indigo-100 px-2.5 py-0.5 rounded-md">
@@ -160,32 +160,32 @@ const AdminProfile = () => {
                     </span>
                   </div>
 
-                  <hr className="border-slate-100" />
+                  <hr className="border-slate-100 dark:border-slate-800" />
 
                   {/* ACCOUNT DATA METRIC FIELDS ROWS */}
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                     
                     {/* EMAIL ADDRESS PROFILE METADATA */}
-                    <div className="flex items-start gap-3 p-3.5 rounded-xl border border-slate-100 bg-slate-50/50">
+                    <div className="flex items-start gap-3 p-3.5 rounded-xl border border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/50">
                       <Mail size={18} className="text-slate-400 mt-0.5 shrink-0" />
                       <div className="truncate">
                         <span className="block text-[10px] font-extrabold text-slate-400 uppercase tracking-wider">
                           Cryptographic Address Alias
                         </span>
-                        <span className="text-xs font-mono font-bold text-slate-700 truncate block">
+                        <span className="text-xs font-mono font-bold text-slate-700 dark:text-slate-300 truncate block">
                           {adminData?.email || "admin@platform.com"}
                         </span>
                       </div>
                     </div>
 
                     {/* MONGO RECORD UNIQUE SYSTEM KEY ID */}
-                    <div className="flex items-start gap-3 p-3.5 rounded-xl border border-slate-100 bg-slate-50/50">
+                    <div className="flex items-start gap-3 p-3.5 rounded-xl border border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/50">
                       <KeyRound size={18} className="text-slate-400 mt-0.5 shrink-0" />
                       <div className="truncate">
                         <span className="block text-[10px] font-extrabold text-slate-400 uppercase tracking-wider">
                           Internal Key Identifier (_id)
                         </span>
-                        <span className="text-xs font-mono font-bold text-slate-500 truncate block">
+                        <span className="text-xs font-mono font-bold text-slate-500 dark:text-slate-400 truncate block">
                           {adminData?._id || "64f19b28a4120bc9e108d4f2"}
                         </span>
                       </div>
@@ -193,13 +193,13 @@ const AdminProfile = () => {
 
                     {/* ACCOUNT HISTORICAL INCEPTION DATE RECORD */}
                     {adminData?.createdAt && (
-                      <div className="flex items-start gap-3 p-3.5 rounded-xl border border-slate-100 bg-slate-50/50">
+                      <div className="flex items-start gap-3 p-3.5 rounded-xl border border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/50">
                         <Clock size={18} className="text-slate-400 mt-0.5 shrink-0" />
                         <div>
                           <span className="block text-[10px] font-extrabold text-slate-400 uppercase tracking-wider">
                             Profile Sequence Creation Timestamp
                           </span>
-                          <span className="text-xs font-semibold text-slate-700">
+                          <span className="text-xs font-semibold text-slate-700 dark:text-slate-300">
                             {new Date(adminData.createdAt).toLocaleString()}
                           </span>
                         </div>
@@ -209,10 +209,10 @@ const AdminProfile = () => {
                   </div>
 
                   {/* CONTROL BUTTON DECK ACTION CONSOLE */}
-                  <div className="pt-4 border-t border-slate-100 flex flex-wrap gap-3">
+                  <div className="pt-4 border-t border-slate-100 dark:border-slate-800 flex flex-wrap gap-3">
                     <button
                       onClick={() => navigate("/admin/forgot-password")}
-                      className="text-xs font-bold border border-slate-200 hover:border-slate-300 bg-white text-slate-600 hover:text-slate-800 px-5 py-3 rounded-xl transition flex items-center gap-1.5 shadow-2xs"
+                      className="text-xs font-bold border border-slate-200 dark:border-slate-800 hover:border-slate-300 bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-400 hover:text-slate-800 dark:text-slate-100 px-5 py-3 rounded-xl transition flex items-center gap-1.5 shadow-2xs"
                     >
                       <KeyRound size={14} />
                       <span>Request Security Credentials Reset</span>

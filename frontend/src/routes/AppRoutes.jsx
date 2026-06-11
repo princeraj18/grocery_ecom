@@ -57,9 +57,7 @@ const user = JSON.parse(
     ) || isVendorRoute;
 
  return (
-  <>
-    {!hideNavbar && <Navbar />}
-
+  <div className="min-h-screen bg-inherit text-inherit">
     <Routes>
 
       {/* PUBLIC ROUTES */}
@@ -177,7 +175,7 @@ const user = JSON.parse(
       />
 
     </Routes>
-  </>
+  </div>
 );
 };
 

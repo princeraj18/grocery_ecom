@@ -102,7 +102,7 @@ const AdminSetting = () => {
 
   if (fetching) {
     return (
-      <div className="flex h-64 flex-col items-center justify-center text-slate-500 font-poppins gap-3">
+      <div className="flex h-64 flex-col items-center justify-center text-slate-500 dark:text-slate-400 font-poppins gap-3">
         <Loader2 className="animate-spin text-indigo-600" size={32} />
         <span className="text-xs font-extrabold uppercase tracking-widest text-slate-400">
           Fetching Master Application Properties...
@@ -115,11 +115,11 @@ const AdminSetting = () => {
     <div className="max-w-4xl mx-auto space-y-6 font-poppins">
       
       {/* HEADER BANNER */}
-      <div className="border-b border-slate-200 pb-5 flex flex-wrap items-center justify-between gap-4">
+      <div className="border-b border-slate-200 dark:border-slate-800 pb-5 flex flex-wrap items-center justify-between gap-4">
         <div>
           <div className="flex items-center gap-2.5">
             <Settings className="text-indigo-600 animate-spin-slow" size={26} />
-            <h1 className="text-2xl md:text-3xl font-extrabold text-slate-900 tracking-wide uppercase">
+            <h1 className="text-2xl md:text-3xl font-extrabold text-slate-900 dark:text-white tracking-wide uppercase">
               System Settings Console
             </h1>
           </div>
@@ -129,7 +129,7 @@ const AdminSetting = () => {
         </div>
         <button 
           onClick={fetchSettings}
-          className="p-2 border border-slate-200 bg-white text-slate-500 rounded-xl hover:bg-slate-50 transition cursor-pointer"
+          className="p-2 border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-slate-500 dark:text-slate-400 rounded-xl hover:bg-slate-50 transition cursor-pointer"
           title="Reload configurations"
         >
           <RefreshCw size={16} />
@@ -155,14 +155,10 @@ const AdminSetting = () => {
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6 items-start">
         
         {/* SIDE TABS CONTROLLER BAR */}
-        <div className="flex md:flex-col overflow-x-auto md:overflow-x-visible gap-2 bg-slate-200/50 p-1.5 rounded-2xl border border-slate-200/60 shrink-0 whitespace-nowrap">
+        <div className="flex md:flex-col overflow-x-auto md:overflow-x-visible gap-2 bg-slate-200/50 p-1.5 rounded-2xl border border-slate-200 dark:border-slate-800/60 shrink-0 whitespace-nowrap">
           <button
             onClick={() => setActiveTab("platform")}
-            className={`flex items-center gap-2.5 px-4 py-3 rounded-xl text-xs font-bold uppercase tracking-wider transition w-full cursor-pointer ${
-              activeTab === "platform" 
-                ? "bg-indigo-600 text-white shadow-xs" 
-                : "text-slate-600 hover:bg-white/60"
-            }`}
+            className={`flex items-center gap-2.5 px-4 py-3 rounded-xl text-xs font-bold uppercase tracking-wider transition w-full cursor-pointer ${ activeTab === "platform" ? "bg-indigo-600 text-white shadow-xs" : "text-slate-600 dark:text-slate-400 hover:bg-white dark:bg-slate-900/60" }`}
           >
             <Settings size={16} />
             <span>Platform</span>
@@ -170,11 +166,7 @@ const AdminSetting = () => {
           
           <button
             onClick={() => setActiveTab("store")}
-            className={`flex items-center gap-2.5 px-4 py-3 rounded-xl text-xs font-bold uppercase tracking-wider transition w-full cursor-pointer ${
-              activeTab === "store" 
-                ? "bg-indigo-600 text-white shadow-xs" 
-                : "text-slate-600 hover:bg-white/60"
-            }`}
+            className={`flex items-center gap-2.5 px-4 py-3 rounded-xl text-xs font-bold uppercase tracking-wider transition w-full cursor-pointer ${ activeTab === "store" ? "bg-indigo-600 text-white shadow-xs" : "text-slate-600 dark:text-slate-400 hover:bg-white dark:bg-slate-900/60" }`}
           >
             <Store size={16} />
             <span>Store Operations</span>
@@ -182,11 +174,7 @@ const AdminSetting = () => {
 
           <button
             onClick={() => setActiveTab("logistics")}
-            className={`flex items-center gap-2.5 px-4 py-3 rounded-xl text-xs font-bold uppercase tracking-wider transition w-full cursor-pointer ${
-              activeTab === "logistics" 
-                ? "bg-indigo-600 text-white shadow-xs" 
-                : "text-slate-600 hover:bg-white/60"
-            }`}
+            className={`flex items-center gap-2.5 px-4 py-3 rounded-xl text-xs font-bold uppercase tracking-wider transition w-full cursor-pointer ${ activeTab === "logistics" ? "bg-indigo-600 text-white shadow-xs" : "text-slate-600 dark:text-slate-400 hover:bg-white dark:bg-slate-900/60" }`}
           >
             <Truck size={16} />
             <span>Logistics Rules</span>
@@ -194,11 +182,7 @@ const AdminSetting = () => {
 
           <button
             onClick={() => setActiveTab("gateways")}
-            className={`flex items-center gap-2.5 px-4 py-3 rounded-xl text-xs font-bold uppercase tracking-wider transition w-full cursor-pointer ${
-              activeTab === "gateways" 
-                ? "bg-indigo-600 text-white shadow-xs" 
-                : "text-slate-600 hover:bg-white/60"
-            }`}
+            className={`flex items-center gap-2.5 px-4 py-3 rounded-xl text-xs font-bold uppercase tracking-wider transition w-full cursor-pointer ${ activeTab === "gateways" ? "bg-indigo-600 text-white shadow-xs" : "text-slate-600 dark:text-slate-400 hover:bg-white dark:bg-slate-900/60" }`}
           >
             <CreditCard size={16} />
             <span>Gateways</span>
@@ -206,28 +190,28 @@ const AdminSetting = () => {
         </div>
 
         {/* INPUT PANEL CANVAS */}
-        <form onSubmit={handleFormSubmit} className="md:col-span-3 bg-white border border-slate-200 rounded-2xl shadow-xs overflow-hidden">
+        <form onSubmit={handleFormSubmit} className="md:col-span-3 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-xs overflow-hidden">
           
           <div className="p-6 md:p-8 space-y-6 min-h-[300px]">
             
             {/* TAB 1: GENERAL PLATFORM CONTEXT */}
             {activeTab === "platform" && (
               <div className="space-y-5 animate-fadeIn">
-                <h3 className="text-sm font-black text-slate-800 uppercase tracking-widest border-b border-slate-100 pb-2">Platform Identity Configuration</h3>
+                <h3 className="text-sm font-black text-slate-800 dark:text-slate-100 uppercase tracking-widest border-b border-slate-100 dark:border-slate-800 pb-2">Platform Identity Configuration</h3>
                 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div className="space-y-1.5">
                     <label className="text-[11px] font-extrabold uppercase text-slate-400 tracking-wider">Application Platform Name</label>
                     <input 
                       type="text" name="siteName" value={settings.siteName} onChange={handleInputChange} required
-                      className="w-full text-xs font-semibold px-4 py-3 bg-slate-50/60 border border-slate-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-indigo-100 focus:border-indigo-600 transition outline-hidden text-slate-800"
+                      className="w-full text-xs font-semibold px-4 py-3 bg-slate-50 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-800 rounded-xl focus:bg-white dark:bg-slate-900 focus:ring-2 focus:ring-indigo-100 focus:border-indigo-600 transition outline-hidden text-slate-800 dark:text-slate-100"
                     />
                   </div>
                   <div className="space-y-1.5">
                     <label className="text-[11px] font-extrabold uppercase text-slate-400 tracking-wider">System Support Email</label>
                     <input 
                       type="email" name="supportEmail" value={settings.supportEmail} onChange={handleInputChange} required
-                      className="w-full text-xs font-semibold px-4 py-3 bg-slate-50/60 border border-slate-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-indigo-100 focus:border-indigo-600 transition outline-hidden text-slate-800"
+                      className="w-full text-xs font-semibold px-4 py-3 bg-slate-50 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-800 rounded-xl focus:bg-white dark:bg-slate-900 focus:ring-2 focus:ring-indigo-100 focus:border-indigo-600 transition outline-hidden text-slate-800 dark:text-slate-100"
                     />
                   </div>
                 </div>
@@ -242,7 +226,7 @@ const AdminSetting = () => {
                       type="checkbox" name="isMaintenanceMode" checked={settings.isMaintenanceMode} onChange={handleInputChange}
                       className="sr-only peer"
                     />
-                    <div className="w-11 h-6 bg-slate-200 peer-focus:outline-hidden rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-amber-500"></div>
+                    <div className="w-11 h-6 bg-slate-200 peer-focus:outline-hidden rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white dark:bg-slate-900 after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-amber-500"></div>
                   </label>
                 </div>
               </div>
@@ -251,30 +235,30 @@ const AdminSetting = () => {
             {/* TAB 2: STORE CART MECHANICS */}
             {activeTab === "store" && (
               <div className="space-y-5 animate-fadeIn">
-                <h3 className="text-sm font-black text-slate-800 uppercase tracking-widest border-b border-slate-100 pb-2">Operational Bounds Parameters</h3>
+                <h3 className="text-sm font-black text-slate-800 dark:text-slate-100 uppercase tracking-widest border-b border-slate-100 dark:border-slate-800 pb-2">Operational Bounds Parameters</h3>
                 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div className="space-y-1.5">
                     <label className="text-[11px] font-extrabold uppercase text-slate-400 tracking-wider">Minimum Cart Total Checkout (₹)</label>
                     <input 
                       type="number" name="minOrderValue" value={settings.minOrderValue} onChange={handleInputChange} min="0" required
-                      className="w-full text-xs font-semibold px-4 py-3 bg-slate-50/60 border border-slate-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-indigo-100 focus:border-indigo-600 transition outline-hidden text-slate-800"
+                      className="w-full text-xs font-semibold px-4 py-3 bg-slate-50 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-800 rounded-xl focus:bg-white dark:bg-slate-900 focus:ring-2 focus:ring-indigo-100 focus:border-indigo-600 transition outline-hidden text-slate-800 dark:text-slate-100"
                     />
                   </div>
                   <div className="space-y-1.5">
                     <label className="text-[11px] font-extrabold uppercase text-slate-400 tracking-wider">Global Order Tax Assessment (%)</label>
                     <input 
                       type="number" name="taxPercentage" value={settings.taxPercentage} onChange={handleInputChange} min="0" max="100" required
-                      className="w-full text-xs font-semibold px-4 py-3 bg-slate-50/60 border border-slate-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-indigo-100 focus:border-indigo-600 transition outline-hidden text-slate-800"
+                      className="w-full text-xs font-semibold px-4 py-3 bg-slate-50 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-800 rounded-xl focus:bg-white dark:bg-slate-900 focus:ring-2 focus:ring-indigo-100 focus:border-indigo-600 transition outline-hidden text-slate-800 dark:text-slate-100"
                     />
                   </div>
                 </div>
 
-                <hr className="border-slate-100" />
+                <hr className="border-slate-100 dark:border-slate-800" />
 
                 <div className="flex items-center justify-between p-2.5">
                   <div>
-                    <h4 className="text-xs font-bold text-slate-700 uppercase tracking-wide">Automated Delivery Partner Engine</h4>
+                    <h4 className="text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wide">Automated Delivery Partner Engine</h4>
                     <p className="text-[11px] text-slate-400 font-medium mt-0.5">Intelligently match incoming orders to the closest active delivery agent automatically.</p>
                   </div>
                   <label className="relative inline-flex items-center cursor-pointer">
@@ -282,7 +266,7 @@ const AdminSetting = () => {
                       type="checkbox" name="autoAssignDelivery" checked={settings.autoAssignDelivery} onChange={handleInputChange}
                       className="sr-only peer"
                     />
-                    <div className="w-11 h-6 bg-slate-200 peer-focus:outline-hidden rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-indigo-600"></div>
+                    <div className="w-11 h-6 bg-slate-200 peer-focus:outline-hidden rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white dark:bg-slate-900 after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-indigo-600"></div>
                   </label>
                 </div>
               </div>
@@ -291,35 +275,35 @@ const AdminSetting = () => {
             {/* TAB 3: LOGISTICS AND DISTANCE CONSTANTS */}
             {activeTab === "logistics" && (
               <div className="space-y-5 animate-fadeIn">
-                <h3 className="text-sm font-black text-slate-800 uppercase tracking-widest border-b border-slate-100 pb-2">Logistics Pricing Formulas</h3>
+                <h3 className="text-sm font-black text-slate-800 dark:text-slate-100 uppercase tracking-widest border-b border-slate-100 dark:border-slate-800 pb-2">Logistics Pricing Formulas</h3>
                 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div className="space-y-1.5">
                     <label className="text-[11px] font-extrabold uppercase text-slate-400 tracking-wider">Base Courier Setup Fee (₹)</label>
                     <input 
                       type="number" name="baseDeliveryFee" value={settings.baseDeliveryFee} onChange={handleInputChange} min="0" required
-                      className="w-full text-xs font-semibold px-4 py-3 bg-slate-50/60 border border-slate-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-indigo-100 focus:border-indigo-600 transition outline-hidden text-slate-800"
+                      className="w-full text-xs font-semibold px-4 py-3 bg-slate-50 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-800 rounded-xl focus:bg-white dark:bg-slate-900 focus:ring-2 focus:ring-indigo-100 focus:border-indigo-600 transition outline-hidden text-slate-800 dark:text-slate-100"
                     />
                   </div>
                   <div className="space-y-1.5">
                     <label className="text-[11px] font-extrabold uppercase text-slate-400 tracking-wider">Free Delivery Cart Waiver (₹)</label>
                     <input 
                       type="number" name="freeDeliveryThreshold" value={settings.freeDeliveryThreshold} onChange={handleInputChange} min="0" required
-                      className="w-full text-xs font-semibold px-4 py-3 bg-slate-50/60 border border-slate-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-indigo-100 focus:border-indigo-600 transition outline-hidden text-slate-800"
+                      className="w-full text-xs font-semibold px-4 py-3 bg-slate-50 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-800 rounded-xl focus:bg-white dark:bg-slate-900 focus:ring-2 focus:ring-indigo-100 focus:border-indigo-600 transition outline-hidden text-slate-800 dark:text-slate-100"
                     />
                   </div>
                   <div className="space-y-1.5">
                     <label className="text-[11px] font-extrabold uppercase text-slate-400 tracking-wider">Distance Scaler Surcharge (₹ / km)</label>
                     <input 
                       type="number" name="perKmSurcharge" value={settings.perKmSurcharge} onChange={handleInputChange} min="0" required
-                      className="w-full text-xs font-semibold px-4 py-3 bg-slate-50/60 border border-slate-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-indigo-100 focus:border-indigo-600 transition outline-hidden text-slate-800"
+                      className="w-full text-xs font-semibold px-4 py-3 bg-slate-50 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-800 rounded-xl focus:bg-white dark:bg-slate-900 focus:ring-2 focus:ring-indigo-100 focus:border-indigo-600 transition outline-hidden text-slate-800 dark:text-slate-100"
                     />
                   </div>
                   <div className="space-y-1.5">
                     <label className="text-[11px] font-extrabold uppercase text-slate-400 tracking-wider">Maximum Shipping Boundary (km)</label>
                     <input 
                       type="number" name="maxDeliveryRadiusKm" value={settings.maxDeliveryRadiusKm} onChange={handleInputChange} min="1" required
-                      className="w-full text-xs font-semibold px-4 py-3 bg-slate-50/60 border border-slate-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-indigo-100 focus:border-indigo-600 transition outline-hidden text-slate-800"
+                      className="w-full text-xs font-semibold px-4 py-3 bg-slate-50 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-800 rounded-xl focus:bg-white dark:bg-slate-900 focus:ring-2 focus:ring-indigo-100 focus:border-indigo-600 transition outline-hidden text-slate-800 dark:text-slate-100"
                     />
                   </div>
                 </div>
@@ -329,12 +313,12 @@ const AdminSetting = () => {
             {/* TAB 4: GATEWAYS SWITCH BOARD */}
             {activeTab === "gateways" && (
               <div className="space-y-5 animate-fadeIn">
-                <h3 className="text-sm font-black text-slate-800 uppercase tracking-widest border-b border-slate-100 pb-2">Active Financial Channels</h3>
+                <h3 className="text-sm font-black text-slate-800 dark:text-slate-100 uppercase tracking-widest border-b border-slate-100 dark:border-slate-800 pb-2">Active Financial Channels</h3>
                 
                 <div className="space-y-1">
-                  <div className="flex items-center justify-between p-3 rounded-xl border border-slate-100 hover:bg-slate-50/50 transition">
+                  <div className="flex items-center justify-between p-3 rounded-xl border border-slate-100 dark:border-slate-800 hover:bg-slate-50 dark:bg-slate-900/50 transition">
                     <div>
-                      <h4 className="text-xs font-bold text-slate-700 uppercase tracking-wide">Cash On Delivery (COD)</h4>
+                      <h4 className="text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wide">Cash On Delivery (COD)</h4>
                       <p className="text-[11px] text-slate-400 font-medium">Allow physical payment clearing strings upon order drop off.</p>
                     </div>
                     <label className="relative inline-flex items-center cursor-pointer">
@@ -342,13 +326,13 @@ const AdminSetting = () => {
                         type="checkbox" name="enableCOD" checked={settings.enableCOD} onChange={handleInputChange}
                         className="sr-only peer"
                       />
-                      <div className="w-11 h-6 bg-slate-200 peer-focus:outline-hidden rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-indigo-600"></div>
+                      <div className="w-11 h-6 bg-slate-200 peer-focus:outline-hidden rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white dark:bg-slate-900 after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-indigo-600"></div>
                     </label>
                   </div>
 
-                  <div className="flex items-center justify-between p-3 rounded-xl border border-slate-100 hover:bg-slate-50/50 transition">
+                  <div className="flex items-center justify-between p-3 rounded-xl border border-slate-100 dark:border-slate-800 hover:bg-slate-50 dark:bg-slate-900/50 transition">
                     <div>
-                      <h4 className="text-xs font-bold text-slate-700 uppercase tracking-wide">Online Digital Gateways (Razorpay/Stripe)</h4>
+                      <h4 className="text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wide">Online Digital Gateways (Razorpay/Stripe)</h4>
                       <p className="text-[11px] text-slate-400 font-medium">Activate processing hooks for credit cards, digital wallets, and UPI networks.</p>
                     </div>
                     <label className="relative inline-flex items-center cursor-pointer">
@@ -356,7 +340,7 @@ const AdminSetting = () => {
                         type="checkbox" name="enableOnlinePayment" checked={settings.enableOnlinePayment} onChange={handleInputChange}
                         className="sr-only peer"
                       />
-                      <div className="w-11 h-6 bg-slate-200 peer-focus:outline-hidden rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-indigo-600"></div>
+                      <div className="w-11 h-6 bg-slate-200 peer-focus:outline-hidden rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white dark:bg-slate-900 after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-indigo-600"></div>
                     </label>
                   </div>
                 </div>
@@ -371,7 +355,7 @@ const AdminSetting = () => {
                       type="checkbox" name="testModeGateways" checked={settings.testModeGateways} onChange={handleInputChange}
                       className="sr-only peer"
                     />
-                    <div className="w-11 h-6 bg-slate-200 peer-focus:outline-hidden rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-rose-500"></div>
+                    <div className="w-11 h-6 bg-slate-200 peer-focus:outline-hidden rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white dark:bg-slate-900 after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-rose-500"></div>
                   </label>
                 </div>
               </div>
@@ -380,7 +364,7 @@ const AdminSetting = () => {
           </div>
 
           {/* PERSISTENCE DECK ACTION PANEL FOOTER */}
-          <div className="px-6 py-4 bg-slate-50 border-t border-slate-100 flex justify-end">
+          <div className="px-6 py-4 bg-slate-50 dark:bg-slate-900 border-t border-slate-100 dark:border-slate-800 flex justify-end">
             <button
               type="submit"
               disabled={loading}

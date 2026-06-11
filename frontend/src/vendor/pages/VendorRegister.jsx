@@ -97,7 +97,7 @@ window.location.href =
         <ThemeToggle />
       </div>
 
-      <div className="bg-white p-8 rounded-2xl shadow-lg w-full max-w-2xl">
+      <div className="bg-white dark:bg-slate-900 p-8 rounded-2xl shadow-lg w-full max-w-2xl">
 
         <h1 className="text-3xl font-bold text-center mb-8">
           Vendor Register

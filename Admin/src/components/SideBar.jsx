@@ -29,7 +29,7 @@ export default function Sidebar() {
     `flex items-center gap-3 p-2.5 rounded-xl transition-all duration-200 text-xs font-semibold shrink-0 font-poppins ${
       isActive
         ? "bg-indigo-600 text-white shadow-md shadow-indigo-600/10"
-        : "text-slate-500 hover:bg-slate-100 hover:text-slate-900"
+        : "text-slate-500 dark:text-slate-400 hover:bg-slate-100 hover:text-slate-900 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-white"
     }`;
 
   // Left Slim Icon Dock Links Styling
@@ -37,7 +37,7 @@ export default function Sidebar() {
     `p-3 rounded-xl transition-all duration-200 relative group shrink-0 ${
       isActive 
         ? "bg-indigo-600 text-white shadow-md shadow-indigo-600/20" 
-        : "text-slate-400 hover:bg-slate-100 hover:text-slate-800"
+        : "text-slate-400 hover:bg-slate-100 hover:text-slate-800 dark:hover:bg-slate-800 dark:hover:text-white"
     }`;
 
   // Helper logic to highlight the category icon if any sub-route is active
@@ -48,12 +48,12 @@ export default function Sidebar() {
   const isProfileActive = currentPath === "/profile";
 
   return (
-    <div className="flex h-screen bg-white text-slate-800 sticky top-0 overflow-hidden select-none border-r border-slate-200 font-poppins">
+    <div className="flex h-screen bg-white dark:bg-slate-900 text-slate-800 dark:text-slate-100 sticky top-0 overflow-hidden select-none border-r border-slate-200 dark:border-slate-800 font-poppins">
       
       {/* ========================================================
           1. LEFT ICON ONLY SIDEBAR (SLIM DOCK CATEGORIES)
          ======================================================== */}
-      <div className="w-16 bg-slate-50 flex flex-col items-center py-6 justify-between border-r border-slate-200 h-full overflow-y-auto no-scrollbar shrink-0 gap-6">
+      <div className="w-16 bg-slate-50 dark:bg-slate-950 flex flex-col items-center py-6 justify-between border-r border-slate-200 dark:border-slate-800 h-full overflow-y-auto no-scrollbar shrink-0 gap-6">
         
         {/* Top Section & Category Group Shortcuts */}
         <div className="flex flex-col items-center gap-4 w-full px-2">
@@ -78,7 +78,7 @@ export default function Sidebar() {
           </NavLink>
 
           {/* Section Divider */}
-          <hr className="w-8 border-slate-200 my-1 shrink-0" />
+          <hr className="w-8 border-slate-200 dark:border-slate-700 my-1 shrink-0" />
 
           {/* CATEGORY 4: HELP & SUPPORT */}
           <NavLink to="/admin/support" className={iconDockClass(isSupportActive)} title="System Support">
@@ -90,18 +90,14 @@ export default function Sidebar() {
         <div className="flex flex-col items-center gap-4 w-full px-2 shrink-0">
           <button onClick={()=>
             navigate("/setting")
-          } className="p-2.5 rounded-xl text-slate-400 hover:bg-slate-100 hover:text-slate-700 transition" title="Settings">
+          } className="p-2.5 rounded-xl text-slate-400 hover:bg-slate-100 hover:text-slate-700 dark:hover:bg-slate-800 dark:hover:text-white transition" title="Settings">
             <Settings size={20} />
           </button>
           
           {/* SECURE ROUTE REDIRECTION AVATAR NODE */}
           <button 
             onClick={() => navigate("/profile")}
-            className={`h-9 w-9 border rounded-full flex items-center justify-center cursor-pointer transition ${
-              isProfileActive 
-                ? "bg-indigo-50 border-indigo-500 text-indigo-600 ring-2 ring-indigo-600/20" 
-                : "bg-slate-200 border-slate-300/50 hover:bg-slate-300 text-slate-600"
-            }`}
+            className={`h-9 w-9 border rounded-full flex items-center justify-center cursor-pointer transition ${ isProfileActive ? "bg-indigo-50 border-indigo-500 text-indigo-600 ring-2 ring-indigo-600/20 dark:bg-indigo-950 dark:border-indigo-500 dark:text-indigo-300" : "bg-slate-200 border-slate-300/50 hover:bg-slate-300 text-slate-600 dark:bg-slate-800 dark:border-slate-700 dark:hover:bg-slate-700 dark:text-slate-300" }`}
             title="Profile Credentials & Account Scope"
           >
             <User size={18} />
@@ -113,11 +109,11 @@ export default function Sidebar() {
       {/* ========================================================
           2. MAIN SIDEBAR (TEXT LINKS MENU DETAILED)
          ======================================================== */}
-      <div className="w-64 bg-white p-5 border-r border-slate-100 flex flex-col h-full overflow-hidden">
+      <div className="w-64 bg-white dark:bg-slate-900 p-5 border-r border-slate-100 dark:border-slate-800 flex flex-col h-full overflow-hidden">
         
         {/* LOGO TITLE */}
         <div className="mb-6 py-1 shrink-0">
-          <h1 className="text-xl font-extrabold text-slate-900 tracking-wide uppercase font-poppins">
+          <h1 className="text-xl font-extrabold text-slate-900 dark:text-white tracking-wide uppercase font-poppins">
             Admin Panel
           </h1>
           <p className="text-[10px] text-indigo-600 font-bold tracking-widest uppercase mt-0.5 font-poppins">Control Center</p>

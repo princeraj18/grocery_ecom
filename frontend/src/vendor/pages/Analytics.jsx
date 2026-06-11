@@ -106,10 +106,10 @@ export default function Analytics() {
   ];
 
   return (
-    <div className="flex h-screen w-screen overflow-hidden bg-slate-50 font-poppins text-slate-800">
+    <div className="flex h-screen w-screen overflow-hidden bg-slate-50 dark:bg-slate-900 font-poppins text-slate-800 dark:text-slate-100">
       
       {/* 1. DESKTOP PERMANENT FIXED SIDEBAR */}
-      <div className="hidden lg:block w-64 h-full flex-shrink-0 border-r border-slate-200 bg-white">
+      <div className="hidden lg:block w-64 h-full flex-shrink-0 border-r border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900">
         <Sidebar />
       </div>
 
@@ -123,9 +123,7 @@ export default function Analytics() {
 
       {/* 3. MOBILE SLIDE-OUT DRAWER */}
       <div
-        className={`fixed top-0 left-0 z-50 h-screen w-64 transform transition-transform duration-300 ease-in-out lg:hidden bg-white ${
-          sidebarOpen ? "translate-x-0" : "-translate-x-full"
-        }`}
+        className={`fixed top-0 left-0 z-50 h-screen w-64 transform transition-transform duration-300 ease-in-out lg:hidden bg-white dark:bg-slate-900 ${ sidebarOpen ? "translate-x-0" : "-translate-x-full" }`}
       >
         <Sidebar />
       </div>
@@ -136,14 +134,14 @@ export default function Analytics() {
       <div className="flex-1 flex flex-col h-full overflow-hidden">
         
         {/* MOBILE TOP CONTROLLER STRIP */}
-        <div className="sticky top-0 z-30 bg-white border-b border-slate-200/80 px-4 py-3 flex items-center lg:hidden flex-shrink-0">
+        <div className="sticky top-0 z-30 bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800/80 px-4 py-3 flex items-center lg:hidden flex-shrink-0">
           <button
             onClick={() => setSidebarOpen(!sidebarOpen)}
-            className="p-2 text-slate-600 hover:bg-slate-100 rounded-xl transition"
+            className="p-2 text-slate-600 dark:text-slate-400 hover:bg-slate-100 rounded-xl transition"
           >
             {sidebarOpen ? <X size={24} /> : <Menu size={24} />}
           </button>
-          <span className="ml-3 font-bold text-slate-800 tracking-wide text-sm uppercase">
+          <span className="ml-3 font-bold text-slate-800 dark:text-slate-100 tracking-wide text-sm uppercase">
             Workspace Hub
           </span>
         </div>
@@ -153,10 +151,10 @@ export default function Analytics() {
           
           {/* DASHBOARD PROFILE HEADER BLOCK */}
           <div className="mb-8">
-            <h1 className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight">
+            <h1 className="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white tracking-tight">
               Vendor Analytics
             </h1>
-            <p className="text-slate-500 mt-1.5 text-xs sm:text-sm font-medium">
+            <p className="text-slate-500 dark:text-slate-400 mt-1.5 text-xs sm:text-sm font-medium">
               Real-time synchronization context for metrics, item velocities, and client distribution.
             </p>
           </div>
@@ -193,9 +191,9 @@ export default function Analytics() {
               <div className="grid grid-cols-1 xl:grid-cols-2 gap-6 mb-8">
                 
                 {/* LINE GRAPH: TRANSACTION VELOCITY */}
-                <div className="bg-white rounded-2xl border border-slate-200/80 shadow-xs p-4 sm:p-6">
+                <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800/80 shadow-xs p-4 sm:p-6">
                   <div className="mb-4">
-                    <h2 className="text-base font-bold text-slate-900 tracking-tight flex items-center gap-2">
+                    <h2 className="text-base font-bold text-slate-900 dark:text-white tracking-tight flex items-center gap-2">
                       <LineChart size={18} className="text-blue-500" /> Revenue Stream Inbound Trend
                     </h2>
                     <p className="text-xs text-slate-400 font-medium">Chronological volume timeline of recent receipts.</p>
@@ -219,9 +217,9 @@ export default function Analytics() {
                 </div>
 
                 {/* BAR GRAPH: STOCK VALUE BALANCE MATRIX */}
-                <div className="bg-white rounded-2xl border border-slate-200/80 shadow-xs p-4 sm:p-6">
+                <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800/80 shadow-xs p-4 sm:p-6">
                   <div className="mb-4">
-                    <h2 className="text-base font-bold text-slate-900 tracking-tight flex items-center gap-2">
+                    <h2 className="text-base font-bold text-slate-900 dark:text-white tracking-tight flex items-center gap-2">
                       <BarChart3 size={18} className="text-emerald-500" /> Stock Volume vs Value Breakdown
                     </h2>
                     <p className="text-xs text-slate-400 font-medium">Correlation matrix displaying top inventory pricing structures.</p>
@@ -248,17 +246,17 @@ export default function Analytics() {
               </div>
 
               {/* RECENT INBOUND TRANSACTION ORDERS TABLE */}
-              <div className="bg-white rounded-2xl border border-slate-200/80 shadow-xs p-4 sm:p-6 mb-8">
+              <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800/80 shadow-xs p-4 sm:p-6 mb-8">
                 <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
                   <div>
-                    <h2 className="text-lg font-bold text-slate-900 tracking-tight">
+                    <h2 className="text-lg font-bold text-slate-900 dark:text-white tracking-tight">
                       Recent Ledger Activities
                     </h2>
                     <p className="text-xs text-slate-400 font-medium mt-0.5">
                       Last 6 processing order tickets captured downstream.
                     </p>
                   </div>
-                  <span className="bg-slate-100 border border-slate-200/60 px-4 py-1.5 rounded-xl text-xs font-bold text-slate-600 w-fit uppercase tracking-wider">
+                  <span className="bg-slate-100 border border-slate-200 dark:border-slate-800/60 px-4 py-1.5 rounded-xl text-xs font-bold text-slate-600 dark:text-slate-400 w-fit uppercase tracking-wider">
                     {analytics.orders.length} Total Receipts
                   </span>
                 </div>
@@ -266,26 +264,26 @@ export default function Analytics() {
                 {/* MOBILE COMPACT ORDER MATRIX */}
                 <div className="block lg:hidden space-y-4">
                   {analytics.orders?.slice(0, 6).map((order) => (
-                    <div key={order._id} className="border border-slate-200 rounded-xl p-4 bg-slate-50/50">
+                    <div key={order._id} className="border border-slate-200 dark:border-slate-800 rounded-xl p-4 bg-slate-50 dark:bg-slate-900/50">
                       <div className="flex items-center justify-between mb-3">
-                        <h3 className="font-bold text-slate-700 text-sm">
+                        <h3 className="font-bold text-slate-700 dark:text-slate-300 text-sm">
                           #{order._id?.slice(-6).toUpperCase()}
                         </h3>
                         <span
                           className={`px-2.5 py-1 rounded-lg text-[10px] font-bold uppercase tracking-wider ${
                             order.orderStatus === "Delivered"
-                              ? "bg-emerald-100 text-emerald-700"
+                              ? "bg-emerald-100 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-400"
                               : order.orderStatus === "Cancelled"
-                              ? "bg-rose-100 text-rose-700"
-                              : "bg-amber-100 text-amber-700"
+                                ? "bg-rose-100 text-rose-700 dark:bg-rose-950/40 dark:text-rose-400"
+                                : "bg-amber-100 text-amber-700 dark:bg-amber-950/40 dark:text-amber-400"
                           }`}
                         >
                           {order.orderStatus}
                         </span>
                       </div>
-                      <div className="space-y-1 text-xs text-slate-500 font-medium">
-                        <p>Client: <span className="text-slate-800 font-semibold">{order?.shippingAddress?.firstName} {order?.shippingAddress?.lastName}</span></p>
-                        <p>Gateway: <span className="text-slate-700 uppercase font-semibold">{order.paymentMethod}</span></p>
+                      <div className="space-y-1 text-xs text-slate-500 dark:text-slate-400 font-medium">
+                        <p>Client: <span className="text-slate-800 dark:text-slate-100 font-semibold">{order?.shippingAddress?.firstName} {order?.shippingAddress?.lastName}</span></p>
+                        <p>Gateway: <span className="text-slate-700 dark:text-slate-300 uppercase font-semibold">{order.paymentMethod}</span></p>
                       </div>
                       <p className="text-emerald-600 font-black text-sm mt-3">
                         ₹{order.totalAmount.toLocaleString("en-IN")}
@@ -298,7 +296,7 @@ export default function Analytics() {
                 <div className="hidden lg:block overflow-x-auto">
                   <table className="w-full min-w-[800px]">
                     <thead>
-                      <tr className="bg-slate-50 border-b border-slate-200 text-slate-500 text-[11px] font-bold uppercase tracking-wider">
+                      <tr className="bg-slate-50 dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 text-slate-500 dark:text-slate-400 text-[11px] font-bold uppercase tracking-wider">
                         <th className="p-4 text-left rounded-l-xl">Receipt Key</th>
                         <th className="p-4 text-left">Purchaser Client</th>
                         <th className="p-4 text-left">Processing Method</th>
@@ -306,29 +304,29 @@ export default function Analytics() {
                         <th className="p-4 text-left rounded-r-xl">Execution Context</th>
                       </tr>
                     </thead>
-                    <tbody className="divide-y divide-slate-100 text-xs font-medium text-slate-600">
+                    <tbody className="divide-y divide-slate-100 text-xs font-medium text-slate-600 dark:text-slate-400">
                       {analytics.orders?.slice(0, 6).map((order) => (
-                        <tr key={order._id} className="hover:bg-slate-50/80 transition duration-150">
-                          <td className="p-4 font-bold text-slate-900">
+                        <tr key={order._id} className="hover:bg-slate-50 dark:bg-slate-900/80 transition duration-150">
+                          <td className="p-4 font-bold text-slate-900 dark:text-white">
                             #{order._id?.slice(-6).toUpperCase()}
                           </td>
-                          <td className="p-4 font-semibold text-slate-700">
+                          <td className="p-4 font-semibold text-slate-700 dark:text-slate-300">
                             {order?.shippingAddress?.firstName} {order?.shippingAddress?.lastName}
                           </td>
-                          <td className="p-4 uppercase tracking-wide text-[10px] font-bold text-slate-500">
+                          <td className="p-4 uppercase tracking-wide text-[10px] font-bold text-slate-500 dark:text-slate-400">
                             {order.paymentMethod}
                           </td>
-                          <td className="p-4 font-bold text-slate-900 text-sm">
+                          <td className="p-4 font-bold text-slate-900 dark:text-white text-sm">
                             ₹{order.totalAmount.toLocaleString("en-IN")}
                           </td>
                           <td className="p-4">
                             <span
                               className={`px-3 py-1 rounded-lg text-[10px] font-black uppercase tracking-wider ${
                                 order.orderStatus === "Delivered"
-                                  ? "bg-emerald-100 text-emerald-700"
+                                  ? "bg-emerald-100 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-400"
                                   : order.orderStatus === "Cancelled"
-                                  ? "bg-rose-100 text-rose-700"
-                                  : "bg-amber-100 text-amber-700"
+                                    ? "bg-rose-100 text-rose-700 dark:bg-rose-950/40 dark:text-rose-400"
+                                    : "bg-amber-100 text-amber-700 dark:bg-amber-950/40 dark:text-amber-400"
                               }`}
                             >
                               {order.orderStatus}
@@ -345,10 +343,10 @@ export default function Analytics() {
               <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
                 
                 {/* VELOCITY METRIC CARD (TOP PRODUCTS) */}
-                <div className="bg-white rounded-2xl border border-slate-200/80 shadow-xs p-4 sm:p-6">
+                <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800/80 shadow-xs p-4 sm:p-6">
                   <div className="flex items-center justify-between mb-6">
                     <div>
-                      <h2 className="text-lg font-bold text-slate-900 tracking-tight flex items-center gap-2">
+                      <h2 className="text-lg font-bold text-slate-900 dark:text-white tracking-tight flex items-center gap-2">
                         <Package size={18} className="text-emerald-500" /> High-Velocity Inventory
                       </h2>
                       <p className="text-xs text-slate-400 font-medium mt-0.5">Top stock items moving out of storage.</p>
@@ -356,27 +354,27 @@ export default function Analytics() {
                   </div>
                   <div className="space-y-3">
                     {analytics.products?.slice(0, 4).map((product, idx) => (
-                      <div key={idx} className="flex items-center justify-between p-3 border border-slate-100 rounded-xl bg-slate-50/50 hover:bg-slate-50 transition">
+                      <div key={idx} className="flex items-center justify-between p-3 border border-slate-100 dark:border-slate-800 rounded-xl bg-slate-50 dark:bg-slate-900/50 hover:bg-slate-50 dark:bg-slate-900 transition">
                         <div className="flex items-center gap-3">
                           <div className="w-8 h-8 rounded-lg bg-emerald-100 text-emerald-600 flex items-center justify-center font-bold text-xs">
                             0{idx + 1}
                           </div>
                           <div>
-                            <h4 className="text-xs font-bold text-slate-800 line-clamp-1">{product.name}</h4>
+                            <h4 className="text-xs font-bold text-slate-800 dark:text-slate-100 line-clamp-1">{product.name}</h4>
                             <p className="text-[10px] text-slate-400 font-medium mt-0.5">Stock Remaining: {product.stock}</p>
                           </div>
                         </div>
-                        <span className="text-xs font-black text-slate-900">₹{product.price}</span>
+                        <span className="text-xs font-black text-slate-900 dark:text-white">₹{product.price}</span>
                       </div>
                     ))}
                   </div>
                 </div>
 
                 {/* USER VELOCITY AND IDENTITY ROSTER */}
-                <div className="bg-white rounded-2xl border border-slate-200/80 shadow-xs p-4 sm:p-6">
+                <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800/80 shadow-xs p-4 sm:p-6">
                   <div className="flex items-center justify-between mb-6">
                     <div>
-                      <h2 className="text-lg font-bold text-slate-900 tracking-tight flex items-center gap-2">
+                      <h2 className="text-lg font-bold text-slate-900 dark:text-white tracking-tight flex items-center gap-2">
                         <TrendingUp size={18} className="text-violet-500" /> Active Consumer Pipeline
                       </h2>
                       <p className="text-xs text-slate-400 font-medium mt-0.5">Client profiles dispatching purchases.</p>
@@ -390,14 +388,14 @@ export default function Analytics() {
                     {analytics.orders?.slice(0, 4).map((order, index) => (
                       <div
                         key={index}
-                        className="flex items-center justify-between border border-slate-100 rounded-xl p-3 bg-slate-50/50 hover:shadow-xs transition"
+                        className="flex items-center justify-between border border-slate-100 dark:border-slate-800 rounded-xl p-3 bg-slate-50 dark:bg-slate-900/50 hover:shadow-xs transition"
                       >
                         <div className="flex items-center gap-3">
                           <div className="w-9 h-9 rounded-xl bg-slate-900 text-white flex items-center justify-center font-bold text-xs tracking-wide uppercase shadow-xs">
                             {order?.shippingAddress?.firstName?.charAt(0) || "C"}
                           </div>
                           <div>
-                            <h3 className="text-xs font-bold text-slate-800">
+                            <h3 className="text-xs font-bold text-slate-800 dark:text-slate-100">
                               {order?.shippingAddress?.firstName} {order?.shippingAddress?.lastName}
                             </h3>
                             <p className="text-[10px] text-slate-400 font-medium truncate max-w-[180px] sm:max-w-xs mt-0.5">
@@ -405,7 +403,7 @@ export default function Analytics() {
                             </p>
                           </div>
                         </div>
-                        <span className="text-[10px] bg-slate-100 border border-slate-200/60 px-2.5 py-1 rounded-lg font-bold text-slate-500 uppercase tracking-wider">
+                        <span className="text-[10px] bg-slate-100 border border-slate-200 dark:border-slate-800/60 px-2.5 py-1 rounded-lg font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">
                           Purchaser
                         </span>
                       </div>

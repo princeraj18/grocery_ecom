@@ -91,7 +91,7 @@ export default function Login() {
 
       <form
         onSubmit={handleLogin}
-        className="bg-white p-8 rounded-2xl shadow-lg w-full max-w-md"
+        className="bg-white dark:bg-slate-900 p-8 rounded-2xl shadow-lg w-full max-w-md"
       >
 
         <h1 className="text-3xl font-bold mb-6 text-center">
@@ -126,7 +126,7 @@ export default function Login() {
   <button
     type="button"
     onClick={() => navigate("/admin/forgot-password")}
-    className="text-sm text-gray-600 hover:text-black hover:underline font-medium"
+    className="text-sm text-gray-600 dark:text-slate-400 hover:text-black hover:underline font-medium"
   >
     Forgot Password?
   </button>
@@ -146,7 +146,7 @@ export default function Login() {
         </button>
 
         {/* REGISTER OPTION */}
-        <p className="text-center mt-5 text-gray-600">
+        <p className="text-center mt-5 text-gray-600 dark:text-slate-400">
           Don't have an account?
         </p>
 

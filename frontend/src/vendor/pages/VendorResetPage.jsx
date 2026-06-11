@@ -49,12 +49,12 @@ export default function VendorResetPassword() {
       <div className="absolute top-4 right-4">
         <ThemeToggle />
       </div>
-      <div className="bg-white p-8 rounded-2xl shadow-lg w-full max-w-md">
-        <h1 className="text-3xl font-bold text-center mb-6 text-gray-800">Set Vendor Password</h1>
+      <div className="bg-white dark:bg-slate-900 p-8 rounded-2xl shadow-lg w-full max-w-md">
+        <h1 className="text-3xl font-bold text-center mb-6 text-gray-800 dark:text-slate-100">Set Vendor Password</h1>
 
         <form onSubmit={handleSubmit} className="space-y-5">
           <div>
-            <label className="font-semibold text-sm text-gray-700 block mb-2">New Password</label>
+            <label className="font-semibold text-sm text-gray-700 dark:text-slate-300 block mb-2">New Password</label>
             <input
               type="password"
               value={password}
@@ -65,7 +65,7 @@ export default function VendorResetPassword() {
           </div>
 
           <div>
-            <label className="font-semibold text-sm text-gray-700 block mb-2">Confirm New Password</label>
+            <label className="font-semibold text-sm text-gray-700 dark:text-slate-300 block mb-2">Confirm New Password</label>
             <input
               type="password"
               value={confirmPassword}

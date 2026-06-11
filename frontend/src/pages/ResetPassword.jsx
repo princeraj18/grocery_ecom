@@ -54,32 +54,32 @@ const ResetPassword = () => {
       <div className="absolute top-4 right-4">
         <ThemeToggle />
       </div>
-      <div className="w-full max-w-md bg-white p-8 rounded-2xl shadow-lg">
-        <h2 className="text-3xl font-bold text-center text-gray-800">Create New Password</h2>
-        <p className="text-center text-gray-500 mt-2">Enter your strong new security password below.</p>
+      <div className="w-full max-w-md bg-white dark:bg-slate-900 p-8 rounded-2xl shadow-lg">
+        <h2 className="text-3xl font-bold text-center text-gray-800 dark:text-slate-100">Create New Password</h2>
+        <p className="text-center text-gray-500 dark:text-slate-400 mt-2">Enter your strong new security password below.</p>
 
         <form onSubmit={handleSubmit} className="mt-8 space-y-5">
           <div>
-            <label className="block mb-2 text-sm font-medium text-gray-700">New Password</label>
+            <label className="block mb-2 text-sm font-medium text-gray-700 dark:text-slate-300">New Password</label>
             <input
               type="password"
               placeholder="Minimum 6 characters"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
-              className="w-full border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              className="w-full border border-gray-300 dark:border-slate-700 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-indigo-500"
             />
           </div>
 
           <div>
-            <label className="block mb-2 text-sm font-medium text-gray-700">Confirm New Password</label>
+            <label className="block mb-2 text-sm font-medium text-gray-700 dark:text-slate-300">Confirm New Password</label>
             <input
               type="password"
               placeholder="Confirm new password"
               value={confirmPassword}
               onChange={(e) => setConfirmPassword(e.target.value)}
               required
-              className="w-full border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              className="w-full border border-gray-300 dark:border-slate-700 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-indigo-500"
             />
           </div>
 
