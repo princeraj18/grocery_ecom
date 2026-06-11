@@ -4,6 +4,7 @@ import axios from "axios";
 
 import { useNavigate, Link } from "react-router-dom";
 import ThemeToggle from "../components/ThemeToggle";
+import api from "../api/api";
 
 export default function VendorLogin() {
 
@@ -43,8 +44,8 @@ export default function VendorLogin() {
     setLoading(true);
 
     const { data } =
-      await axios.post(
-        "http://localhost:5000/api/vendors/login",
+      await api.post(
+        "/vendors/login",
         formData
       );
 

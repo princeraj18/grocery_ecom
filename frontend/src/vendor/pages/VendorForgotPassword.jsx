@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import axios from "axios";
 import ThemeToggle from "../components/ThemeToggle";
+import api from "../api/api";
 
 export default function VendorForgotPassword() {
   const [email, setEmail] = useState("");
@@ -16,7 +17,7 @@ export default function VendorForgotPassword() {
     setLoading(true);
 
     try {
-      const res = await axios.post("http://localhost:5000/api/vendors/forgot-password", { email });
+      const res = await api.post("/vendors/forgot-password", { email });
       if (res.data.success) {
         setMessage("A password reset link has been sent to your vendor email inbox.");
       }

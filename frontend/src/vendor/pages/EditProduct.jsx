@@ -14,6 +14,7 @@ import {
 } from "lucide-react";
 import Sidebar from "../components/Sidebar";
 import Navbar from "../components/Navbar";
+import api from "../api/api";
 
 export default function EditProduct() {
   const { id } = useParams();
@@ -36,7 +37,7 @@ export default function EditProduct() {
   // ===================================
   const fetchCategories = async () => {
     try {
-      const res = await axios.get("http://localhost:5000/api/categories");
+      const res = await api.get("/categories");
       setCategories(res.data.categories || []);
     } catch (error) {
       console.error("CATEGORY ERROR:", error);
@@ -49,12 +50,9 @@ export default function EditProduct() {
   const fetchProduct = async () => {
     try {
       const token = localStorage.getItem("vendorToken");
-      const { data } = await axios.get(
-        `http://localhost:5000/api/products/${id}`,
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        }
-      );
+      const { data } = await api.get(`/products/${id}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
 
       const product = data.product;
       setProductData({
@@ -142,7 +140,7 @@ export default function EditProduct() {
         formData.append("images", images[i]);
       }
 
-      await axios.put(`http://localhost:5000/api/products/${id}`, formData, {
+      await api.put(`/products/${id}`, formData, {
         headers: {
           Authorization: `Bearer ${token}`,
           "Content-Type": "multipart/form-data",

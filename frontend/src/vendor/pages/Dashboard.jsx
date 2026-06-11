@@ -10,6 +10,7 @@ import Sidebar from "../components/Sidebar";
 import Navbar from "../components/Navbar";
 
 import StatCard from "../components/StatCard";
+import api from "../api/api";
 
 export default function Dashboard() {
 
@@ -39,8 +40,8 @@ export default function Dashboard() {
           );
 
         const { data } =
-          await axios.get(
-            "http://localhost:5000/api/dashboard/stats",
+          await api.get(
+            "/dashboard/stats",
             {
               headers: {
                 Authorization:

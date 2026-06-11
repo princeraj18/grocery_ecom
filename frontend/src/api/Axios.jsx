@@ -1,9 +1,8 @@
-// src/api/api.js
-
 import axios from "axios";
 
 const api = axios.create({
-  baseURL: "http://localhost:5000/api",
+  // Dynamically points to your live Vercel config in production, or localhost in development
+  baseURL: import.meta.env.VITE_API_BASE_URL || "http://localhost:5000/api",
   headers: {
     "Content-Type": "application/json",
   },
@@ -20,7 +19,7 @@ api.interceptors.request.use(
       config.headers.Authorization = `Bearer ${token}`;
     }
 
-    return config;
+  return config;
   },
   (error) => Promise.reject(error)
 );

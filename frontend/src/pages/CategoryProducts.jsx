@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useParams, Link, useNavigate } from "react-router-dom";
 import { FaBoxes, FaArrowLeft, FaShoppingBag } from "react-icons/fa";
 import axios from "axios";
+import api from "../api/Axios";
 
 const CategoryProducts = () => {
   const { category } = useParams();
@@ -16,8 +17,8 @@ const CategoryProducts = () => {
       try {
         setLoading(true);
         const [productsRes, categoriesRes] = await Promise.all([
-          axios.get("http://localhost:5000/api/products"),
-          axios.get("http://localhost:5000/api/categories"),
+          api.get("/products"),
+          api.get("/categories"),
         ]);
 
         setProducts(productsRes.data.products || []);

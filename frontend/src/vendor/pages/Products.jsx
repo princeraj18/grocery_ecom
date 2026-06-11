@@ -15,6 +15,7 @@ import {
 } from "lucide-react";
 import Sidebar from "../components/Sidebar";
 import Navbar from "../components/Navbar";
+import api from "../api/api";
 
 export default function Products() {
   const [products, setProducts] = useState([]);
@@ -29,8 +30,8 @@ export default function Products() {
     try {
       setLoading(true);
       const token = localStorage.getItem("vendorToken");
-      const { data } = await axios.get(
-        "http://localhost:5000/api/products/vendor",
+      const { data } = await api.get(
+        "/products/vendor",
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -56,7 +57,7 @@ export default function Products() {
 
     try {
       const token = localStorage.getItem("vendorToken");
-      await axios.delete(`http://localhost:5000/api/products/${id}`, {
+      await api.delete(`/products/${id}`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },

@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
 import ThemeToggle from "../components/ThemeToggle";
+import api from "../api/api";
 
 export default function VendorResetPassword() {
   const { token } = useParams();
@@ -28,7 +29,7 @@ export default function VendorResetPassword() {
     setLoading(true);
 
     try {
-      const res = await axios.post("http://localhost:5000/api/vendors/reset-password", {
+      const res = await api.post("/vendors/reset-password", {
         token,
         password,
       });

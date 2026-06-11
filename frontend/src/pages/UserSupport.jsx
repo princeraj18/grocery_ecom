@@ -4,6 +4,7 @@ import React, {
 } from "react";
 
 import axios from "axios";
+import api from "../api/Axios";
 
 const UserSupport = () => {
 
@@ -27,8 +28,8 @@ const UserSupport = () => {
           );
 
         const { data } =
-          await axios.get(
-            "http://localhost:5000/api/contact/my-supports",
+          await api.get(
+            "/contact/my-supports",
             {
               headers: {
                 Authorization:

@@ -17,6 +17,7 @@ import {
 
 import Sidebar from "../components/Sidebar";
 import Navbar from "../components/Navbar";
+import api from "../api/api";
 
 export default function Orders() {
   // =========================================
@@ -33,7 +34,7 @@ export default function Orders() {
   const fetchOrders = async () => {
     try {
       const token = localStorage.getItem("vendorToken");
-      const { data } = await axios.get("http://localhost:5000/api/orders/vendor", {
+      const { data } = await api.get("/orders/vendor", {
         headers: { Authorization: `Bearer ${token}` },
       });
       setOrders(data.orders || []);
@@ -50,7 +51,7 @@ export default function Orders() {
   const fetchPartners = async () => {
     try {
       const token = localStorage.getItem("vendorToken");
-      const { data } = await axios.get("http://localhost:5000/api/delivery-partners/all", {
+      const { data } = await api.get("/delivery-partners/all", {
         headers: { Authorization: `Bearer ${token}` },
       });
       setPartners(data.partners || []);
@@ -65,8 +66,8 @@ export default function Orders() {
   const updateStatus = async (orderId, status) => {
     try {
       const token = localStorage.getItem("vendorToken");
-      await axios.put(
-        `http://localhost:5000/api/orders/${orderId}`,
+      await api.put(
+        `/orders/${orderId}`,
         { orderStatus: status },
         { headers: { Authorization: `Bearer ${token}` } }
       );
@@ -84,8 +85,8 @@ export default function Orders() {
     if (!partnerId) return;
     try {
       const token = localStorage.getItem("vendorToken");
-      const { data } = await axios.put(
-        "http://localhost:5000/api/orders/assign-delivery-partner",
+      const { data } = await api.put(
+        "/orders/assign-delivery-partner",
         { orderId, deliveryPartnerId: partnerId },
         { headers: { Authorization: `Bearer ${token}` } }
       );

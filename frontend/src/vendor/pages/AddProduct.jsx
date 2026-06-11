@@ -16,6 +16,7 @@ import {
 
 import Sidebar from "../components/Sidebar";
 import Navbar from "../components/Navbar";
+import api from "../api/api";
 
 export default function AddProduct() {
   // =========================
@@ -52,7 +53,7 @@ export default function AddProduct() {
     const fetchCategories = async () => {
       try {
         setLoadingCategories(true);
-        const res = await axios.get("http://localhost:5000/api/categories");
+        const res = await api.get("/categories");
         setCategories(res.data.categories || []);
       } catch (error) {
         console.error("CATEGORY FETCH ERROR:", error);
@@ -63,7 +64,7 @@ export default function AddProduct() {
 
     const fetchVariants = async () => {
       try {
-        const res = await axios.get("http://localhost:5000/api/variants");
+        const res = await api.get("/variants");
         setVariantOptions(res.data.variants || []);
       } catch (error) {
         console.error("VARIANT FETCH ERROR:", error);
@@ -130,7 +131,7 @@ export default function AddProduct() {
         data.append("images", image);
       });
 
-      await axios.post("http://localhost:5000/api/products", data, {
+      await api.post("/products", data, {
         headers: {
           Authorization: `Bearer ${token}`,
           "Content-Type": "multipart/form-data",

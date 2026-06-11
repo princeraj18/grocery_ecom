@@ -14,6 +14,7 @@ import {
 import { ShopContext } from "../context/ShopContext";
 import ProductReview from "../components/ProductReview";
 import RelatedProducts from "../components/RelatedProducts";
+import api from "../api/Axios";
 
 const ProductDetails = () => {
   const { id } = useParams();
@@ -37,7 +38,7 @@ const ProductDetails = () => {
     const fetchProduct = async () => {
       try {
         setPageLoading(true);
-        const { data } = await axios.get(`http://localhost:5000/api/products/${id}`);
+        const { data } = await api.get(`/products/${id}`);
         const productData = data.product;
 
         setProduct(productData);
@@ -63,7 +64,7 @@ const ProductDetails = () => {
     const checkWishlist = async () => {
       if (!userId || !product?._id) return;
       try {
-        const { data } = await axios.get(`http://localhost:5000/api/wishlist/${userId}`);
+        const { data } = await api.get(`/wishlist/${userId}`);
         const exists = data.wishlist.some((item) => item.product?._id === product._id);
         setIsWishlisted(exists);
       } catch (error) {
@@ -85,13 +86,13 @@ const ProductDetails = () => {
 
     try {
       if (isWishlisted) {
-        await axios.delete("http://localhost:5000/api/wishlist/remove", {
+        await api.delete("/wishlist/remove", {
           data: { userId, productId: product._id },
         });
         setIsWishlisted(false);
         alert("Removed from wishlist");
       } else {
-        await axios.post("http://localhost:5000/api/wishlist/add", {
+        await api.post("/wishlist/add", {
           userId,
           productId: product._id,
         });

@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { FaStar, FaRegStar, FaCircleNotch, FaLock } from "react-icons/fa";
+import api from "../api/Axios";
 
 export default function ProductReview({ productId }) {
   // =========================
@@ -36,7 +37,7 @@ export default function ProductReview({ productId }) {
   const fetchReviews = async () => {
     try {
       setReviewsLoading(true);
-      const { data } = await axios.get(
+      const { data } = await api.get(
         `http://localhost:5000/api/reviews/product/${productId}`
       );
       setReviews(data.reviews || []);

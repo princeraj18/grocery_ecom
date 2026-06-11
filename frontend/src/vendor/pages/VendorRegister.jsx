@@ -9,6 +9,7 @@ import {
   Link,
 } from "react-router-dom";
 import ThemeToggle from "../components/ThemeToggle";
+import api from "../api/api";
 
 export default function VendorRegister() {
 
@@ -53,8 +54,8 @@ export default function VendorRegister() {
         setLoading(true);
 
         const { data } =
-          await axios.post(
-            "http://localhost:5000/api/vendors/register",
+          await api.post(
+            "/vendors/register",
             formData
           );
 

@@ -7,6 +7,7 @@ import { useNavigate } from "react-router-dom";
 
 import axios from "axios";
 import ThemeToggle from "./ThemeToggle";
+import api from "../api/api";
 
 export default function Navbar() {
 
@@ -33,7 +34,7 @@ export default function Navbar() {
           if (!token) return;
 
           const { data } =
-            await axios.get(
+            await api.get(
               "http://localhost:5000/api/vendors/profile",
               {
                 headers: {
