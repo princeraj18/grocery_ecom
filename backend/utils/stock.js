@@ -1,4 +1,4 @@
-import Product from "../models/Product.model.js";
+import Product from "../models/product.model.js";
 import Variant from "../models/Variant.model.js";
 
 export const getVariantStock = async (
