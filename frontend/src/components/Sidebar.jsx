@@ -34,6 +34,8 @@ const Sidebar = ({
   const links = [
     { label: "Home", path: "/" },
     { label: "Products", path: "/products" },
+     { label: "Orders", path: "/orders" },
+
     { label: "About Us", path: "/about" },
     { label: "Coupons", path: "/coupons" },
     {
